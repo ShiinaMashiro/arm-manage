@@ -1,0 +1,308 @@
+<template>
+  <div class="dev-list">
+    <div class="dev-list-search">
+      <div class="search-btn">
+        <el-button size="small" type="primary" @click="addAppPopShow = true" v-if="$store.getters.checkChangeAuth()">新增/更新应用</el-button>
+        <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
+      </div>
+      <div class="search-advanced" v-show="advancedShow">
+        <div class="search-main">
+          <div class="search-main-item">
+            <span>应用名称:</span>
+            <div class="item-input">
+              <el-input v-model="searchInfo.appNameLike" size="mini"></el-input>
+            </div>
+          </div>
+          <div class="search-main-item">
+            <span>APK名称:</span>
+            <div class="item-input">
+              <el-input v-model="searchInfo.apkNameLike" size="mini"></el-input>
+            </div>
+          </div>
+          <div class="search-main-item">
+            <span>APPID:</span>
+            <div class="item-input">
+              <el-input v-model="searchInfo.appId" size="mini"></el-input>
+            </div>
+          </div>
+        </div>
+        <div class="search-btn">
+          <el-button size="mini" @click="advancedShow = false">取消</el-button>
+          <el-button type="primary" size="mini" @click="getAppList">搜索</el-button>
+        </div>
+      </div>
+    </div>
+    <div class="device-case-dev border-all">
+      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column type="selection"></el-table-column>
+        <el-table-column prop="appName" label="应用名称"></el-table-column>
+        <el-table-column prop="packageName" label="包名"></el-table-column>
+        <el-table-column prop="versionName" label="版本"></el-table-column>
+        <el-table-column prop="appId" label="APPID"></el-table-column>
+        <el-table-column min-width="120px" label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="goDetail(scope.row)">编辑</el-button>
+            <el-button type="text" size="small" @click="goGroup(scope.row)">分组</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="list-bottom">
+        <div class="list-bottom-btn">
+          <el-button size="small" plain :disabled="multipleSelection.length === 0" v-if="$store.getters.checkChangeAuth()" @click="apkOffBatch">下架</el-button>
+        </div>
+        <el-pagination
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="page.startPage"
+                :page-sizes="[20, 50, 100]"
+                :page-size="page.limit"
+                layout="total, sizes, prev, pager, next"
+                :total="info.total">
+        </el-pagination>
+      </div>
+      <!-- 上传应用 -->
+      <el-dialog title="新增应用" ref="uploadPop" :append-to-body="true"
+                 :close-on-click-modal="false" :show-close="false"
+                 :visible.sync="addAppPopShow" width="500px">
+        <div>
+          <el-form ref="form" :model="addAppExtraInfo" label-width="100px">
+            <el-form-item label="是否授权">
+              <el-switch v-model="addAppExtraInfo.isRoot"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item label="是否预启动">
+              <el-switch v-model="addAppExtraInfo.isPrestart"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item>
+              <el-upload
+                      class="upload-demo"
+                      ref="upload"
+                      :headers="$store.getters.getHeaders"
+                      :action="$uri.apk.apkAdd"
+                      :data="addAppExtraInfo"
+                      :file-list="addAppFileList"
+                      accept="apk"
+                      :limit="1"
+                      :multiple="false"
+                      :on-success="handleSuccess"
+                      :before-upload="handleUpload"
+                      :on-progress="handleProgress"
+                      :auto-upload="false">
+                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传apk文件</div>
+              </el-upload>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" :disabled="addAppPopCloseTip" @click="submitUpload">确定</el-button>
+              <el-button @click="tipFileUpload">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+
+</template>
+
+<script>
+  export default {
+    name: "AppList",
+    data () {
+      return {
+        info: {
+          success: false,
+          list: [],
+          total: 0
+        },
+        page: { // 分页参数
+          startPage: 1,
+          limit: 20
+        },
+        multipleSelection: [], // 选中的对象列表
+        addAppPopShow: false, // 显示添加应用弹窗
+        addAppPopCloseTip: false,
+        addAppExtraInfo: {
+          isRoot: "0",
+          isPrestart: "0"
+        },
+        addAppFileList: [],
+        advancedShow: false,
+        searchInfo: {
+          appNameLike: "",
+          apkNameLike: "",
+          appId: "",
+          apkStatus: 1
+        }
+      }
+    },
+    methods: {
+      /* 表单击行事件 */
+      checkRow(r, c ,e) {
+        this.$refs.multipleTable.toggleRowSelection(r)
+      },
+      /* 获取应用列表 */
+      getAppList () {
+        let that = this
+        that.$post(that.$uri.apk.apkList, {...that.page, ...that.searchInfo}).then(res => {
+          that.info = res
+        })
+      },
+      /* 当前页改变 */
+      currentChangeHandle (val) {
+        this.page.startPage = val
+        this.getAppList()
+      },
+      /* 每页条数改变 */
+      sizeChangeHandle (val) {
+        this.page.limit = val
+        this.getAppList()
+      },
+      /* 获取选中的数据 */
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+        console.log(this.multipleSelection)
+      },
+      /* 下架应用 */
+      async apkOff (id) {
+        let that = this
+        await that.$post(that.$uri.apk.apkOff, {id})
+      },
+      /* 批量下架应用 */
+      apkOffBatch () {
+        let ids = []
+        this.multipleSelection.forEach(v => {
+          ids.push(v.id)
+        })
+        let that = this
+        that.$post(that.$uri.apk.apkOff, {ids}).then(res => {
+          this.$message.success("下架完成")
+          this.getAppList()
+        })
+      },
+      /* 关闭弹窗并暂停文件传输 */
+      closeUploadPop () {
+        this.addAppPopShow = false
+        this.addAppPopCloseTip = false
+        this.$refs.upload.clearFiles()
+      },
+      /* 上传文件 */
+      submitUpload() {
+        this.$refs.upload.submit()
+      },
+      /* 文件传输成功回调 */
+      handleSuccess(response, file, fileList) {
+        if (response.success) {
+          this.addAppPopShow = false
+          this.$message.success("上传成功")
+          this.closeUploadPop()
+          this.getAppList()
+        } else {
+          console.log(response)
+          this.$message.error("上传失败")
+          this.$refs.upload.clearFiles()
+        }
+      },
+      handleProgress (event, file, fileList) {
+        if (!this.addAppPopShow) {
+          this.$refs.upload.abort(file)
+          this.$refs.upload.clearFiles()
+        }
+      },
+      handleUpload () {
+        this.addAppPopCloseTip = true
+      },
+      /* 上传文件中关闭弹窗提醒 */
+      tipFileUpload () {
+        if (this.addAppPopCloseTip) {
+          this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
+            type: "warning"
+          }).then( () => {
+            this.closeUploadPop()
+          }).catch( () => {})
+        } else {
+          this.closeUploadPop()
+        }
+      },
+      /* 前往详情页 */
+      goDetail (info) {
+        this.$store.commit(this.$mutation.APP_DETAIL, info)
+        this.$router.push("/home/app/detail")
+      },
+      /* 前往分组页 */
+      goGroup (info) {
+        this.$store.commit(this.$mutation.APP_DETAIL, info)
+        this.$router.push("/home/app/group")
+      }
+    },
+    filters: {
+    },
+    mounted () {
+      this.getAppList()
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .dev-list {
+    .dev-list-search {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      .search-btn {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .search-advanced {
+        display: flex;
+        flex-direction: column;
+        .search-main {
+          margin-top: 10px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          .search-main-item {
+            width: 24%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            /*flex-grow: 1;*/
+            padding: 5px 10px;
+            span {
+              font-size: 12px;
+            }
+            .item-input {
+              width: 180px;
+            }
+          }
+        }
+        .search-btn {
+          padding: 0 10px;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          align-items: center;
+        }
+      }
+    }
+    .device-case-dev {
+      margin-top: 10px;
+      .list-bottom {
+        padding: 10px 8px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .list-bottom-btn {
+          display: flex;
+          flex-direction: row;
+        }
+      }
+    }
+  }
+</style>

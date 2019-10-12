@@ -1,0 +1,326 @@
+<template>
+  <div class="dev-list">
+    <div class="dev-list-search">
+      <div class="search-btn">
+        <el-button size="small" type="primary" @click="addUserPop" v-if="$store.getters.checkChangeAuth()">添加用户组</el-button>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+      </div>
+    </div>
+    <div class="device-case-dev border-all">
+      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%">
+        <el-table-column type="index" label="ID"></el-table-column>
+        <el-table-column prop="groupName" label="用户组"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="changeUserPop(scope.row)" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+            <el-button type="text" size="small" @click="delUser(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="list-bottom">
+        <div class="list-bottom-btn">
+
+        </div>
+        <el-pagination
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="page.startPage"
+                :page-sizes="[20, 50, 100]"
+                :page-size="page.limit"
+                layout="total, sizes, prev, pager, next"
+                :total="info.total">
+        </el-pagination>
+      </div>
+      <!-- 添加用户 -->
+      <el-dialog title="添加用户组" :append-to-body="true" :visible.sync="addUserPopShow" width="500px">
+        <div>
+          <el-form ref="form" :model="addUserInfo" label-width="100px">
+            <el-form-item label="用户组名称">
+              <el-input v-model="addUserInfo.groupName"></el-input>
+            </el-form-item>
+            <el-card class="box-card" style="margin-bottom: 10px">
+              <div slot="header" class="clearfix">
+                <span>管理权限</span>
+                <el-button style="float: right; padding: 3px 0" type="text" @click="checkAll">全选</el-button>
+              </div>
+              <template v-for="(item, index) in authority">
+                <el-checkbox-group v-model="item.value" :key="index" size="mini">
+                  <el-checkbox-button disabled label="">{{item.name}}</el-checkbox-button>
+                  <el-checkbox-button :label="item.query">查看</el-checkbox-button>
+                  <el-checkbox-button :label="item.change">修改</el-checkbox-button>
+                </el-checkbox-group>
+              </template>
+            </el-card>
+            <el-form-item>
+              <el-button type="primary" @click="addUser">确定</el-button>
+              <el-button @click="addUserPopShow = false">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-dialog>
+      <!-- 修改用户 -->
+      <el-dialog title="修改用户组" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px">
+        <div>
+          <el-form ref="form" :model="changeUserInfo" label-width="100px">
+            <el-form-item label="用户组名称">
+              <el-input v-model="changeUserInfo.groupName"></el-input>
+            </el-form-item>
+            <el-card class="box-card" style="margin-bottom: 10px">
+              <div slot="header" class="clearfix">
+                <span>管理权限</span>
+                <el-button style="float: right; padding: 3px 0" type="text" @click="checkAll">全选</el-button>
+              </div>
+              <template v-for="(item, index) in authority">
+                <el-checkbox-group v-model="item.value" :key="index" size="mini">
+                  <el-checkbox-button disabled label="">{{item.name}}</el-checkbox-button>
+                  <el-checkbox-button :label="item.query">查看</el-checkbox-button>
+                  <el-checkbox-button :label="item.change">修改</el-checkbox-button>
+                </el-checkbox-group>
+              </template>
+            </el-card>
+            <el-form-item>
+              <el-button type="primary" @click="changeUser">确定</el-button>
+              <el-button @click="changeUserPopShow = false">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-dialog>
+    </div>
+  </div>
+
+</template>
+
+<script>
+  export default {
+    name: "UserGroupList",
+    data () {
+      return {
+        info: {
+          success: false,
+          list: [],
+          total: 0
+        },
+        page: { // 分页参数
+          startPage: 1,
+          limit: 20
+        },
+        addUserPopShow: false, // 显示手动添加弹窗
+        addUserInfo: {
+          groupName: "",
+          authority: ""
+        },
+        changeUserPopShow: false, // 显示修改用户弹窗
+        changeUserInfo: {
+          id: "",
+          groupName: "",
+          authority: ""
+        },
+        authority: [
+          {
+            name: "系统管理",
+            query: "_0001_",
+            change: "_0000_",
+            value: []
+          },
+          {
+            name: "用户管理",
+            query: "_0101_",
+            change: "_0100_",
+            value: []
+          },
+          {
+            name: "设备管理",
+            query: "_0201_",
+            change: "_0200_",
+            value: []
+          },
+          {
+            name: "应用管理",
+            query: "_0301_",
+            change: "_0300_",
+            value: ""
+          },
+          /*{
+            name: "分组管理",
+            query: "_0401_",
+            change: "_0400_",
+            value: []
+          },*/
+          {
+            name: "日志管理",
+            query: "_0501_",
+            change: "_0500_",
+            value: []
+          }
+        ]
+      }
+    },
+    methods: {
+      /* 全选 */
+      checkAll () {
+        let i = 0;
+        this.authority.forEach(v => {
+          i += v.value.length
+        })
+        this.authority.forEach(v => {
+          v.value = i === 12 ? [] : [v.query, v.change]
+        })
+      },
+      /* 获取用户组列表 */
+      getUserList () {
+        let that = this
+        that.$post(that.$uri.user.groupList, {...that.page}).then(res => {
+          that.info = res
+        })
+      },
+      /* 当前页改变 */
+      currentChangeHandle (val) {
+        this.page.startPage = val
+        this.getUserList()
+      },
+      /* 每页条数改变 */
+      sizeChangeHandle (val) {
+        this.page.limit = val
+        this.getUserList()
+      },
+      /* 添加用户组 */
+      addUserPop () {
+        this.authority.forEach(v => {
+          v.value = []
+        })
+        this.addUserPopShow = true
+      },
+      /* 添加用户 */
+      addUser () {
+        if (!this.addUserInfo.groupName) {
+          this.$message.error("用户组名称不能为空")
+          return
+        }
+        let list = []
+        this.authority.forEach(v => {
+            list = [...list, ...v.value]
+        })
+        this.addUserInfo.authority = list.join()
+        let that = this
+        that.$post(that.$uri.user.groupAdd, that.addUserInfo).then(res => {
+          that.$message.success("添加成功")
+          that.addUserPopShow = false
+          that.getUserList()
+        })
+      },
+      /* 修改用户弹窗 */
+      changeUserPop (row) {
+        this.changeUserInfo.id = row.id
+        this.changeUserInfo.groupName = row.groupName
+        let a = row.authority
+        this.authority.forEach(v => {
+          let list = []
+          if (a.indexOf(v.query) !== -1) {
+            list.push(v.query)
+          }
+          if (a.indexOf(v.change) !== -1) {
+            list.push(v.change)
+          }
+          v.value = list
+        })
+        this.changeUserPopShow = true
+      },
+      /* 修改用户 */
+      changeUser () {
+        if (!this.changeUserInfo.groupName) {
+          this.$message.error("用户组名称不能为空")
+          return
+        }
+        let list = []
+        this.authority.forEach(v => {
+          list = [...list, ...v.value]
+        })
+        this.changeUserInfo.authority = list.join()
+        let that = this
+        that.$post(that.$uri.user.groupInfoSave, that.changeUserInfo).then(res => {
+          that.$message.success("修改成功")
+          that.changeUserPopShow = false
+          that.getUserList()
+        })
+      },
+      /* 删除用户 */
+      delUser (id) {
+        this.$confirm("确认删除用户？", "提示", {
+          type: "warning"
+        }).then( () => {
+          let that = this
+          that.$post(that.$uri.user.groupDelete, {id}).then(res => {
+            that.$message.success("删除成功")
+            that.getUserList()
+          })
+        }).catch( () => {})
+      }
+    },
+    mounted () {
+      this.getUserList()
+    }
+  };
+</script>
+
+<style lang="less" scoped>
+  .dev-list {
+    .dev-list-search {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      .search-btn {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      .search-advanced {
+        display: flex;
+        flex-direction: column;
+        .search-main {
+          margin-top: 10px;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          flex-wrap: wrap;
+          .search-main-item {
+            /*width: 24%;*/
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            /*flex-grow: 1;*/
+            padding: 5px 10px;
+            span {
+              font-size: 12px;
+              margin-right: 6px;
+            }
+            .item-input {
+              width: 180px;
+            }
+          }
+        }
+        .search-btn {
+          padding: 0 10px;
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-end;
+          align-items: center;
+        }
+      }
+    }
+    .device-case-dev {
+      margin-top: 10px;
+      .list-bottom {
+        padding: 10px 8px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .list-bottom-btn {
+          display: flex;
+          flex-direction: row;
+        }
+      }
+    }
+  }
+</style>

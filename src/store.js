@@ -1,10 +1,398 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import * as mutation from "./mutation-types"
+import * as action from "./action-types"
+import router from "./router"
 
 Vue.use(Vuex);
 
+const vm = new Vue()
+
+const state = {
+  loginState: false,
+  loginForwardPath: "/home",
+  h5TestUrl: "http://oreki/mosico/player/index?appkey=ffffccec3c124642967fe476cef558c4&appid=0&requestUrl=oreki" +
+    "/mosico/player/bootstrap&reportUrl=oreki/mosico/player/terminate&ljyip=oreki",
+  orekiIp: "",
+  userInfo: {
+    id: 0,
+    username: '',
+    token: '',
+    authority: '_0000_,_0001_,_0100_,_0101_,_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,_0500_,_0501_'
+  },
+  caseInfo: {
+    id: 0,
+    caseNo: "",
+    initialPort: 0,
+    route: "",
+    netmask: "",
+    dns: "",
+    isStatus: 0,
+    isLock: 1,
+    nodeIp: "",
+    nodeIpBak: "",
+    remark: "",
+    deviceNum: 0,
+    deviceNumIsDistributed: 0,
+    deviceNumIsFault: 0,
+    ntpAddress: ""
+  },
+  appInfo: {
+    id: "",
+    appId: ""
+  },
+  groupInfo: {
+    id: 0
+  },
+  sideCheck: -1,
+  sceneCheck: 0,
+  sideItems: [
+    {
+      src: "dev",
+      name: "设备管理",
+      authorCode: "_02",
+      queryAuthor: "_0201_",
+      updateAuthor: "_0200_",
+      children: [
+        {
+          name: "设备池",
+          path: '/home/deviceCase',
+          author: '_0201_',
+          sceneList: [
+            {
+              name: "设备池详情",
+              path: "/home/deviceCaseDetail",
+              author: "_0201_"
+            }, {
+              name: "池内设备",
+              path: "/home/deviceCaseDev",
+              author: "_0201_"
+            }
+          ]
+        },
+        {
+          name: "设备列表",
+          path: '/home/deviceList',
+          author: '_0201_'
+        },
+        {
+          name: "分组列表",
+          path: '/home/group/list',
+          author: '_0201_',
+          sceneList: [
+            {
+              name: "新增设备",
+              path: "/home/group/dev/manage",
+              author: "_0201_"
+            }, {
+              name: "组内设备",
+              path: "/home/group/dev",
+              author: "_0201_"
+            }, {
+              name: "应用管理",
+              path: "/home/group/app/manage",
+              author: "_0201_"
+            }
+          ]
+        }
+      ]
+    }, {
+      src: "app",
+      name: "应用管理",
+      authorCode: "_03",
+      queryAuthor: "_0301_",
+      updateAuthor: "_0300_",
+      children: [
+        {
+          name: "应用列表",
+          path: '/home/app/list',
+          author: '_0301_',
+          sceneList: [
+            {
+              name: "应用详情",
+              path: "/home/app/detail",
+              author: "_0301_"
+            }, {
+              name: "所属分组",
+              path: "/home/app/group",
+              author: "_0301_"
+            }
+          ]
+        }, {
+          name: "应用恢复",
+          path: "/home/app/recover",
+          author: "_0300_"
+        }
+      ]
+    }, /*{
+      src: "group",
+      name: "分组管理",
+      authorCode: "_04",
+      queryAuthor: "_0401_",
+      updateAuthor: "_0400_",
+      children: [
+        {
+          name: "分组列表",
+          path: '/home/group/list',
+          author: '_0401_',
+          sceneList: [
+            {
+              name: "设备管理",
+              path: "/home/group/dev/manage",
+              author: "_0401_"
+            }, {
+              name: "组内设备",
+              path: "/home/group/dev",
+              author: "_0401_"
+            }, {
+              name: "应用管理",
+              path: "/home/group/app/manage",
+              author: "_0401_"
+            }
+          ]
+        }
+      ]
+    },*/ {
+      src: "log",
+      name: "日志管理",
+      authorCode: "_05",
+      queryAuthor: "_0501_",
+      updateAuthor: "_0500_",
+      children: [
+        {
+          name: "操作日志",
+          path: '/home/log/operation',
+          author: '_0501_'
+        },
+        {
+          name: "调度日志",
+          path: '/home/log/dispatch',
+          author: '_0501_'
+        }
+      ]
+    }, {
+      src: "user",
+      name: "用户管理",
+      authorCode: "_01",
+      queryAuthor: "_0101_",
+      updateAuthor: "_0100_",
+      children: [
+        {
+          name: "用户列表",
+          path: '/home/user/list',
+          author: '_0101_'
+        },
+        {
+          name: "用户组列表",
+          path: '/home/user/group/list',
+          author: '_0101_'
+        }
+      ]
+    }, {
+      src: "system",
+      name: "系统管理",
+      authorCode: "_00",
+      queryAuthor: "_0001_",
+      updateAuthor: "_0000_",
+      children: [
+        {
+          name: "系统信息",
+          path: '/home/system',
+          author: '_0001_'
+        }
+      ]
+    }
+  ]
+}
+
+for (let item in state) {
+  sessionStorage.getItem(item) ? state[item] = JSON.parse(sessionStorage.getItem(item)) : false;
+}
+
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {}
+  state,
+  mutations: {
+    /* 登陆成功保存登陆信息 */
+    [mutation.LOGIN_INFO] (state, user) {
+      if (user.id !== state.userInfo.id) {
+        state.sideCheck = -1
+      }
+      state.userInfo = user
+      sessionStorage.setItem('userInfo', JSON.stringify(user))
+    },
+    /* 查看设备池详情跳转时保存信息 */
+    [mutation.CASE_DETAIL] (state, caseInfo) {
+      state.caseInfo = caseInfo
+      sessionStorage.setItem('caseInfo', JSON.stringify(caseInfo))
+    },
+    /* 保存查看详情的appId */
+    [mutation.APP_DETAIL] (state, appInfo) {
+      state.appInfo = appInfo
+      sessionStorage.setItem('appInfo', JSON.stringify(appInfo))
+    },
+    /* 保存要操作的分组的信息 */
+    [mutation.GROUP_DETAIL] (state, groupInfo) {
+      state.groupInfo = groupInfo
+      sessionStorage.setItem('groupInfo', JSON.stringify(groupInfo))
+    },
+    /* 保存sideBar的checked */
+    [mutation.SIDE_CHECK] (state, checked) {
+      state.sideCheck = checked
+      sessionStorage.setItem('sideCheck', JSON.stringify(checked))
+    },
+    /* 保存mainScene的checked */
+    [mutation.SCENE_CHECK] (state, checked) {
+      state.sceneCheck = checked
+      sessionStorage.setItem('sceneCheck', JSON.stringify(checked))
+    },
+    /* 保存token过期回到登陆界面前的路由 */
+    [mutation.LOGIN_FORWARD_PATH] (state, path) {
+      state.loginForwardPath = path
+      sessionStorage.setItem('loginForwardPath', JSON.stringify(path))
+    },
+    /* 保存oreki——ip */
+    [mutation.OREKI_IP] (state, ip) {
+      state.orekiIp = ip
+      sessionStorage.setItem('orekiIp', JSON.stringify(ip))
+    }
+  },
+  actions: {
+    /* 登陆 */
+    [action.LOGIN] ({commit, state}, loginInfo) {
+      let that = vm
+      that.$post(that.$uri.login.login, loginInfo).then(res => {
+        commit(mutation.LOGIN_INFO, res.data)
+        router.push("/home")
+      })
+    },
+    /* 查看设备池详情 */
+    [action.GO_CASE_DETAIL] ({commit}, caseInfo) {
+      for (let v in caseInfo) {
+        if (typeof v === "number") {
+          caseInfo[v] = v + ""
+        }
+      }
+      commit(mutation.CASE_DETAIL, caseInfo)
+      commit(mutation.SIDE_CHECK, 0)
+      commit(mutation.SCENE_CHECK, 0)
+      router.push("/home/deviceCaseDetail")
+    },
+    /* 查看设备列表 */
+    [action.GO_CASE_DEV] ({commit}, caseInfo) {
+      for (let v in caseInfo) {
+        if (typeof v === "number") {
+          caseInfo[v] = v + ""
+        }
+      }
+      commit(mutation.CASE_DETAIL, caseInfo)
+      commit(mutation.SIDE_CHECK, 0)
+      commit(mutation.SCENE_CHECK, 0)
+      router.push("/home/deviceCaseDev")
+    }
+  },
+  getters: {
+    /* 检查是否有当前模块的修改权限 */
+    checkChangeAuth: (state) => () => {
+      let route = router.currentRoute
+      if (!route.meta || !route.meta.changeAuth) {
+        return true
+      }
+      return state.userInfo.authority.indexOf(route.meta.changeAuth) !== -1
+    },
+    /* 获取推流链接 */
+    h5TestUrl: (state) => (deviceId) => {
+      let url = state.h5TestUrl + "&deviceId=" + deviceId
+      return url.split("oreki").join(state.orekiIp)
+    },
+    /* 获取权限过滤后的展示信息 */
+    authorItems (state) {
+      let list = []
+      state.sideItems.forEach(i => {
+        if (state.userInfo.authority.indexOf(i.authorCode) !== -1) {
+          list.push(i)
+        }
+      })
+      return list
+    },
+    /* 获取请求头部 */
+    getHeaders (state) {
+      return {
+        userId: state.userInfo.id,
+        username: state.userInfo.username,
+        token: state.userInfo.token
+      }
+    },
+    /* 判断用户是否有权限 */
+    checkChildAuthor: (state) => (authorCode) => {
+      return state.userInfo.authority.indexOf(authorCode) !== -1
+    },
+    /* 获取设备池详情页面所需的list */
+    detailTableList (state) {
+      let list = []
+      list.push({
+        name: 'ID',
+        value: state.caseInfo.id
+      })
+      list.push({
+        name: '设备池编号',
+        value: state.caseInfo.caseNo
+      })
+      list.push({
+        name: '初始端口',
+        value: state.caseInfo.initialPort
+      })
+      list.push({
+        name: '网关',
+        value: state.caseInfo.route
+      })
+      list.push({
+        name: '掩码',
+        value: state.caseInfo.netmask
+      })
+      list.push({
+        name: 'DNS',
+        value: state.caseInfo.dns
+      })
+      list.push({
+        name: '是否有状态',
+        value: state.caseInfo.isStatus ? "有" : "无"
+      })
+      list.push({
+        name: 'IP是否锁定',
+        value: state.caseInfo.isLock === 1 ? "否" : "是"
+      })
+      list.push({
+        name: '分层处理器IP',
+        value: state.caseInfo.nodeIp
+      })
+      list.push({
+        name: '备用分层处理器IP',
+        value: state.caseInfo.nodeIpBak
+      })
+      list.push({
+        name: '备注',
+        value: state.caseInfo.remark
+      })
+      list.push({
+        name: '设备数量',
+        value: state.caseInfo.deviceNum
+      })
+      list.push({
+        name: '受控设备数量',
+        value: state.caseInfo.deviceNumIsDistributed
+      })
+      list.push({
+        name: '故障设备数量',
+        value: state.caseInfo.deviceNumIsFault
+      })
+      list.push({
+        name: 'NTP服务器地址',
+        value: state.caseInfo.ntpAddress
+      })
+      list.forEach(v => {
+        v.value += ''
+      })
+      return list
+    }
+  }
 });
