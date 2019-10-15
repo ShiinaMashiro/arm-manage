@@ -3,7 +3,7 @@
     <div class="arm-logo">
       <div class="arm-logo-wrapper">
         <TopBarItem2 class="arm-icon">
-          <img class="img" src="../assets/logo.png" />
+          <img class="img" src="../assets/lj.png" />
         </TopBarItem2>
         <TopBarItem2 class="sys-link">
           <span>龙境安卓云系统管理软件</span>
@@ -15,7 +15,6 @@
         <img class="img" src="../assets/user__easyico.png" />
       </TopBarItem>
     </div>
-
   </div>
 </template>
 

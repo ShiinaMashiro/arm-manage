@@ -18,7 +18,12 @@ export const uri = {
         paramGet: '/system/edit', // 系统参数获取
         paramSave: '/system/saveEdit', // 系统参数修改
         logGet: '/syslog/edit/', // sysLog参数获取
-        logSave: '/syslog/saveEdit' // sysLog参数修改
+        logSave: '/syslog/saveEdit', // sysLog参数修改
+        engineCodeList: '/bmEngine/list', // 引擎编码表列表
+        engineCodeInfo: '/bmEngine/edit', // 引擎编码信息
+        engineCodeAdd: '/bmEngine/saveAdd', // 引擎编码新增
+        engineCodeChange: '/bmEngine/saveEdit', // 引擎编码修改
+        engineCodeDelete: '/bmEngine/delete', // 引擎编码删除
     },
     user: { // 用户管理模块
         list: '/user/list', // 用户信息列表

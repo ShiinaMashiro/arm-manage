@@ -142,11 +142,24 @@
             name: "是否预启动",
             value: v.isPrestart === "1" ? "是" : "否"
           })
-          list.push({
-            name: "推流最大码率",
-            value: v.encodeRateMax + ""
-          })
-          that.list = list
+          if (v.encodeRateMax > 0) {
+            list.push({
+              name: "推流最大码率",
+              value: v.encodeRateMax + ""
+            })
+            that.list = list
+          } else {
+            that.$post(that.$uri.system.paramGet, {paramName: 'encodeRateMax'}).then(res => {
+              if (res.success) {
+                v.encodeRateMax = res.data.paramValue
+              }
+              list.push({
+                name: "推流最大码率",
+                value: v.encodeRateMax + ""
+              })
+              that.list = list
+            })
+          }
         })
       }
     },

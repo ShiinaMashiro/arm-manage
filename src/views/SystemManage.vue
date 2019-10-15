@@ -7,13 +7,14 @@
       <div class="detail-table-body">
         <DetailTableItem class="detail-table-body-item" name="设备引擎版本" style="width: 100%">
           <div class="engine-info">
-            <div class="engine-version">
+            <!--<div class="engine-version">
               <template v-for="(item, index) in engineList">
                 <span :key="index">{{item.engineTypeName}}</span>
               </template>
-            </div>
+            </div>-->
             <el-button type="text" @click="engineUpdatePopShow = true" v-if="$store.getters.checkChangeAuth()">引擎升级</el-button>
             <el-button type="text" @click="checkVersion" v-if="$store.getters.checkChangeAuth()">版本检查</el-button>
+            <el-button type="text" @click="versionPop" v-if="$store.getters.checkChangeAuth()">版本管理</el-button>
           </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="管理系统版本">
@@ -40,8 +41,8 @@
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="运维信息">
           <div class="engine-info">
-            <el-button type="text" @click="emailPopShow = true" v-if="$store.getters.checkChangeAuth()">运维邮箱</el-button>
-            <el-button type="text" @click="phonePopShow = true" v-if="$store.getters.checkChangeAuth()">运维电话</el-button>
+            <el-button type="text" @click="emailPopShow = true; emailAddShow = false" v-if="$store.getters.checkChangeAuth()">运维邮箱</el-button>
+            <el-button type="text" @click="phonePopShow = true; phoneAddShow = false" v-if="$store.getters.checkChangeAuth()">运维电话</el-button>
           </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="推流最大码率">
@@ -54,6 +55,12 @@
           <div class="engine-info">
             <span class="engine-version">{{systemParams.ntpAddress}}</span>
             <el-button type="text" @click="ntpChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
+        </DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" name="公网IP">
+          <div class="engine-info">
+            <span class="engine-version">{{systemParams.extranetIp}}</span>
+            <el-button type="text" @click="netIpChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
           </div>
         </DetailTableItem>
       </div>
@@ -298,6 +305,20 @@
         </el-form>
       </div>
     </el-dialog>
+    <!-- 公网配置 -->
+    <el-dialog title="公网配置" :append-to-body="true" :visible.sync="netIpChangePopShow" width="500px">
+      <div>
+        <el-form ref="form" :model="netIpChangeInfo" label-width="100px">
+          <el-form-item label="IP/域名">
+            <el-input v-model="netIpChangeInfo.extranetIp"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="netIpChange">确定</el-button>
+            <el-button @click="netIpChangePopShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
     <!-- 推流配置 -->
     <el-dialog title="推流配置" :append-to-body="true" :visible.sync="rateChangePopShow" width="500px">
       <div>
@@ -319,6 +340,38 @@
         </el-form>
       </div>
     </el-dialog>
+    <!-- 引擎版本配置 -->
+    <el-dialog title="引擎版本管理" :append-to-body="true" :visible.sync="versionPopShow" width="500px">
+      <div>
+        <el-form ref="form" :model="versionAddInfo" label-width="100px">
+          <el-button type="primary" size="small" @click="versionAddShow = true" v-if="!versionAddShow">新增版本</el-button>
+          <div v-if="versionAddShow" style="padding: 0 0 0 10px;display: flex;">
+            <el-form :inline="true" size="small" :model="versionAddInfo">
+              <el-form-item label="引擎编码">
+                <el-input type="text" style="width: 80px" placeholder="数字" show-word-limit
+                          maxlength="4" v-model="versionAddInfo.code"></el-input>
+              </el-form-item>
+              <el-form-item label="引擎版本">
+                <el-input type="text" style="width: 148px" placeholder="数字/字母" show-word-limit
+                          maxlength="20" v-model="versionAddInfo.content"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="versionAdd">确定</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div style="display: flex;flex-direction: column;border-top: thin solid gray; margin-top: 10px;max-height: 400px;overflow-y: auto">
+            <template v-for="(item, index) in versionInfoList">
+              <div style="display: flex;flex-direction: row;justify-content: space-between;padding: 5px 10px;" :key="index">
+                <div style="display: flex;justify-content: start;align-items: center;width: 150px">引擎编码：{{item.code}}</div>
+                <div style="display: flex;justify-content: start;align-items: center;width: 150px">引擎版本：{{item.content}}</div>
+                <el-button type="text" @click="versionDelete(item.code)">删除</el-button>
+              </div>
+            </template>
+          </div>
+        </el-form>
+      </div>
+    </el-dialog>
     <!-- 邮箱配置 -->
     <el-dialog title="邮箱配置" :append-to-body="true" :visible.sync="emailPopShow" width="500px">
       <div>
@@ -327,7 +380,7 @@
             <el-button type="text" @click="emailAddShow = true" v-if="!emailAddShow">新增邮箱</el-button>
           </el-form-item>
           <el-form-item label="运维邮箱">
-            <div style="display: flex;flex-direction: column">
+            <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
               <template v-for="(item, index) in emailList">
                 <div style="display: flex;flex-direction: row;justify-content: space-between">
                   <span :key="index">{{item}}</span>
@@ -354,7 +407,7 @@
             <el-button type="text" @click="phoneAddShow = true" v-if="!phoneAddShow">新增电话</el-button>
           </el-form-item>
           <el-form-item label="运维电话">
-            <div style="display: flex;flex-direction: column">
+            <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
               <template v-for="(item, index) in phoneList">
                 <div style="display: flex;flex-direction: row;justify-content: space-between">
                   <span :key="index">{{item}}</span>
@@ -386,6 +439,13 @@
     data () {
       return {
         engineUpdatePopShow: false,
+        versionPopShow: false,
+        versionInfoList: [],
+        versionAddShow: false,
+        versionAddInfo: {
+          code: '',
+          content: ''
+        },
         logChangePopShow: false,
         systemUpdatePopShow: false,
         caseTypeChangePopShow: false,
@@ -414,6 +474,10 @@
         ntpChangePopShow: false,
         ntpChangeInfo: {
           ntpAddress: ""
+        },
+        netIpChangePopShow: false,
+        netIpChangeInfo: {
+          extranetIp: ""
         },
         rateChangePopShow: false,
         rateChangeInfo: {
@@ -496,7 +560,8 @@
           email: "",
           phone: "",
           ntpAddress: "",
-          encodeRateMax: ""
+          encodeRateMax: "",
+          extranetIp: ""
         },
         systemParamIds: {
           webIp: "",
@@ -505,7 +570,8 @@
           email: "",
           phone: "",
           ntpAddress: "",
-          encodeRateMax: ""
+          encodeRateMax: "",
+          extranetIp: ""
         },
         systemVersion: ""
       }
@@ -560,6 +626,64 @@
       }
     },
     methods: {
+      versionPop () {
+        let that = this
+        that.versionAddShow = false
+        that.$post(that.$uri.system.engineCodeList).then(res => {
+          if (res.success) {
+            that.versionInfoList = res.list
+            that.versionPopShow = true
+          } else {
+            that.$message.error("获取信息失败，" + res.message)
+          }
+        })
+      },
+      versionAdd () {
+        let that = this
+        if (!/^[0-9]{1,4}$/.test(that.versionAddInfo.code) || !/^[0-9a-zA-Z]{1,20}$/.test(that.versionAddInfo.content)) {
+          that.$message.error("请按正确的格式输入参数")
+          return
+        }
+        that.$post(that.$uri.system.engineCodeAdd, that.versionAddInfo).then(res => {
+          if (res.success) {
+            that.$message.success("添加引擎版本成功")
+            that.versionAddShow = false
+            that.versionAddInfo = {code:'', content: ''}
+            that.$post(that.$uri.system.engineCodeList).then(res => {
+              if (res.success) {
+                that.versionInfoList = res.list
+              } else {
+                that.$message.error("获取信息失败，" + res.message)
+              }
+            })
+          } else {
+            that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
+          }
+        })
+      },
+      versionDelete (code) {
+        let that = this
+        this.$confirm('此操作将永久删除该引擎版本，是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        }).then(() => {
+          that.$post(that.$uri.system.engineCodeDelete, {code}).then(res => {
+            if (res.success) {
+              that.$message.success("删除成功")
+              for (let i in that.versionInfoList) {
+                if (that.versionInfoList[i].code === code) {
+                  that.versionInfoList.splice(i, 1)
+                  break
+                }
+              }
+            } else {
+              that.$message.error("删除失败，错误信息：" + res.message + "，错误码：" + res.code)
+            }
+          })
+        }).catch(() => {})
+      },
       emailAdd () {
         let emailStr = this.emailAddInfo.email
         let reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+(\.[a-zA-Z]{2,4}){1,2}$/;
@@ -889,6 +1013,31 @@
           that.$message.success("修改成功")
           that.ntpChangePopShow = false
           that.getSystemParamList()
+        })
+      },
+      /* 修改公网配置弹窗 */
+      netIpChangePop () {
+        this.netIpChangeInfo.extranetIp = this.systemParams.extranetIp
+        this.netIpChangePopShow = true
+      },
+      /* 修改公网配置 */
+      netIpChange () {
+        let that = this
+        if (!/^(?=^.{3,255}$)[a-z0-9][-a-z0-9]{0,62}(\.[a-z0-9][-a-z0-9]{0,62})+(\.[a-z]{2,3})$/.test(this.netIpChangeInfo.extranetIp)
+          && !/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/.test(this.netIpChangeInfo.extranetIp)) {
+          that.$message.error("请输入正确的ip或域名")
+          return
+        }
+        this.caseTypeChangeInfo.id = this.systemParamIds.extranetIp
+        this.caseTypeChangeInfo.paramName = "extranetIp"
+        this.caseTypeChangeInfo.paramValue = this.netIpChangeInfo.extranetIp
+        that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
+          if (res.success) {
+            that.$message.success("修改成功")
+            that.netIpChangePopShow = false
+            that.getSystemParamList()
+            that.$store.commit(that.$mutation.OREKI_IP, that.netIpChangeInfo.extranetIp)
+          }
         })
       },
       /* 修改ntp配置弹窗 */
