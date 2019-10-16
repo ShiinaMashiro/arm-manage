@@ -31,6 +31,9 @@ export default {
     that.$post(that.$uri.system.paramGet, {paramName: "extranetIp"}).then(res => {
       that.$store.commit(that.$mutation.OREKI_IP, res.data.paramValue)
     })
+    that.$post(that.$uri.system.paramGet, {paramName: "webIp"}).then(res => {
+      that.$store.commit(that.$mutation.WEB_IP, res.data.paramValue)
+    })
   }
 };
 </script>

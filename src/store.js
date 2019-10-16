@@ -12,8 +12,9 @@ const state = {
   loginState: false,
   loginForwardPath: "/home",
   h5TestUrl: "http://oreki/mosico/player/index?appkey=ffffccec3c124642967fe476cef558c4&appid=0&requestUrl=oreki" +
-    "/mosico/player/bootstrap&reportUrl=oreki/mosico/player/terminate&ljyip=oreki",
+    "/mosico/player/bootstrap&reportUrl=oreki/mosico/player/terminate&ljyip=shino",
   orekiIp: "",
+  webIp: "",
   userInfo: {
     id: 0,
     username: '',
@@ -254,6 +255,11 @@ export default new Vuex.Store({
     [mutation.OREKI_IP] (state, ip) {
       state.orekiIp = ip
       sessionStorage.setItem('orekiIp', JSON.stringify(ip))
+    },
+    /* 保存web——ip */
+    [mutation.WEB_IP] (state, ip) {
+      state.webIp = ip
+      sessionStorage.setItem('webIp', JSON.stringify(ip))
     }
   },
   actions: {
@@ -302,7 +308,11 @@ export default new Vuex.Store({
     /* 获取推流链接 */
     h5TestUrl: (state) => (deviceId) => {
       let url = state.h5TestUrl + "&deviceId=" + deviceId
-      return url.split("oreki").join(state.orekiIp)
+      url = url.split("oreki").join(state.orekiIp || state.webIp)
+      console.log(state.orekiIp)
+      console.log(state.webIp)
+      console.log(state.webIp === state.orekiIp)
+      return url.split("shino").join((state.orekiIp || state.webIp) === state.webIp ? "0.0.0.0" : state.orekiIp)
     },
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
