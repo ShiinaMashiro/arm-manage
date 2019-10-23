@@ -309,10 +309,11 @@ export default new Vuex.Store({
     h5TestUrl: (state) => (deviceId) => {
       let url = state.h5TestUrl + "&deviceId=" + deviceId
       url = url.split("oreki").join(state.orekiIp || state.webIp)
-      console.log(state.orekiIp)
-      console.log(state.webIp)
-      console.log(state.webIp === state.orekiIp)
-      return url.split("shino").join((state.orekiIp || state.webIp) === state.webIp ? "0.0.0.0" : state.orekiIp)
+      let shinoIp = (state.orekiIp || state.webIp) === state.webIp ? "0.0.0.0" : state.orekiIp
+      if (shinoIp.indexOf(":") > 0) {
+        shinoIp = shinoIp.substr(0,shinoIp.indexOf(":"))
+      }
+      return url.split("shino").join(shinoIp)
     },
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
