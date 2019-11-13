@@ -20,10 +20,15 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%">
+      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%" @row-click="checkRow" @selection-change="handleSelectionChange">
+        <el-table-column type="selection"></el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
-        <el-table-column prop="deviceNum" label="组内设备数量"></el-table-column>
+        <el-table-column label="组内设备数量">
+          <template slot-scope="scope">
+            {{deviceNum || 0}}
+          </template>
+        </el-table-column>
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>
         <el-table-column label="操作" min-width="200px">
           <template slot-scope="scope">
@@ -32,13 +37,13 @@
             <el-button type="text" size="small" @click="goAppManage(scope.row)">应用管理</el-button>
             <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
             <el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>
-            <el-button type="text" size="small" @click="confirmDelGroup(scope.row)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+            <!--<el-button type="text" size="small" @click="confirmDelGroup(scope.row)" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="apkOffBatch">下架</el-button>-->
+          <el-button size="small" plain @click="deleteBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -51,11 +56,23 @@
         </el-pagination>
       </div>
       <!-- 新增分组弹窗 -->
-      <el-dialog title="新增分组" :append-to-body="true" :visible.sync="addGroupPopShow" width="500px">
+      <el-dialog title="新增分组" :append-to-body="true" :visible.sync="addGroupPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="addGroupInfo" label-width="100px">
+          <el-form ref="form" :model="addGroupInfo" label-width="130px" label-position="left">
             <el-form-item label="分组名称">
               <el-input v-model="addGroupInfo.groupName"></el-input>
+            </el-form-item>
+            <el-form-item label="设备自主安装应用">
+              <div class="test">
+                <el-switch
+                        v-model="addGroupInfo.isAppAllow"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+                <el-tooltip effect="dark" content="允许用户在推流设备桌面时，通过apk包的形式安装应用并且不在同步时对应用进行删除。" placement="top-start">
+                  <i class="el-icon-question" style="margin-left: 5px" ></i>
+                </el-tooltip>
+              </div>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="addGroup">确定</el-button>
@@ -65,9 +82,9 @@
         </div>
       </el-dialog>
       <!-- 修改分组弹窗 -->
-      <el-dialog title="修改分组名称" :append-to-body="true" :visible.sync="changeGroupPopShow" width="500px">
+      <el-dialog title="修改分组名称" :append-to-body="true" :visible.sync="changeGroupPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="changeGroupInfo" label-width="100px">
+          <el-form ref="form" :model="changeGroupInfo" label-width="130px" label-position="left">
             <el-form-item label="分组名称">
               <el-input v-model="changeGroupInfo.groupName"></el-input>
             </el-form-item>
@@ -81,10 +98,10 @@
     </div>
     <!-- 上传文件 -->
     <el-dialog title="上传文件" :append-to-body="true"
-               :close-on-click-modal="false" :show-close="false"
+               :close-on-click-modal="false" :show-close="false" top="15vh"
                :visible.sync="uploadFilePopShow" width="500px">
       <div>
-        <el-form ref="form" :model="uploadFileExtraInfo" label-width="100px">
+        <el-form ref="form" :model="uploadFileExtraInfo" label-width="130px" label-position="left">
           <el-form-item>
             <el-upload
                     class="upload-demo"
@@ -125,13 +142,15 @@ export default {
         list: [],
         total: 0
       },
+      multipleSelection: [],
       page: { // 分页参数
         startPage: 1,
         limit: 20
       },
       addGroupPopShow: false, // 显示添加分组弹窗
       addGroupInfo: {
-        groupName: ""
+        groupName: "",
+        isAppAllow: "0"
       },
       delGroupPopShow: false, // 显示删除分组弹窗
       changeGroupPopShow: false, // 显示修改分组名称弹窗
@@ -152,6 +171,15 @@ export default {
   computed: {
   },
   methods: {
+    /* 表单击行事件 */
+    checkRow(r, c ,e) {
+      this.$refs.multipleTable.toggleRowSelection(r)
+    },
+    /* 获取选中的数据 */
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+      console.log(this.multipleSelection)
+    },
     /* 获取分组列表 */
     getGroupList () {
       let that = this
@@ -269,6 +297,24 @@ export default {
         this.$refs.upload.abort(file)
         this.$refs.upload.clearFiles()
       }
+    },
+    /* 删除设备池 */
+    async asyncDelete (id) {
+      let that = this
+      await that.$post(that.$uri.group.delete, {id})
+    },
+    /* 批量删除设备池 */
+    deleteBatch () {
+      this.$confirm("确认批量删除分组？", "提示", {
+        type: "warning"
+      }).then( () => {
+        this.multipleSelection.forEach(v => {
+          this.asyncDelete(v.id)
+        })
+        this.$message.success("删除完成")
+        let that = this
+        setTimeout(() => {that.getGroupList()}, 1000)
+      }).catch( () => {})
     },
     /* 管理 */
     manage (info) {

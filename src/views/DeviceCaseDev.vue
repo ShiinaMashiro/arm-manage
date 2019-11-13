@@ -53,7 +53,7 @@
               :total="info.total">
       </el-pagination>
     </div>
-    <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow">
+    <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
       <el-select v-model="groupInfo.groupId" placeholder="请选择">
         <el-option
                 v-for="item in options"

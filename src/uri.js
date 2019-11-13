@@ -62,7 +62,10 @@ export const uri = {
         apkDelete: '/apk/delete', // 应用删除
         apkGroupMerge: '/apk/saveApkGroupMerge', // 应用关联分组
         apkOff: '/apk/off', // 应用下架
-        apkUp: '/apk/up' //应用上架
+        apkUp: '/apk/up', //应用上架
+        apkMonitorDelete: '/apkIssued/delete', //应用安装监控信息删除
+        apkMonitorDeleteAll: '/apkIssued/deleteAll', //应用安装监控信息全部删除
+        apkMonitor: '/apkIssued/list' //应用安装监控信息列表
     },
     group: { // 分组管理模块
         list: '/group/list', // 分组信息列表
@@ -79,5 +82,23 @@ export const uri = {
         dispatchLog: '/log/dispatch', // 调度日志列表
         operationLogDelete: '/log/deleteOperation', // 操作日志删除
         dispatchLogDelete: '/log/deleteDispatch' // 调度日志删除
+    },
+    help: { // 帮助中心
+        faqList: '/faq/list', // FAQ信息列表
+        faqInfo: '/faq/edit', // FAQ信息
+        faqAdd: '/faq/saveAdd', // FAQ信息新增
+        faqModify: '/faq/saveEdit', // FAQ信息修改
+        faqDelete: '/faq/delete', // FAQ信息删除
+        funClassList: '/introductionCategory/list', // 功能介绍大类信息列表
+        funClassInfo: '/introductionCategory/edit/', // 功能介绍大类信息
+        funClassAdd: '/introductionCategory/saveAdd', // 功能介绍大类信息新增
+        funClassModify: '/introductionCategory/saveEdit', // 功能介绍大类信息修改
+        funClassDelete: '/introductionCategory/delete', // 功能介绍大类信息删除
+        funList: '/introduction/list', // 功能介绍信息列表
+        funInfo: '/introduction/edit', // 功能介绍信息
+        funAdd: '/introduction/saveAdd', // 功能介绍信息新增
+        funModify: '/introduction/saveEdit', // 功能介绍信息修改
+        funDelete: '/introduction/delete', // 功能介绍信息删除
+        funImgAdd: '/uploadFile', // 功能介绍信息图片增加
     }
 }

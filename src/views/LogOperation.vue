@@ -39,7 +39,8 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%">
+      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column type="selection"></el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="username" label="用户名" min-width="80px"></el-table-column>
         <el-table-column prop="remark" label="操作内容" min-width="150px"></el-table-column>
@@ -48,15 +49,15 @@
             {{scope.row.updateTime | formatDateTime}}
           </template>
         </el-table-column>
-        <el-table-column min-width="80px" label="操作">
+        <!--<el-table-column min-width="80px" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="logDelete(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="apkOffBatch">下架</el-button>-->
+          <el-button size="small" plain @click="deleteCaseBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -134,6 +135,10 @@
       }
     },
     methods: {
+      /* 表单击行事件 */
+      checkRow(r, c ,e) {
+        this.$refs.multipleTable.toggleRowSelection(r)
+      },
       /* 获取操作日志列表 */
       getLogList () {
         let that = this
@@ -157,6 +162,24 @@
       handleSelectionChange (val) {
         this.multipleSelection = val
         console.log(this.multipleSelection)
+      },
+      /* 删除设备池 */
+      async deleteCase (id) {
+        let that = this
+        await that.$post(that.$uri.log.operationLogDelete, {id})
+      },
+      /* 批量删除设备池 */
+      deleteCaseBatch () {
+        this.$confirm("确认批量删除日志？", "提示", {
+          type: "warning"
+        }).then( () => {
+          this.multipleSelection.forEach(v => {
+            this.deleteCase(v.id)
+          })
+          this.$message.success("删除完成")
+          let that = this
+          setTimeout(() => {that.getLogList()}, 1000)
+        }).catch( () => {})
       },
       /* 删除日志 */
       logDelete (id) {

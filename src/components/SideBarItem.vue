@@ -1,17 +1,30 @@
-<template>
-  <div class="side-bar-item" :style="checkStyle" @click="clickHandler">
+<template xmlns:v-popover="http://www.w3.org/1999/xhtml">
+  <div class="side-bar-item" :style="checkStyle" @click="clickHandler" v-popover:guide2>
     <div class="item-icon center-container">
-      <!--<img :src="item.src">-->
       <i class="iconfont" v-if="item.src === 'dev'">&#xe8a8;</i>
       <i class="iconfont" v-if="item.src === 'group'">&#xe8b1;</i>
       <i class="iconfont" v-if="item.src === 'log'">&#xe74d;</i>
       <i class="iconfont" v-if="item.src === 'system'">&#xe610;</i>
       <i class="iconfont" v-if="item.src === 'user'">&#xe638;</i>
       <i class="iconfont" v-if="item.src === 'app'">&#xe600;</i>
+      <i class="iconfont" v-if="item.src === 'admin'">&#xe601;</i>
     </div>
     <div class="item-name ">
       <span>{{item.name}}</span>
     </div>
+    <el-popover
+            ref="guide2"
+            placement="right"
+            title=""
+            width="250"
+            :value="$store.getters.isGuideShow(index + 2) && show"
+            trigger="manual">
+      <p style="white-space: pre-line">{{guideContent}}</p>
+      <div style="text-align: right; margin: 0">
+        <el-button size="mini" type="text" @click="jumpStep">跳过</el-button>
+        <el-button type="primary" size="mini" @click="nextStep">下一步</el-button>
+      </div>
+    </el-popover>
   </div>
 </template>
 
@@ -25,15 +38,41 @@ export default {
   },
   computed: {
     checkStyle () {
-      return this.index === this.value
+      return this.index == this.$store.state.sideCheck
         ? {backgroundColor: "#00c1de!important"} : {}
+    },
+    guideContent() {
+      switch (this.item.src) {
+        case "dev": return "设备管理用于管理您的设备和设备池，还能按照分组的形式管理您的设备。设备池可以对设备的网络进行设置。";
+        case "app": return "应用管理用于应用的添加、更新、删除以及关联分组，提供查看应用安装与卸载状态的应用监控功能。";
+        case "log": return "日志管理用于查看设备的调度日志和管理人员的操作日志。";
+        case "user": return "用户管理用于添加并管理用户和用户组，从而实现登录账户的权限控制。";
+        case "system": return "系统管理用于管理系统参数、设备引擎版本，同时可对系统和设备引擎进行升级。如果设备需要在公网访问，则需要设置公网IP！";
+        default: return ""
+      }
+    }
+  },
+  data() {
+    return {
+      show: false
     }
   },
   methods: {
     clickHandler () {
-      this.$emit('input', this.index)
       this.$router.push(this.item.children[0].path)
+    },
+    nextStep() {
+      console.log("nextStep:" + this.index)
+      this.$store.commit(this.$mutation.GUIDE, this.$store.state.guide + 1)
+      this.$store.commit(this.$mutation.SIDE_CHECK, this.index + 1)
+    },
+    jumpStep() {
+      this.$store.commit(this.$mutation.GUIDE, 0)
+      this.$store.commit(this.$mutation.SIDE_CHECK, 0)
     }
+  },
+  mounted() {
+    this.show = this.guideContent !== ""
   }
 };
 </script>

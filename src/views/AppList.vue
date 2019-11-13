@@ -62,10 +62,10 @@
       </div>
       <!-- 上传应用 -->
       <el-dialog title="新增应用" ref="uploadPop" :append-to-body="true"
-                 :close-on-click-modal="false" :show-close="false"
+                 :close-on-click-modal="false" :show-close="false" top="15vh"
                  :visible.sync="addAppPopShow" width="500px">
         <div>
-          <el-form ref="form" :model="addAppExtraInfo" label-width="100px">
+          <el-form ref="form" :model="addAppExtraInfo" label-width="180px" label-position="left">
             <el-form-item label="是否授权">
               <el-switch v-model="addAppExtraInfo.isRoot"
                          active-value="1"
@@ -76,7 +76,35 @@
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item>
+            <el-form-item label="是否上传定位信息">
+              <el-switch v-model="addAppExtraInfo.isUploadLocationInfo"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item label="是否开启传感器">
+              <el-switch v-model="addAppExtraInfo.isSensor"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item label="退出是否清理用户数据">
+              <el-switch v-model="addAppExtraInfo.isClean"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item label="退出后是否重启设备">
+              <el-switch v-model="addAppExtraInfo.isReboot"
+                         active-value="1"
+                         inactive-value="0"></el-switch>
+            </el-form-item>
+            <el-form-item label="退出后是否关闭应用">
+              <el-select v-model="addAppExtraInfo.isStopApp" placeholder="请选择" size="small">
+                <el-option label="关闭应用" value="0"></el-option>
+                <el-option label="不关闭并放入后台" value="1"></el-option>
+                <el-option label="不关闭并留在前台" value="2"></el-option>
+              </el-select>
+            </el-form-item>
+
+            <div class="popup-flex">
               <el-upload
                       class="upload-demo"
                       ref="upload"
@@ -94,11 +122,11 @@
                 <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传apk文件</div>
               </el-upload>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" :disabled="addAppPopCloseTip" @click="submitUpload">确定</el-button>
-              <el-button @click="tipFileUpload">取消</el-button>
-            </el-form-item>
+              <div style="margin-top: 20px">
+                <el-button type="primary" :disabled="addAppPopCloseTip" @click="submitUpload">确定</el-button>
+                <el-button @click="tipFileUpload">取消</el-button>
+              </div>
+            </div>
           </el-form>
         </div>
       </el-dialog>
@@ -126,7 +154,12 @@
         addAppPopCloseTip: false,
         addAppExtraInfo: {
           isRoot: "0",
-          isPrestart: "0"
+          isPrestart: "0",
+          isClean: "0",
+          isReboot: "0",
+          isSensor: "0",
+          isUploadLocationInfo: "0",
+          isStopApp: 0
         },
         addAppFileList: [],
         advancedShow: false,

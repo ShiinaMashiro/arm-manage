@@ -7,19 +7,20 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%">
+      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column type="selection"></el-table-column>
         <el-table-column type="index" label="ID"></el-table-column>
         <el-table-column prop="groupName" label="用户组"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="changeUserPop(scope.row)" v-if="$store.getters.checkChangeAuth()">修改</el-button>
-            <el-button type="text" size="small" @click="delUser(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+            <!--<el-button type="text" size="small" @click="delUser(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-
+          <el-button size="small" plain @click="deleteCaseBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -32,9 +33,9 @@
         </el-pagination>
       </div>
       <!-- 添加用户 -->
-      <el-dialog title="添加用户组" :append-to-body="true" :visible.sync="addUserPopShow" width="500px">
+      <el-dialog title="添加用户组" :append-to-body="true" :visible.sync="addUserPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="addUserInfo" label-width="100px">
+          <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
             <el-form-item label="用户组名称">
               <el-input v-model="addUserInfo.groupName"></el-input>
             </el-form-item>
@@ -59,9 +60,9 @@
         </div>
       </el-dialog>
       <!-- 修改用户 -->
-      <el-dialog title="修改用户组" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px">
+      <el-dialog title="修改用户组" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="changeUserInfo" label-width="100px">
+          <el-form ref="form" :model="changeUserInfo" label-width="130px" label-position="left">
             <el-form-item label="用户组名称">
               <el-input v-model="changeUserInfo.groupName"></el-input>
             </el-form-item>
@@ -104,6 +105,7 @@
           startPage: 1,
           limit: 20
         },
+        multipleSelection: [],
         addUserPopShow: false, // 显示手动添加弹窗
         addUserInfo: {
           groupName: "",
@@ -156,6 +158,33 @@
       }
     },
     methods: {
+      /* 表单击行事件 */
+      checkRow(r, c ,e) {
+        this.$refs.multipleTable.toggleRowSelection(r)
+      },
+      /* 删除设备池 */
+      async deleteCase (id) {
+        let that = this
+        await that.$post(that.$uri.user.groupDelete, {id})
+      },
+      /* 批量删除设备池 */
+      deleteCaseBatch () {
+        this.$confirm("确认批量删除用户组？", "提示", {
+          type: "warning"
+        }).then( () => {
+          this.multipleSelection.forEach(v => {
+            this.deleteCase(v.id)
+          })
+          this.$message.success("删除完成")
+          let that = this
+          setTimeout(() => {that.getUserList()}, 1000)
+        }).catch( () => {})
+      },
+      /* 获取选中的数据 */
+      handleSelectionChange (val) {
+        this.multipleSelection = val
+        console.log(this.multipleSelection)
+      },
       /* 全选 */
       checkAll () {
         let i = 0;

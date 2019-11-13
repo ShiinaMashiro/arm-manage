@@ -10,7 +10,8 @@ export default {
   props: {
     value: Number,
     index: Number,
-    item: Object
+    item: Object,
+    scene: Boolean
   },
   data () {
     return {
@@ -19,12 +20,18 @@ export default {
   },
   computed: {
     checkStyle () {
-      return this.index === this.value ? {backgroundColor: '#fff!important'} : {}
+      // console.log("style")
+      // console.log(this.$store.state.sceneChildCheck)
+      // console.log(this.$store.state.sceneCheck)
+      // console.log(this.index)
+      let check = this.scene ? this.$store.state.sceneChildCheck : this.$store.state.sceneCheck
+      return this.index == check ? {backgroundColor: '#fff!important'} : {}
     }
   },
   methods: {
     check () {
       this.$emit('input', this.index)
+      // this.$store.commit(this.$mutation.SCENE_CHECK, {checked: this.index, scene: this.scene})
       this.$router.replace(this.item.path)
     }
   }

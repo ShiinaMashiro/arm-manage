@@ -21,9 +21,9 @@
       </div>
 
       <!-- 网络设置 -->
-      <el-dialog title="网络设置" :append-to-body="true" :visible.sync="networkPopShow" width="500px">
+      <el-dialog title="网络设置" :append-to-body="true" :visible.sync="networkPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="caseInfo" label-width="100px">
+          <el-form ref="form" :model="caseInfo" label-width="130px" label-position="left">
             <el-form-item label="网关">
               <el-input v-model="caseInfo.route"></el-input>
             </el-form-item>
@@ -57,9 +57,9 @@
         </div>
       </el-dialog>
       <!-- 分层设置 -->
-      <el-dialog title="分层设置" :append-to-body="true" :visible.sync="nodePopShow" width="500px">
+      <el-dialog title="分层设置" :append-to-body="true" :visible.sync="nodePopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="caseInfo" label-width="100px">
+          <el-form ref="form" :model="caseInfo" label-width="150px" label-position="left">
             <el-form-item label="分层处理器IP">
               <el-input v-model="caseInfo.nodeIp"></el-input>
             </el-form-item>
@@ -74,9 +74,9 @@
         </div>
       </el-dialog>
       <!-- ip设置 -->
-      <el-dialog title="修改设备IP" :append-to-body="true" :visible.sync="ipPopShow" width="500px">
+      <el-dialog title="修改设备IP" :append-to-body="true" :visible.sync="ipPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="ipChangeInfo" label-width="100px">
+          <el-form ref="form" :model="ipChangeInfo" label-width="130px" label-position="left">
             <el-form-item label="设备起始IP">
               <el-input v-model="ipChangeInfo.initialIp"></el-input>
             </el-form-item>
@@ -97,7 +97,7 @@
         </div>
       </el-dialog>
       <!-- ip设置成功 -->
-      <el-dialog title="IP批量修改成功" :append-to-body="true" :visible.sync="ipSuccessPopShow" width="500px">
+      <el-dialog title="IP批量修改成功" :append-to-body="true" :visible.sync="ipSuccessPopShow" width="500px" top="15vh">
         <div>
           <el-table :data="ipSuccessList">
             <el-table-column type="index" label="ID"></el-table-column>
@@ -115,9 +115,9 @@
         </div>
       </el-dialog>
       <!-- 备注设置 -->
-      <el-dialog title="修改备注" :append-to-body="true" :visible.sync="remarkPopShow" width="500px">
+      <el-dialog title="修改备注" :append-to-body="true" :visible.sync="remarkPopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="caseInfo" label-width="100px">
+          <el-form ref="form" :model="caseInfo" label-width="130px" label-position="left">
             <el-form-item label="备注">
               <el-input v-model="caseInfo.remark"></el-input>
             </el-form-item>

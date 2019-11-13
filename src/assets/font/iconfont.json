@@ -1,0 +1,65 @@
+{
+  "id": "1110961",
+  "name": "arm",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1301",
+      "name": "应用",
+      "font_class": "yingyong",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "978324",
+      "name": "用户",
+      "font_class": "yonghu",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "1029209",
+      "name": "设置",
+      "font_class": "setting-1-copy",
+      "unicode": "e610",
+      "unicode_decimal": 58896
+    },
+    {
+      "icon_id": "1391283",
+      "name": "设置",
+      "font_class": "shezhi",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "2057780",
+      "name": "sls日志服务",
+      "font_class": "slsrizhifuwu",
+      "unicode": "e74d",
+      "unicode_decimal": 59213
+    },
+    {
+      "icon_id": "3248639",
+      "name": "管理员",
+      "font_class": "guanliyuan",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "5583375",
+      "name": "ecs 云服务器ECS",
+      "font_class": "ecsyunfuwuqiECS",
+      "unicode": "e8a8",
+      "unicode_decimal": 59560
+    },
+    {
+      "icon_id": "5583413",
+      "name": "ots 表格存储",
+      "font_class": "otsbiaogecunchu",
+      "unicode": "e8b1",
+      "unicode_decimal": 59569
+    }
+  ]
+}

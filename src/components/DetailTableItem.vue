@@ -1,6 +1,6 @@
 <template>
   <div class="detail-table-item">
-    <span class="name">{{name}}:</span>
+    <span class="name" style="padding: 12px 0">{{name}}:</span>
     <span class="param">{{param}}</span>
   </div>
 </template>

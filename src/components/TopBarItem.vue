@@ -5,9 +5,9 @@
       <UserInfo @change="changePasswordPop"></UserInfo>
     </template>
     <!-- 修改密码 -->
-    <el-dialog title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px">
+    <el-dialog title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="changeInfo" label-width="100px">
+        <el-form ref="form" :model="changeInfo" label-width="130px" label-position="left">
           <el-form-item label="原密码">
             <el-input v-model="changeInfo.oldPassword" type="password"></el-input>
           </el-form-item>

@@ -63,6 +63,18 @@
             <el-button type="text" @click="netIpChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
           </div>
         </DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" name="设备自主安装应用">
+          <div class="engine-info">
+            <span class="engine-version">{{systemParams.isAppAllow == 1 ? "是" : "否"}}</span>
+            <el-button type="text" @click="appAllowChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
+        </DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" name="推流帧率">
+          <div class="engine-info">
+            <span class="engine-version">{{systemParams.framerate}}</span>
+            <el-button type="text" @click="frameRateChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
+        </DetailTableItem>
       </div>
     </div>
 
@@ -80,34 +92,52 @@
       </div>
       <div class="detail-table-body">
         <DetailTableItem class="detail-table-body-item" name="日志输出方式">
-          <span>{{this.sysLogInfo.data.output | logOutput}}</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.output | logOutput}}</span>
+            <el-button type="text" @click="sysLogChangePop('output')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="日志文件的大小">
-          <span>{{this.sysLogInfo.data.fileSize}}M</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.fileSize}}M</span>
+            <el-button type="text" @click="sysLogChangePop('fileSize')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="日志服务器的地址">
-          <span>{{this.sysLogInfo.data.udpServer}}</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.udpServer}}</span>
+            <el-button type="text" @click="sysLogChangePop('udpServer')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="日志服务器的端口">
-          <span>{{this.sysLogInfo.data.udpPort}}</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.udpPort}}</span>
+            <el-button type="text" @click="sysLogChangePop('udpPort')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="远程日志级别">
-          <span>{{this.sysLogInfo.data.remoteLevel | logLevel}}</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.remoteLevel | logLevel}}</span>
+            <el-button type="text" @click="sysLogChangePop('remoteLevel')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="日志级别">
-          <span>{{this.sysLogInfo.data.logLevel | logLevel}}</span>
+          <div class="engine-info">
+            <span class="engine-version">{{this.sysLogInfo.data.logLevel | logLevel}}</span>
+            <el-button type="text" @click="sysLogChangePop('logLevel')" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
         </DetailTableItem>
       </div>
     </div>
     <div class="detail-setting">
-      <el-button type="info" plain size="small" @click="sysLogChangePop">参数设置</el-button>
+      <!--<el-button type="info" plain size="small" @click="sysLogChangePop">参数设置</el-button>-->
     </div>
     <!-- 引擎升级 -->
     <el-dialog title="引擎升级" :append-to-body="true"
-               :close-on-click-modal="false" :show-close="false"
+               :close-on-click-modal="false" :show-close="false" top="15vh"
                :visible.sync="engineUpdatePopShow" width="500px">
       <div>
-        <el-form ref="form" :model="engineUpdateExtraInfo" label-width="100px">
+        <el-form ref="form" :model="engineUpdateExtraInfo" label-width="130px" label-position="left">
           <el-form-item label="系统当前版本">
             <div style="display: flex;flex-direction: column;justify-content: flex-start">
               <template v-for="(item, index) in engineList">
@@ -163,10 +193,10 @@
       </div>
     </el-dialog>
     <!-- 日志参数设置 -->
-    <el-dialog title="日志参数设置" :append-to-body="true" :visible.sync="logChangePopShow" width="500px">
+    <el-dialog title="日志参数设置" :append-to-body="true" :visible.sync="logChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="sysLogChangeInfo" label-width="100px">
-          <el-form-item label="日志输出方式">
+        <el-form ref="form" :model="sysLogChangeInfo" label-width="130px" label-position="left">
+          <el-form-item label="日志输出方式" :style="logItemShow('output')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.output" size="samll" placeholder="引擎版本">
                 <el-option
@@ -178,7 +208,7 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="日志级别">
+          <el-form-item label="日志级别" :style="logItemShow('logLevel')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.logLevel" size="samll" placeholder="日志级别">
                 <el-option
@@ -190,7 +220,7 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="远程日志级别">
+          <el-form-item label="远程日志级别" :style="logItemShow('remoteLevel')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.remoteLevel" size="samll" placeholder="远程日志级别">
                 <el-option
@@ -202,13 +232,13 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="日志文件大小">
+          <el-form-item label="日志文件大小" :style="logItemShow('fileSize')">
             <el-input v-model="sysLogChangeInfo.fileSize"></el-input>
           </el-form-item>
-          <el-form-item label="日志服务器地址">
+          <el-form-item label="日志服务器地址" :style="logItemShow('udpServer')">
             <el-input v-model="sysLogChangeInfo.udpServer"></el-input>
           </el-form-item>
-          <el-form-item label="日志服务器端口">
+          <el-form-item label="日志服务器端口" :style="logItemShow('udpPort')">
             <el-input v-model="sysLogChangeInfo.udpPort"></el-input>
           </el-form-item>
           <el-form-item>
@@ -220,10 +250,10 @@
     </el-dialog>
     <!-- 管理系统升级 -->
     <el-dialog title="管理系统升级" :append-to-body="true"
-               :close-on-click-modal="false" :show-close="false"
+               :close-on-click-modal="false" :show-close="false" top="15vh"
                :visible.sync="systemUpdatePopShow" width="500px">
       <div>
-        <el-form ref="form" :model="sysLogChangeInfo" label-width="100px">
+        <el-form ref="form" :model="sysLogChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="系统当前版本">
             <span>{{systemVersion}}</span>
           </el-form-item>
@@ -252,9 +282,9 @@
       </div>
     </el-dialog>
     <!-- 机箱类型修改 -->
-    <el-dialog title="机箱类型修改" :append-to-body="true" :visible.sync="caseTypeChangePopShow" width="500px">
+    <el-dialog title="机箱类型修改" :append-to-body="true" :visible.sync="caseTypeChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="caseTypeChangeInfo" label-width="100px">
+        <el-form ref="form" :model="caseTypeChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="机箱类型">
             <div class="item-input">
               <el-select v-model="caseTypeChangeInfo.paramValue" size="samll" placeholder="机箱类型">
@@ -275,9 +305,9 @@
       </div>
     </el-dialog>
     <!-- 网络配置 -->
-    <el-dialog title="网络配置" :append-to-body="true" :visible.sync="netChangePopShow" width="500px">
+    <el-dialog title="网络配置" :append-to-body="true" :visible.sync="netChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="netChangeInfo" label-width="100px">
+        <el-form ref="form" :model="netChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="IP">
             <el-input v-model="netChangeInfo.ip"></el-input>
           </el-form-item>
@@ -292,9 +322,9 @@
       </div>
     </el-dialog>
     <!-- ntp配置 -->
-    <el-dialog title="NTP配置" :append-to-body="true" :visible.sync="ntpChangePopShow" width="500px">
+    <el-dialog title="NTP配置" :append-to-body="true" :visible.sync="ntpChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="ntpChangeInfo" label-width="100px">
+        <el-form ref="form" :model="ntpChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="IP/域名">
             <el-input v-model="ntpChangeInfo.ntpAddress"></el-input>
           </el-form-item>
@@ -306,9 +336,9 @@
       </div>
     </el-dialog>
     <!-- 公网配置 -->
-    <el-dialog title="公网配置" :append-to-body="true" :visible.sync="netIpChangePopShow" width="500px">
+    <el-dialog title="公网配置" :append-to-body="true" :visible.sync="netIpChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="netIpChangeInfo" label-width="100px">
+        <el-form ref="form" :model="netIpChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="IP/域名">
             <el-input v-model="netIpChangeInfo.extranetIp"></el-input>
           </el-form-item>
@@ -320,9 +350,9 @@
       </div>
     </el-dialog>
     <!-- 推流配置 -->
-    <el-dialog title="推流配置" :append-to-body="true" :visible.sync="rateChangePopShow" width="500px">
+    <el-dialog title="推流配置" :append-to-body="true" :visible.sync="rateChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="rateChangeInfo" label-width="100px">
+        <el-form ref="form" :model="rateChangeInfo" label-width="130px" label-position="left">
           <el-form-item label="码率">
             <div class="test">
               <el-input type="number" v-model="rateChangeInfo.encodeRateMax">
@@ -340,10 +370,48 @@
         </el-form>
       </div>
     </el-dialog>
-    <!-- 引擎版本配置 -->
-    <el-dialog title="引擎版本管理" :append-to-body="true" :visible.sync="versionPopShow" width="500px">
+    <!-- 推流帧率配置 -->
+    <el-dialog title="推流帧率配置" :append-to-body="true" :visible.sync="frameRateChangePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="versionAddInfo" label-width="100px">
+        <el-form ref="form" :model="frameRateChangeInfo" label-width="130px" label-position="left">
+          <el-form-item label="推流帧率">
+            <div class="test">
+              <el-input type="number" v-model="frameRateChangeInfo.framerate">
+              </el-input>
+              <el-tooltip effect="dark" content="推流帧率为应用推流时的最大帧数，建议值为1-60" placement="top-start">
+                <i class="el-icon-question" style="margin-left: 5px" ></i>
+              </el-tooltip>
+            </div>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="frameRateChange">确定</el-button>
+            <el-button @click="frameRateChangePopShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
+    <!-- 设备自主安装应用配置 -->
+    <el-dialog title="设备自主安装应用配置" :append-to-body="true" :visible.sync="appAllowChangePopShow" width="500px" top="15vh">
+      <div>
+        <el-form ref="form" :model="appAllowChangeInfo" label-width="150px" label-position="left">
+          <el-form-item label="设备自主安装应用">
+            <el-switch
+                    v-model="appAllowChangeInfo.isAppAllow"
+                    active-value="1"
+                    inactive-value="0">
+            </el-switch>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="appAllowChange">确定</el-button>
+            <el-button @click="appAllowChangePopShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
+    <!-- 引擎版本配置 -->
+    <el-dialog title="引擎版本管理" :append-to-body="true" :visible.sync="versionPopShow" width="500px" top="15vh">
+      <div>
+        <el-form ref="form" :model="versionAddInfo" label-width="130px" label-position="left">
           <el-button type="primary" size="small" @click="versionAddShow = true" v-if="!versionAddShow">新增版本</el-button>
           <div v-if="versionAddShow" style="padding: 0 0 0 10px;display: flex;">
             <el-form :inline="true" size="small" :model="versionAddInfo">
@@ -373,9 +441,9 @@
       </div>
     </el-dialog>
     <!-- 邮箱配置 -->
-    <el-dialog title="邮箱配置" :append-to-body="true" :visible.sync="emailPopShow" width="500px">
+    <el-dialog title="邮箱配置" :append-to-body="true" :visible.sync="emailPopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="emailAddInfo" label-width="100px">
+        <el-form ref="form" :model="emailAddInfo" label-width="130px" label-position="left">
           <el-form-item label="">
             <el-button type="text" @click="emailAddShow = true" v-if="!emailAddShow">新增邮箱</el-button>
           </el-form-item>
@@ -400,9 +468,9 @@
       </div>
     </el-dialog>
     <!-- 用户配置 -->
-    <el-dialog title="电话配置" :append-to-body="true" :visible.sync="phonePopShow" width="500px">
+    <el-dialog title="电话配置" :append-to-body="true" :visible.sync="phonePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="phoneAddInfo" label-width="100px">
+        <el-form ref="form" :model="phoneAddInfo" label-width="130px" label-position="left">
           <el-form-item label="">
             <el-button type="text" @click="phoneAddShow = true" v-if="!phoneAddShow">新增电话</el-button>
           </el-form-item>
@@ -483,6 +551,14 @@
         rateChangeInfo: {
           encodeRateMax: ""
         },
+        appAllowChangePopShow: false,
+        appAllowChangeInfo: {
+          isAppAllow: "0"
+        },
+        frameRateChangePopShow: false,
+        frameRateChangeInfo: {
+          framerate: ""
+        },
         caseInfo: {},
         list: [],
         engineList: [],
@@ -505,6 +581,7 @@
           udpServer: "",
           udpPort: ""
         },
+        logItem: "",
         logLevelOptions: [
           {
             label: "EMERG",
@@ -561,7 +638,9 @@
           phone: "",
           ntpAddress: "",
           encodeRateMax: "",
-          extranetIp: ""
+          extranetIp: "",
+          isAppAllow: "",
+          framerate: ""
         },
         systemParamIds: {
           webIp: "",
@@ -571,7 +650,9 @@
           phone: "",
           ntpAddress: "",
           encodeRateMax: "",
-          extranetIp: ""
+          extranetIp: "",
+          isAppAllow: "",
+          framerate: ""
         },
         systemVersion: ""
       }
@@ -626,6 +707,9 @@
       }
     },
     methods: {
+      logItemShow(item) {
+        return this.logItem === item ? {} : {"display": "none"}
+      },
       versionPop () {
         let that = this
         that.versionAddShow = false
@@ -874,8 +958,9 @@
         })
       },
       /* 修改日志参数弹窗 */
-      sysLogChangePop () {
+      sysLogChangePop (item) {
         this.sysLogChangeInfo = {...this.sysLogInfo.data}
+        this.logItem = item
         this.logChangePopShow = true
       },
       /* 修改日志参数 */
@@ -1040,7 +1125,7 @@
           }
         })
       },
-      /* 修改ntp配置弹窗 */
+      /* 修改推流配置弹窗 */
       rateChangePop () {
         this.rateChangeInfo.encodeRateMax = this.systemParams.encodeRateMax
         this.rateChangePopShow = true
@@ -1059,6 +1144,45 @@
         that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
           that.$message.success("修改成功")
           that.rateChangePopShow = false
+          that.getSystemParamList()
+        })
+      },
+      /* 修改设备自主安装配置弹窗 */
+      appAllowChangePop () {
+        this.appAllowChangeInfo.isAppAllow = this.systemParams.isAppAllow
+        this.appAllowChangePopShow = true
+      },
+      /* 修改设备自主安装配置 */
+      appAllowChange () {
+        let that = this
+        this.caseTypeChangeInfo.id = this.systemParamIds.isAppAllow
+        this.caseTypeChangeInfo.paramName = "isAppAllow"
+        this.caseTypeChangeInfo.paramValue = this.appAllowChangeInfo.isAppAllow
+        that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
+          that.$message.success("修改成功")
+          that.appAllowChangePopShow = false
+          that.getSystemParamList()
+        })
+      },
+      /* 修改推流帧率弹窗 */
+      frameRateChangePop () {
+        this.frameRateChangeInfo.framerate = this.systemParams.framerate
+        this.frameRateChangePopShow = true
+      },
+      /* 修改推流帧率配置 */
+      frameRateChange () {
+        let that = this
+        let rate = parseInt(this.frameRateChangeInfo.framerate)
+        if (!/^[0-9]+$/.test(this.frameRateChangeInfo.framerate) || (rate < 1 || rate > 60)) {
+          that.$message.error("请输入1-60的整数")
+          return
+        }
+        this.caseTypeChangeInfo.id = this.systemParamIds.framerate
+        this.caseTypeChangeInfo.paramName = "framerate"
+        this.caseTypeChangeInfo.paramValue = rate
+        that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
+          that.$message.success("修改成功")
+          that.frameRateChangePopShow = false
           that.getSystemParamList()
         })
       }
@@ -1138,4 +1262,5 @@
     justify-content: center;
     align-items: center;
   }
+
 </style>

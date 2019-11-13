@@ -54,7 +54,7 @@
                 :total="info.total">
         </el-pagination>
       </div>
-      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow">
+      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
         <el-select v-model="groupInfo.groupId" placeholder="请选择">
           <el-option
                   v-for="item in options"
@@ -68,9 +68,9 @@
           <el-button type="primary" @click="groupDev">确 定</el-button>
         </div>
       </el-dialog>
-      <el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px">
+      <el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">
         <div>
-          <el-form ref="form" :model="addDevInfo" label-width="100px">
+          <el-form ref="form" :model="addDevInfo" label-width="130px" label-position="left">
             <el-form-item label="分层处理器IP">
               <el-select v-model="addDevInfo.caseId" placeholder="请选择">
                 <el-option

@@ -19,7 +19,16 @@ import GroupListDevShow from "./views/GroupListDevShow.vue";
 import UserList from "./views/UserList.vue";
 import UserGroupList from "./views/UserGroupList.vue";
 import SystemManage from "./views/SystemManage.vue";
-import Forward from "./views/Forward.vue";
+import Manage from "./views/Manage.vue";
+import FunClass from "./views/FunClass.vue";
+import Fun from "./views/Fun.vue";
+import FunAdd from "./views/FunAdd.vue";
+import FunChange from "./views/FunChange.vue";
+import FAQ from "./views/FAQ.vue";
+import AppMonitor from "./views/AppMonitor.vue";
+import HelpFAQ from "./views/HelpFAQ.vue";
+import HelpFun from "./views/HelpFun.vue";
+import HelpFunShow from "./views/HelpFunShow.vue";
 
 Vue.use(Router);
 
@@ -30,9 +39,17 @@ export default new Router({
       name: "login",
       component: Login
     }, {
+      path: "/manage",
+      name: "后台管理",
+      component: Manage,
+      meta: {
+        changeAuth: "_0000_"
+      }
+    }, {
       path: "/home",
       name: "home",
       component: Home,
+      redirect: '/home/deviceCase',
       children: [
         {
           path: "deviceCase",
@@ -70,6 +87,13 @@ export default new Router({
           path: "app/list",
           name: "应用列表",
           component: AppList,
+          meta: {
+            changeAuth: "_0300_"
+          }
+        }, {
+          path: "app/monitor",
+          name: "应用监控",
+          component: AppMonitor,
           meta: {
             changeAuth: "_0300_"
           }
@@ -163,6 +187,66 @@ export default new Router({
           component: SystemManage,
           meta: {
             changeAuth: "_0000_"
+          }
+        }, {
+          path: "faq",
+          name: "FAQ",
+          component: FAQ,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "fun/class",
+          name: "功能介绍大类",
+          component: FunClass,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "fun",
+          name: "功能介绍",
+          component: Fun,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "fun/add",
+          name: "添加功能介绍",
+          component: FunAdd,
+          meta: {
+            c2c: true,
+            changeAuth: "_0000_"
+          }
+        },{
+          path: "fun/change",
+          name: "修改功能介绍",
+          component: FunChange,
+          meta: {
+            c2c: true,
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "help/faq",
+          name: "FAQ",
+          component: HelpFAQ,
+          meta: {
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "help/fun",
+          name: "功能介绍",
+          component: HelpFun,
+          meta: {
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "help/fun/show",
+          name: "功能介绍展示",
+          component: HelpFunShow,
+          meta: {
+            c2c: true,
+            fun: true,
+            changeAuth: "_0200_"
           }
         }
       ]

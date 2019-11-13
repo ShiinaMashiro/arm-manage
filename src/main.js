@@ -9,11 +9,25 @@ import * as muName from './mutation-types';
 import {myUtil} from './util';
 import store from "./store";
 import router from "./router";
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+import axios from 'axios'
 
+Vue.use(mavonEditor)
 Vue.use(ElementUI);
 Vue.config.productionTip = false;
 Vue.prototype.$post = postData
 Vue.prototype.$uri = uri
+Vue.prototype.$filePost = () => {
+  return axios.create({
+    timeout: 1000,
+    headers: {
+      "Content-Type": "multiple/form-data",
+      ...store.state.userInfo,
+      userId: store.state.userInfo.id
+    }
+  })
+}
 Vue.prototype.$mutation = muName
 Vue.prototype.$action = acName
 Vue.prototype.$util = myUtil

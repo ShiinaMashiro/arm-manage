@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-dialog
-            title="提示"
+            title="提示" top="15vh"
             :visible.sync="show"
-            :before-close="handleClose">
+            :before-close="handleClose"  width="500px">
       <span>{{message}}</span>
       <span slot="footer" class="dialog-footer">
     <el-button @click="show = false">取 消</el-button>

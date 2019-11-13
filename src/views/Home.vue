@@ -8,6 +8,7 @@
         <router-view></router-view>
       </div>
     </div>
+    <div :style="{display: $store.state.guide > 0 ? 'block' : 'none'}" class="mask"></div>
   </div>
 </template>
 
@@ -34,6 +35,45 @@ export default {
     that.$post(that.$uri.system.paramGet, {paramName: "webIp"}).then(res => {
       that.$store.commit(that.$mutation.WEB_IP, res.data.paramValue)
     })
+    this.$store.commit(this.$mutation.SIDE_CHECK, 0)
+    this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: 0})
+
+  },
+  updated () {
+    console.log("home: " + this.$route.path)
+    if (this.$store.state.guide > 0) {
+      return
+    }
+    let sideItem = this.$store.state.sideItems
+    for (let i in sideItem) {
+      let children = sideItem[i].children
+      for (let j in children) {
+        if (children[j].path === this.$route.path) {
+          console.log("home i - j: " + i + " - " + j)
+          this.$store.commit(this.$mutation.SIDE_CHECK, i)
+          this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: j})
+          return
+        }
+        let scene = children[j].sceneList
+        if (scene) {
+          for (let k in scene) {
+            let path = this.$route.path
+            if (scene[k].path.indexOf("?") >= 0) {
+              path += "?index=" + this.$route.query.index
+            }
+            if (scene[k].path === path) {
+              console.log("home i - j: " + i + " - " + j)
+              this.$store.commit(this.$mutation.SIDE_CHECK, i)
+              this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: j})
+              this.$store.commit(this.$mutation.SCENE_CHECK, {scene: true, checked: k})
+              return
+            }
+          }
+        }
+      }
+    }
+    this.$store.commit(this.$mutation.SIDE_CHECK, 0)
+    this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: 0})
   }
 };
 </script>
@@ -60,4 +100,14 @@ export default {
     }
   }
 }
+  .mask {
+    opacity: 0.3;
+    background-color: black;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1055;
+  }
 </style>

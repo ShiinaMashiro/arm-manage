@@ -1,12 +1,26 @@
-<template>
+<template xmlns:v-popover="http://www.w3.org/1999/xhtml">
   <div>
-    <div class="side-bar">
+    <el-popover
+            ref="guide1"
+            placement="right"
+            title=""
+            width="250"
+            :value="$store.getters.isGuideShow(1) && show"
+            trigger="manual">
+      <p>感谢您使用龙境安卓云管理软件，下面为您介绍后台的使用方法：左边栏为后台的菜单栏，可以进入各个功能入口。</p>
+      <div style="text-align: right; margin: 0">
+        <el-button size="mini" type="text" @click="$store.commit($mutation.GUIDE, 0)">跳过</el-button>
+        <el-button type="primary" size="mini" @click="$store.commit($mutation.GUIDE, $store.state.guide + 1)">下一步</el-button>
+      </div>
+    </el-popover>
+
+    <div :style="sideStyle" class="side-bar" v-popover:guide1>
       <template v-for="(item, index) in authorItems">
-        <SideBarItem :key="index" :index="index" :item="item" v-model="checked"></SideBarItem>
+        <SideBarItem v-if="item.name" :key="index" :index="index" :item="item"></SideBarItem>
       </template>
     </div>
-    <template v-if="mainSceneItem && show">
-      <MainScene :info="mainSceneItem"></MainScene>
+    <template v-if="mainSceneItem">
+      <MainScene></MainScene>
     </template>
   </div>
 </template>
@@ -20,30 +34,23 @@ export default {
     SideBarItem,
     MainScene
   },
-  data () {
+  data() {
     return {
-      checked: 0,
-      sideRecover: false,
       show: false
-    }
-  },
-  watch: {
-    checked (val) {
-      this.$store.commit(this.$mutation.SIDE_CHECK, val)
     }
   },
   computed: {
     mainSceneItem () {
-      return this.authorItems[this.checked]
+      return this.authorItems[this.$store.state.sideCheck]
     },
     authorItems () {
       return this.$store.getters.authorItems
+    },
+    sideStyle() {
+      return this.$store.state.guide > 0 ? {width: "230px"} : {}
     }
   },
-  mounted () {
-    let num = parseInt(this.$store.state.sideCheck)
-    this.sideRecover = num !== -1
-    this.checked = num === -1 ? 0 : num
+  mounted() {
     this.show = true
   }
 };

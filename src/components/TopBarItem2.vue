@@ -1,27 +1,35 @@
 <template>
-  <div class="top-bar-item">
+  <div class="top-bar-item" @click="clickHandler">
     <slot></slot>
   </div>
 </template>
 
 <script>
-import UserInfo from "@/components/UserInfo.vue";
 export default {
   name: "TopBarItem",
-  components: {UserInfo},
+  props: {
+    jump: {
+      type: Boolean,
+      default: false
+    },
+    path: {
+      type: String,
+      default: "/home"
+    }
+  },
   data () {
     return {
       show: false
     }
   },
   methods: {
-    mouseMoveHandler() {
-      this.show = true
-    },
-    mouseOutHandler() {
-      this.show = false
-    }
+    clickHandler() {
+      if (this.jump) {
+        this.$router.push(this.path)
+        this.$forceUpdate()
       }
+    }
+  }
 };
 </script>
 

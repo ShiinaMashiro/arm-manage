@@ -19,20 +19,24 @@ axios.interceptors.request.use(
   }
 )
 
+let loginTimeout = false
+
 axios.interceptors.response.use(
   (res) => {
     // console.log(res)
     let obj = res.data
     if (obj.success) {
+      loginTimeout = false
       return res.data
     } else {
-      if (obj.code === '10105') {
-        vm.$message.error("登陆状态过期")
+      if (obj.code === '10105' && !loginTimeout) {
+        loginTimeout = true
+        vm.$message.error("登录状态过期")
         store.commit("LOGIN_FORWARD_PATH", router.currentRoute.path)
         router.push("/")
       } else {
-        // let mes = obj.message | "请求失败"
-        vm.$message.error("请求失败")
+        let mes = obj.message || "请求失败"
+        vm.$message.error(mes)
       }
       return Promise.reject(obj.message)
     }

@@ -25,6 +25,12 @@ export default {
     login () {
       this.$store.dispatch(this.$action.LOGIN, this.info)
     }
+  },
+  mounted() {
+    console.log(this.$route)
+    if (this.$route.query.from === "manage") {
+      this.$store.commit(this.$mutation.MANAGE, 1)
+    }
   }
 };
 </script>

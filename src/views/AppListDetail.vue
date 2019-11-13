@@ -13,22 +13,32 @@
     </div>
     <div class="detail-table-body">
       <template v-for="(item, index) in list">
-        <DetailTableItem class="detail-table-body-item" :key="index" :name="item.name" :param="item.value"></DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" :key="index" :name="item.name" :param="item.value">
+        </DetailTableItem>
       </template>
     </div>
     <!-- 网络设置 -->
-    <el-dialog title="修改设置" :append-to-body="true" :visible.sync="changePopShow" width="500px">
+    <el-dialog title="修改设置" :append-to-body="true" :visible.sync="changePopShow" width="500px" top="15vh">
       <div>
-        <el-form ref="form" :model="appInfo" label-width="100px">
-          <el-form-item label="类名">
+        <el-form ref="form" :model="appInfo" :rules="rules" label-width="180px" label-position="left">
+          <el-form-item label="类名" prop="activity">
             <el-input v-model="appInfo.activity"></el-input>
           </el-form-item>
-          <el-form-item label="推流最大码率">
+          <el-form-item label="推流最大码率" prop="encodeRateMax">
             <div class="test">
               <el-input v-model="appInfo.encodeRateMax">
                 <div slot="suffix">kb/s</div>
               </el-input>
               <el-tooltip effect="dark" content="推流最大码率主要用于调节推流清晰度，根据网络实时进行适配，保证良好的推流体验，设置建议值1000-6000" placement="top-start">
+                <i class="el-icon-question" style="margin-left: 5px" ></i>
+              </el-tooltip>
+            </div>
+          </el-form-item>
+          <el-form-item label="推流帧率" prop="framerate">
+            <div class="test">
+              <el-input v-model="appInfo.framerate">
+              </el-input>
+              <el-tooltip effect="dark" content="推流帧率为应用推流时的最大帧数，建议值为1-60." placement="top-start">
                 <i class="el-icon-question" style="margin-left: 5px" ></i>
               </el-tooltip>
             </div>
@@ -43,10 +53,39 @@
                        active-value="1"
                        inactive-value="0"></el-switch>
           </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="saveAppInfo">确定</el-button>
-            <el-button @click="changePopShow = false">取消</el-button>
+          <el-form-item label="是否上传定位信息">
+            <el-switch v-model="appInfo.isUploadLocationInfo"
+                       active-value="1"
+                       inactive-value="0"></el-switch>
           </el-form-item>
+          <el-form-item label="是否开启传感器">
+            <el-switch v-model="appInfo.isSensor"
+                       active-value="1"
+                       inactive-value="0"></el-switch>
+          </el-form-item>
+          <el-form-item label="推出是否清理用户数据">
+            <el-switch v-model="appInfo.isClean"
+                       active-value="1"
+                       inactive-value="0"></el-switch>
+          </el-form-item>
+          <el-form-item label="退出后是否重启设备">
+            <el-switch v-model="appInfo.isReboot"
+                       active-value="1"
+                       inactive-value="0"></el-switch>
+          </el-form-item>
+          <el-form-item label="退出后是否关闭应用" prop="isStopApp">
+            <el-select v-model="appInfo.isStopApp" placeholder="请选择" size="small">
+              <el-option label="关闭应用" value="0"></el-option>
+              <el-option label="不关闭并放入后台" value="1"></el-option>
+              <el-option label="不关闭并留在前台" value="2"></el-option>
+            </el-select>
+          </el-form-item>
+          <div class="popup-flex">
+            <div>
+              <el-button type="primary" @click="saveAppInfo">确定</el-button>
+              <el-button @click="changePopShow = false">取消</el-button>
+            </div>
+          </div>
         </el-form>
       </div>
     </el-dialog>
@@ -68,18 +107,69 @@
         id: -1,
         changePopShow: false,
         appInfo: {},
-        list: []
+        list: [],
+        rules: {
+          activity: [
+            {required: true, message: "请输入类名", trigger: "blur"},
+            {min: 1, max: 200, message: "长度为1-200个字符", trigger: "blur"}
+          ],
+          encodeRateMax: [
+            {validator: (rule, value, callback) => {
+                value = parseInt(value)
+                if (!value) {
+                  return callback(new Error('不能为空'));
+                }
+                setTimeout(() => {
+                  if (!Number.isInteger(value)) {
+                    callback(new Error('请输入整数'));
+                  } else {
+                    if (value < 1000 || value > 6000) {
+                      callback(new Error('1000-6000'));
+                    } else {
+                      callback();
+                    }
+                  }
+                }, 1000);
+              }, trigger: "blur"}
+          ],
+          framerate: [
+            {validator: (rule, value, callback) => {
+                value = parseInt(value)
+                if (!value) {
+                  return callback(new Error('不能为空'));
+                }
+                setTimeout(() => {
+                  if (!Number.isInteger(value)) {
+                    callback(new Error('请输入整数'));
+                  } else {
+                    if (value < 1 || value > 60) {
+                      callback(new Error('1-60'));
+                    } else {
+                      callback();
+                    }
+                  }
+                }, 1000);
+              }, trigger: "blur"}
+          ],
+          isStopApp: [
+            {required: true, message: "不能为空", trigger: "change"}
+          ]
+        }
       }
     },
     methods: {
       /* 修改设备池信息 */
       saveAppInfo () {
         let that = this
-        that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
-          that.changePopShow = false
-          that.$message.success("修改成功")
-          // 刷新数据
-          that.getDetailList()
+        that.$refs.form.validate(valid => {
+          if (valid) {
+            that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
+              that.changePopShow = false
+              that.$message.success("修改成功")
+              // 刷新数据
+              that.getDetailList()
+            })
+          }
         })
       },
       /* 修改弹窗 */
@@ -136,11 +226,35 @@
           })
           list.push({
             name: "是否授权",
-            value: v.isRoot === "1" ? "是" : "否"
+            value: v.isRoot == "1" ? "是" : "否"
           })
           list.push({
             name: "是否预启动",
-            value: v.isPrestart === "1" ? "是" : "否"
+            value: v.isPrestart == "1" ? "是" : "否"
+          })
+          list.push({
+            name: "是否清理用户数据",
+            value: v.isClean == "1" ? "是" : "否"
+          })
+          list.push({
+            name: "应用退出后是否重启设备",
+            value: v.isReboot == "1" ? "是" : "否"
+          })
+          list.push({
+            name: "是否上传定位信息",
+            value: v.isUploadLocationInfo == "1" ? "是" : "否"
+          })
+          list.push({
+            name: "是否开启传感器",
+            value: v.isSensor == "1" ? "是" : "否"
+          })
+          list.push({
+            name: "应用退出后是否关闭",
+            value: v.isStopApp == "0" ? "关闭应用" : (v.isStopApp == "1" ? "不关闭并放入后台" : "不关闭并留在前台")
+          })
+          list.push({
+            name: "推流帧率",
+            value: v.framerate + ""
           })
           if (v.encodeRateMax > 0) {
             list.push({

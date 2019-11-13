@@ -1,6 +1,6 @@
 <template>
   <div class="home-main-top-bar">
-    <span>{{$route.name}}</span>
+    <span>{{$route.meta.fun ? $store.state.fun.title + "功能介绍" : $route.name}}</span>
   </div>
 </template>
 

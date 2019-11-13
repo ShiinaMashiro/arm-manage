@@ -4,17 +4,17 @@
       <div class="i-back" v-if="$route.meta.c2c" @click="$router.back()">
         <i class="el-icon-arrow-left"></i>
       </div>
-      <span v-else>{{info.name}}</span>
+      <span v-else>{{$store.getters.sceneName || "帮助中心"}}</span>
     </div>
     <nav class="nav-list">
       <div v-show="!$route.meta.c2c">
-        <template v-for="(item, index) in info.children">
-          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" v-model="checked" :item="item"></MainSceneItem>
+        <template v-for="(item, index) in childrenList">
+          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" :item="item"></MainSceneItem>
         </template>
       </div>
       <div v-if="$route.meta.c2c">
         <template v-for="(item, index) in sceneList">
-          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" v-model="sceneChecked" :item="item"></MainSceneItem>
+          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" :item="item" :scene="true"></MainSceneItem>
         </template>
       </div>
     </nav>
@@ -28,65 +28,18 @@ export default {
   components: {
     MainSceneItem
   },
-  props: {
-    info: Object,
-    sideRecover: Boolean
-  },
-  data () {
-    return {
-      checked: 0,
-      sceneChecked: 0
-    }
-  },
   computed: {
+    childrenList () {
+      return this.$store.state.sideItems[this.$store.state.sideCheck].children
+    },
     /* 获取展示数据list */
     sceneList () {
-      return this.info.children[this.checked].sceneList
-    }
-  },
-  watch: {
-    info (newVal) {
-        this.checked = 0
-        this.sceneChecked = 0
-    },
-    checked (val) {
-      this.$store.commit(this.$mutation.SCENE_CHECK, val)
-    }
-  },
-  methods: {
-    recoverChecked () {
-      let path = this.$route.path
-      let info = this.info.children
-      for (let i = 0; i<info.length; i++) {
-        if (path === info[i].path) {
-          this.checked = i
-          break
-        }
-        let sceneList = info[i].sceneList
-        if (sceneList) {
-          for (let j = 0; j<sceneList.length; j++) {
-            if (path === sceneList[j].path) {
-              this.sceneChecked = j
-              break
-            }
-          }
-        }
-      }
+      return this.$store.getters.sceneList
     }
   },
   mounted () {
-    // this.checked = parseInt(this.$store.state.sceneCheck)
-    this.recoverChecked()
     if (this.$route.path === "/home") {
-      this.$router.push(this.info.children[this.checked].path)
-    }
-  },
-  updated () {
-    let list = this.sceneList
-    for (let i in list) {
-      if (list[i].path === this.$route.path) {
-        this.sceneChecked = parseInt(i)
-      }
+      this.$router.push(this.childrenList[0].path)
     }
   }
 };

@@ -1,16 +1,31 @@
-<template>
+<template xmlns:v-popover="">
   <div class="home-head">
     <div class="arm-logo">
       <div class="arm-logo-wrapper">
-        <TopBarItem2 class="arm-icon">
+        <TopBarItem2 class="arm-icon" :jump="true">
           <img class="img" src="../assets/lj.png" />
         </TopBarItem2>
-        <TopBarItem2 class="sys-link">
+        <TopBarItem2 class="sys-link" :jump="true">
           <span>龙境安卓云系统管理软件</span>
         </TopBarItem2>
       </div>
     </div>
+    <el-popover
+            ref="guide3"
+            placement="bottom"
+            title=""
+            width="250"
+            :value="$store.getters.isGuideShow(7) && show"
+            trigger="manual">
+      <p>如果还有其他问题，可以进入帮助中心查看并下载用户手册。</p>
+      <div style="text-align: right; margin: 0">
+        <el-button type="primary" size="mini" @click="$store.commit($mutation.GUIDE, 0);$store.commit($mutation.SIDE_CHECK, 0)">结束</el-button>
+      </div>
+    </el-popover>
     <div class="arm-info">
+      <TopBarItem2 class="sys-link" :jump="true" path="/home/help/faq" v-popover:guide3>
+        <span>帮助中心</span>
+      </TopBarItem2>
       <TopBarItem class="head-icon" v-model="userShow">
         <img class="img" src="../assets/user__easyico.png" />
       </TopBarItem>
@@ -29,8 +44,12 @@ export default {
   },
   data () {
     return {
-      userShow: false
+      userShow: false,
+      show: false
     }
+  },
+  mounted() {
+    this.show = true
   }
 };
 </script>
@@ -86,11 +105,22 @@ export default {
     }
   }
   .arm-info {
-    /*position: absolute;*/
-    /*z-index: 3;*/
-    /*top: 0;*/
-    /*right: 0;*/
-    /*float: right !important;*/
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    .sys-link {
+      color: #fff;
+      font-size: 14px;
+      line-height: 50px;
+      margin-right: 1px;
+      /*padding: 0 12px;*/
+      text-align: center;
+      text-decoration: none;
+      span {
+        padding: 0 12px;
+      }
+    }
     .head-icon {
       /*padding: 0 12px;*/
       height: 50px;
