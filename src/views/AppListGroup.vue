@@ -4,7 +4,11 @@
       <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
-        <el-table-column prop="deviceNum" label="组内设备数量"></el-table-column>
+        <el-table-column label="组内设备数量">
+          <template slot-scope="scope">
+            {{scope.row.deviceNum || 0}}
+          </template>
+        </el-table-column>
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>
       </el-table>
       <div class="list-bottom">

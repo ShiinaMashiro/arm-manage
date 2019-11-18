@@ -105,6 +105,8 @@
     data () {
       return {
         id: -1,
+        loading: null,
+        frameRate: 0,
         changePopShow: false,
         appInfo: {},
         list: [],
@@ -161,10 +163,17 @@
       /* 修改设备池信息 */
       saveAppInfo () {
         let that = this
+        that.loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         that.$refs.form.validate(valid => {
           if (valid) {
             that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
               that.changePopShow = false
+              that.loading.close()
               that.$message.success("修改成功")
               // 刷新数据
               that.getDetailList()
@@ -191,6 +200,7 @@
           v.isRoot += ""
           v.isPrestart += ""
           that.appInfo = v
+          that.appInfo.isStopApp = that.appInfo.isStopApp + ""
           let list = []
           list.push({
             name: "应用名称",
@@ -254,7 +264,7 @@
           })
           list.push({
             name: "推流帧率",
-            value: v.framerate + ""
+            value: (v.framerate || this.frameRate) + ""
           })
           if (v.encodeRateMax > 0) {
             list.push({
@@ -279,7 +289,13 @@
     },
     created () {
       this.id = this.$store.state.appInfo.id
-      this.getDetailList()
+
+      this.$post(this.$uri.system.paramGet, {paramName: "framerate"}).then(res => {
+        if (res.success) {
+          this.frameRate = res.data.paramValue
+        }
+        this.getDetailList()
+      })
     }
   };
 </script>

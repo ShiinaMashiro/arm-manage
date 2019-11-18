@@ -36,14 +36,14 @@
         <el-table-column type="selection"></el-table-column>
         <el-table-column prop="appName" label="应用名称"></el-table-column>
         <el-table-column prop="packageName" label="包名"></el-table-column>
-        <el-table-column prop="versionCode" label="版本号"></el-table-column>
+        <el-table-column prop="versionName" label="版本号"></el-table-column>
         <el-table-column prop="appId" label="APPID"></el-table-column>
-        <el-table-column min-width="120px" label="操作">
+        <!--<el-table-column min-width="120px" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="apkUp(scope.row.id)" v-if="$store.getters.checkChangeAuth()">恢复</el-button>
             <el-button type="text" size="small" @click="apkDel(scope.row.id)"  v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
-        </el-table-column>
+        </el-table-column>-->
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">

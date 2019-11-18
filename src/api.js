@@ -26,14 +26,16 @@ axios.interceptors.response.use(
     // console.log(res)
     let obj = res.data
     if (obj.success) {
-      loginTimeout = false
+      store.commit(vm.$mutation.LOGIN_TIMEOUT, false)
       return res.data
     } else {
-      if (obj.code === '10105' && !loginTimeout) {
-        loginTimeout = true
-        vm.$message.error("登录状态过期")
-        store.commit("LOGIN_FORWARD_PATH", router.currentRoute.path)
-        router.push("/")
+      if (obj.code === '10105') {
+        if (!store.state.loginTimeout) {
+          store.commit(vm.$mutation.LOGIN_TIMEOUT, true)
+          vm.$message.error("登录状态过期")
+          store.commit("LOGIN_FORWARD_PATH", router.currentRoute.path)
+          router.push("/")
+        }
       } else {
         let mes = obj.message || "请求失败"
         vm.$message.error(mes)

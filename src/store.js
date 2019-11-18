@@ -214,7 +214,8 @@ const state = {
   sideCheck: 0,
   sceneCheck: 0,
   sceneChildCheck: 0,
-  sideItems: sideItems
+  sideItems: sideItems,
+  loginTimeout: false
 }
 
 let admin = {
@@ -371,6 +372,10 @@ export default new Vuex.Store({
     [mutation.MANAGE] (state, t) {
       state.sideItems = [...sideItems, admin]
       console.log("manage")
+    },
+    /* 登录过期 */
+    [mutation.LOGIN_TIMEOUT] (state, timeout) {
+      state.loginTimeout = timeout
     }
   },
   actions: {

@@ -26,7 +26,7 @@
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
         <el-table-column label="组内设备数量">
           <template slot-scope="scope">
-            {{deviceNum || 0}}
+            {{scope.row.deviceNum || 0}}
           </template>
         </el-table-column>
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>

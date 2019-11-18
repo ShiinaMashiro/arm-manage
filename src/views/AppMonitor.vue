@@ -76,7 +76,11 @@
             <span>{{scope.row | statusStr}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="更新时间"></el-table-column>
+        <el-table-column prop="updateTime" label="时间">
+            <template slot-scope="scope">
+              {{scope.row.updateTime | formatDateTime}}
+            </template>
+        </el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
             <span :style="scope.row | statusClassFilter">
