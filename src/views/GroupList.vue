@@ -88,6 +88,18 @@
             <el-form-item label="分组名称">
               <el-input v-model="changeGroupInfo.groupName"></el-input>
             </el-form-item>
+            <el-form-item label="设备自主安装应用">
+              <div class="test">
+                <el-switch
+                        v-model="changeGroupInfo.isAppAllow"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+                <el-tooltip effect="dark" content="允许用户在推流设备桌面时，通过apk包的形式安装应用并且不在同步时对应用进行删除。" placement="top-start">
+                  <i class="el-icon-question" style="margin-left: 5px" ></i>
+                </el-tooltip>
+              </div>
+            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="changeGroupName">确定</el-button>
               <el-button @click="changeGroupPopShow = false">取消</el-button>
@@ -156,7 +168,8 @@ export default {
       changeGroupPopShow: false, // 显示修改分组名称弹窗
       changeGroupInfo: {
         id: 0,
-        groupName: ''
+        groupName: '',
+        isAppAllow: ''
       },
       uploadFilePopShow: false,
       uploadFileExtraInfo: {
@@ -229,6 +242,7 @@ export default {
       }).then( () => {
         this.changeGroupInfo.id = row.id
         this.changeGroupInfo.groupName = row.groupName
+        this.changeGroupInfo.isAppAllow = row.isAppAllow
         this.changeGroupNamePop(row.id)
       }).catch( () => {})
     },
