@@ -147,19 +147,19 @@
         searchOptions: {
           status: [
             {
-              label: "已通知板卡删除",
+              label: "卸载中",
               value: -1
             }, {
-              label: "初始",
+              label: "设备等待下载",
               value: 1
             }, {
-              label: "已通知节点下载",
+              label: "分层下载中",
               value: 2
             }, {
-              label: "节点已下载",
+              label: "分层下载完成",
               value: 3
             }, {
-              label: "已通知板卡下载",
+              label: "设备下载中",
               value: 4
             }
           ],
@@ -246,11 +246,11 @@
     filters: {
       statusStr (row) {
         switch (row.issuedStatus) {
-          case -1: return "已通知板卡删除";
-          case 1: return "初始";
-          case 2: return "已通知节点下载";
-          case 3: return "节点已下载";
-          case 4: return "已通知板卡下载";
+          case -1: return "卸载中";
+          case 1: return "设备等待下载";
+          case 2: return "分层下载中";
+          case 3: return "分层下载完成";
+          case 4: return "设备下载中";
           default: return "未知";
         }
       },
