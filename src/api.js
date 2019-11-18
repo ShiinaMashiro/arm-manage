@@ -34,6 +34,7 @@ axios.interceptors.response.use(
           store.commit(vm.$mutation.LOGIN_TIMEOUT, true)
           vm.$message.error("登录状态过期")
           store.commit("LOGIN_FORWARD_PATH", router.currentRoute.path)
+
           router.push("/")
         }
       } else {
