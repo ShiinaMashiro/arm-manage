@@ -26,7 +26,7 @@
           </el-form-item>
           <el-form-item label="推流最大码率" prop="encodeRateMax">
             <div class="test">
-              <el-input v-model="appInfo.encodeRateMax">
+              <el-input v-model="appInfo.encodeRateMax" :placeholder="rateTip">
                 <div slot="suffix">kb/s</div>
               </el-input>
               <el-tooltip effect="dark" content="推流最大码率主要用于调节推流清晰度，根据网络实时进行适配，保证良好的推流体验，设置建议值1000-6000" placement="top-start">
@@ -36,7 +36,7 @@
           </el-form-item>
           <el-form-item label="推流帧率" prop="framerate">
             <div class="test">
-              <el-input v-model="appInfo.framerate">
+              <el-input v-model="appInfo.framerate" :placeholder="frameTip">
               </el-input>
               <el-tooltip effect="dark" content="推流帧率为应用推流时的最大帧数，建议值为1-60." placement="top-start">
                 <i class="el-icon-question" style="margin-left: 5px" ></i>
@@ -107,6 +107,7 @@
         id: -1,
         loading: null,
         frameRate: 0,
+        maxRate: 0,
         changePopShow: false,
         appInfo: {},
         list: [],
@@ -119,7 +120,7 @@
             {validator: (rule, value, callback) => {
                 value = parseInt(value)
                 if (!value) {
-                  return callback(new Error('不能为空'));
+                  return callback();
                 }
                 setTimeout(() => {
                   if (!Number.isInteger(value)) {
@@ -138,7 +139,7 @@
             {validator: (rule, value, callback) => {
                 value = parseInt(value)
                 if (!value) {
-                  return callback(new Error('不能为空'));
+                  return callback();
                 }
                 setTimeout(() => {
                   if (!Number.isInteger(value)) {
@@ -159,6 +160,14 @@
         }
       }
     },
+    computed: {
+      frameTip() {
+        return "默认系统设置的帧率(" + this.frameRate + ")"
+      },
+      rateTip() {
+        return "默认系统设置的码率(" + this.maxRate + ")"
+      }
+    },
     methods: {
       /* 修改设备池信息 */
       saveAppInfo () {
@@ -171,6 +180,12 @@
         });
         that.$refs.form.validate(valid => {
           if (valid) {
+            if (!that.appInfo.framerate) {
+              that.appInfo.framerate = 0
+            }
+            if (!that.appInfo.encodeRateMax) {
+              that.appInfo.encodeRateMax = 0
+            }
             that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
               that.changePopShow = false
               that.loading.close()
@@ -183,6 +198,12 @@
       },
       /* 修改弹窗 */
       changePop () {
+        if (this.appInfo.framerate == 0) {
+          this.appInfo.framerate = ""
+        }
+        if (this.appInfo.encodeRateMax == 0) {
+          this.appInfo.encodeRateMax = ""
+        }
         this.changePopShow = true
       },
       /* 下拉菜单事件 */
@@ -274,12 +295,13 @@
             that.list = list
           } else {
             that.$post(that.$uri.system.paramGet, {paramName: 'encodeRateMax'}).then(res => {
+              that.maxRate = v.encodeRateMax
               if (res.success) {
-                v.encodeRateMax = res.data.paramValue
+                that.maxRate = res.data.paramValue
               }
               list.push({
                 name: "推流最大码率",
-                value: v.encodeRateMax + ""
+                value: that.maxRate + ""
               })
               that.list = list
             })

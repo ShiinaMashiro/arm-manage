@@ -159,7 +159,7 @@
           isReboot: "0",
           isSensor: "0",
           isUploadLocationInfo: "0",
-          isStopApp: 0
+          isStopApp: "0"
         },
         addAppFileList: [],
         advancedShow: false,
