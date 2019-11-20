@@ -42,7 +42,7 @@
             <el-input v-model="addInfo.title"></el-input>
           </el-form-item>
           <el-form-item label="回答" prop="content">
-            <el-input v-model="addInfo.content"></el-input>
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 8}" v-model="addInfo.content"></el-input>
           </el-form-item>
           <el-form-item label="排序" prop="sort">
             <el-input v-model="addInfo.sort"></el-input>
@@ -64,7 +64,7 @@
             <el-input v-model="changeInfo.title"></el-input>
           </el-form-item>
           <el-form-item label="回答" prop="content">
-            <el-input v-model="changeInfo.content"></el-input>
+            <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 8}" v-model="changeInfo.content"></el-input>
           </el-form-item>
           <el-form-item label="排序" prop="sort">
             <el-input v-model="changeInfo.sort"></el-input>
