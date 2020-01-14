@@ -134,6 +134,11 @@ let sideItems = [
         name: "调度日志",
         path: '/home/log/dispatch',
         author: '_0501_'
+      },
+      {
+        name: "分组日志",
+        path: '/home/log/group',
+        author: '_0501_'
       }
     ]
   }, {
@@ -215,7 +220,8 @@ const state = {
   sceneCheck: 0,
   sceneChildCheck: 0,
   sideItems: sideItems,
-  loginTimeout: false
+  loginTimeout: false,
+  logGroupId: ''
 }
 
 let admin = {
@@ -376,6 +382,10 @@ export default new Vuex.Store({
     /* 登录过期 */
     [mutation.LOGIN_TIMEOUT] (state, timeout) {
       state.loginTimeout = timeout
+    },
+    /* 保存跳转到分组日志的分组id */
+    [mutation.LOG_GROUP_ID] (state, id) {
+      state.logGroupId = id
     }
   },
   actions: {

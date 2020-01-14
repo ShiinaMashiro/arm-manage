@@ -146,7 +146,10 @@
       /* 删除应用 */
       apkDel (ids) {
         this.$confirm("确定删除应用？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let that = this
           that.$post(that.$uri.apk.apkDelete, {ids}).then(res => {
@@ -163,7 +166,10 @@
       /* 批量删除应用 */
       apkDelBatch () {
         this.$confirm("确定批量删除应用？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let ids = []
           this.multipleSelection.forEach(v => {

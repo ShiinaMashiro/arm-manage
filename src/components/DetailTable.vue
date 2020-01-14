@@ -228,9 +228,9 @@ export default {
 
       this.$confirm('点击确定后将对设备IP进行自动填充修改，修改后设备会重启，如果输入有误，请点击取消返回修改，确定无误后，点击确认则对修改生效。', '提示', {
         confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-        center: true
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then(() => {
         that.ipChangeInfo.caseId = that.caseInfo.id
         that.$post(that.$uri.device.updateDeviceIp, that.ipChangeInfo).then(res => {

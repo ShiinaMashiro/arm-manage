@@ -217,7 +217,10 @@
       /* 批量删除记录 */
       deleteDevBatch () {
         this.$confirm("确认批量删除记录？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let ids = []
           this.multipleSelection.forEach(v => {
@@ -233,7 +236,10 @@
       /* 删除全部记录 */
       allDelete() {
         this.$confirm("确认删除全部记录？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let that = this
           that.$post(that.$uri.apk.apkMonitorDeleteAll, {}).then(res => {

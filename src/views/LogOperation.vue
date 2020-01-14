@@ -33,7 +33,7 @@
           </div>
         </div>
         <div class="search-btn">
-          <el-button size="mini" @click="advancedShow = false">取消</el-button>
+          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
           <el-button type="primary" size="mini" @click="getLogList">搜索</el-button>
         </div>
       </div>
@@ -57,7 +57,7 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain @click="deleteCaseBatch">删除</el-button>
+          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteCaseBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -170,8 +170,11 @@
       },
       /* 批量删除设备池 */
       deleteCaseBatch () {
-        this.$confirm("确认批量删除日志？", "提示", {
-          type: "warning"
+        this.$confirm("日志删除后无法恢复，是否继续？", "提示", {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-yellow',
+          iconClass: 'el-icon-c-yellow',
+          cancelButtonText: '取消'
         }).then( () => {
           this.multipleSelection.forEach(v => {
             this.deleteCase(v.id)
@@ -184,7 +187,10 @@
       /* 删除日志 */
       logDelete (id) {
         this.$confirm("确认删除？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let that = this
           that.$post(that.$uri.log.operationLogDelete, {id}).then(res => {

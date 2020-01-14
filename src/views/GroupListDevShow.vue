@@ -232,8 +232,11 @@ export default {
     },
     /* 批量删除设备 */
     deleteDevBatch () {
-      this.$confirm("确认批量删除设备？", "提示", {
-        type: "warning"
+      this.$confirm("删除设备会导致设备恢复出厂设置，清除数据，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then( () => {
         let deviceIps = []
         this.multipleSelection.forEach(v => {
@@ -253,8 +256,11 @@ export default {
     },
     /* 设备批量重启 */
     rebootDevBatch () {
-      this.$confirm("确认批量重启？", "提示", {
-        type: "warning"
+      this.$confirm("重启设备会导致当前应用缓存丢失，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then( () => {
         let deviceIps = []
         this.multipleSelection.forEach(v => {
@@ -269,8 +275,11 @@ export default {
     },
     /* 恢复出厂设置 */
     initDev (deviceIp) {
-      this.$confirm("确认恢复出厂设置？", "提示", {
-        type: "warning"
+      this.$confirm("恢复出厂后设备的应用和数据都会被清除， 是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then( () => {
         let that = this
         that.$post(that.$uri.device.deviceRestore, {deviceIp}).then(res => {

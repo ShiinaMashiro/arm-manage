@@ -29,6 +29,7 @@ import AppMonitor from "./views/AppMonitor.vue";
 import HelpFAQ from "./views/HelpFAQ.vue";
 import HelpFun from "./views/HelpFun.vue";
 import HelpFunShow from "./views/HelpFunShow.vue";
+import LogGroup from "./views/LogGroup.vue";
 
 Vue.use(Router);
 
@@ -132,6 +133,13 @@ export default new Router({
           path: "log/dispatch",
           name: "调度日志",
           component: LogDispatch,
+          meta: {
+            changeAuth: "_0500_"
+          }
+        }, {
+          path: "log/group",
+          name: "分组日志",
+          component: LogGroup,
           meta: {
             changeAuth: "_0500_"
           }

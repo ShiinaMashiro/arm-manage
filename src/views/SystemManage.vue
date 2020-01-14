@@ -724,7 +724,7 @@
       },
       versionAdd () {
         let that = this
-        if (!/^[0-9]{1,4}$/.test(that.versionAddInfo.code) || !/^[0-9a-zA-Z]{1,20}$/.test(that.versionAddInfo.content)) {
+        if (!/^[0-9]{1,4}$/.test(that.versionAddInfo.code) || !/^[0-9a-zA-Z_]{1,20}$/.test(that.versionAddInfo.content)) {
           that.$message.error("请按正确的格式输入参数")
           return
         }
@@ -747,11 +747,11 @@
       },
       versionDelete (code) {
         let that = this
-        this.$confirm('此操作将永久删除该引擎版本，是否继续?', '提示', {
+        this.$confirm('删除后引擎版本将无法识别，是否继续?', '提示', {
           confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          center: true
+          confirmButtonClass: 'confirm-btn-yellow',
+          iconClass: 'el-icon-c-yellow',
+          cancelButtonText: '取消'
         }).then(() => {
           that.$post(that.$uri.system.engineCodeDelete, {code}).then(res => {
             if (res.success) {
@@ -890,7 +890,10 @@
       /* 版本检查 */
       checkVersion () {
         this.$confirm("开始检查设备版本，低版本将自动升级？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           let that = this
           that.$post(that.$uri.system.engineVersionCheck, {}).then(res => {
@@ -905,10 +908,10 @@
           let msg = res.success ? "" : res.message
           msg += "\n如果确认无误，请点击确认按钮进行升级。"
           this.$confirm(msg, "提示", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning",
-            center: true
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
           }).then(() => {
             this.$refs.upload.submit();
           }).catch(() => {});
@@ -1013,7 +1016,10 @@
       systemUploadPopClose () {
         if (this.systemUploadTip) {
           this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
-            type: "warning"
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
           }).then( () => {
             this.systemUpdatePopShow = false
             this.systemUploadTip = false
@@ -1028,7 +1034,10 @@
       engineUploadPopClose () {
         if (this.engineUploadTip) {
           this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
-            type: "warning"
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
           }).then( () => {
             this.engineUpdatePopShow = false
             this.engineUploadTip = false
@@ -1197,6 +1206,7 @@
 </script>
 
 <style lang="less" scoped>
+
   .detail-table {
     .detail-table-header {
       padding-left: 12px;

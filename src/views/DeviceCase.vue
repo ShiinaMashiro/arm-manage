@@ -102,7 +102,10 @@ export default {
     /* 扫描分层处理器 */
     scanCaseNode () {
       this.$confirm("确认扫描分层处理器？", "提示", {
-        type: "warning"
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消'
       }).then( () => {
         this.scan(this.$uri.device.scanNode, {})
       }).catch( () => {})
@@ -110,7 +113,10 @@ export default {
     /* 扫描设备 */
     scanDevice () {
       this.$confirm("确认扫描设备？", "提示", {
-        type: "warning"
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消'
       }).then( () => {
         this.scan(this.$uri.device.scanDevice, {caseIds: this.selectIds})
       }).catch( () => {})
@@ -122,8 +128,11 @@ export default {
     },
     /* 批量删除设备池 */
     deleteCaseBatch () {
-      this.$confirm("确认批量删除设备池？", "提示", {
-        type: "warning"
+      this.$confirm("删除设备池后会导致设备池内的设备恢复出厂设置，清除数据，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then( () => {
         this.multipleSelection.forEach(v => {
           this.deleteCase(v.id)

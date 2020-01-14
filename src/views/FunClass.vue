@@ -160,7 +160,10 @@
       /* 批量删除FAQ */
       deleteFAQBatch () {
         this.$confirm("确认批量删除介绍大类？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           this.multipleSelection.forEach(v => {
             this.deleteFAQ(v.id)

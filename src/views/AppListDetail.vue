@@ -89,8 +89,36 @@
         </el-form>
       </div>
     </el-dialog>
+    <!-- 白名单配置 -->
+    <el-dialog title="应用白名单" :append-to-body="true" :visible.sync="changeWhitePopShow" width="500px" top="15vh">
+      <div>
+        <el-form ref="form" :model="appInfo" label-width="130px" label-position="left">
+          <el-form-item label="">
+            <el-button type="text" @click="addWhiteShow = true" v-if="!addWhiteShow">新增白名单</el-button>
+          </el-form-item>
+          <el-form-item label="">
+            <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
+              <template v-for="(item, index) in whiteList">
+                <div style="display: flex;flex-direction: row;justify-content: space-between">
+                  <span :key="index">{{item}}</span>
+                  <el-button type="text" @click="whiteDel(index)">删除</el-button>
+                </div>
+              </template>
+            </div>
+          </el-form-item>
+          <el-form-item label="包名" v-if="addWhiteShow">
+            <el-input v-model="addWhiteName"></el-input>
+          </el-form-item>
+          <el-form-item  v-if="addWhiteShow">
+            <el-button type="primary" @click="whiteAdd">确定</el-button>
+            <el-button @click="addWhiteShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
     <div class="detail-setting">
       <el-button type="info" plain size="small" @click="changePop">修改设置</el-button>
+      <el-button type="info" plain size="small" @click="changeWhitePop">白名单设置</el-button>
     </div>
   </div>
 </template>
@@ -109,6 +137,10 @@
         frameRate: 0,
         maxRate: 0,
         changePopShow: false,
+        changeWhitePopShow: false,
+        addWhiteShow: false,
+        addWhiteName: '',
+        whiteList: [],
         appInfo: {},
         list: [],
         rules: {
@@ -205,6 +237,44 @@
           this.appInfo.encodeRateMax = ""
         }
         this.changePopShow = true
+      },
+      /* 白名单弹窗 */
+      changeWhitePop () {
+        if (this.appInfo.whiteList) {
+          this.whiteList = this.appInfo.whiteList.split(';')
+        }
+        this.changeWhitePopShow = true
+      },
+      /* 白名单删除 */
+      whiteDel (index) {
+        let that = this
+        this.$confirm('确认删除这条记录?', '提示', {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
+        }).then(() => {
+          that.whiteList.splice(index, 1)
+          this.appInfo.whiteList = this.whiteList.join(";")
+          that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
+
+          })
+        }).catch(() => {});
+
+      },
+      /* 白名单新增 */
+      whiteAdd () {
+        let that = this
+        console.log(that.addWhiteName)
+        if (!/^[a-zA-Z0-9.]{1,150}$/.test(that.addWhiteName)) {
+          that.$message.warning("包名只允许字母数字和小数点")
+          return
+        }
+        that.whiteList.push(that.addWhiteName)
+        this.appInfo.whiteList = this.whiteList.join(";")
+        that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
+
+        })
       },
       /* 下拉菜单事件 */
       handleCommand (command) {
@@ -304,6 +374,7 @@
                 value: that.maxRate + ""
               })
               that.list = list
+
             })
           }
         })
@@ -323,6 +394,7 @@
 </script>
 
 <style lang="less" scoped>
+
   .detail-table {
     .detail-table-header {
       padding-left: 12px;

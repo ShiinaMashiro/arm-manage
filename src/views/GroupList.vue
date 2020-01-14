@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="search-btn">
-          <el-button size="mini" @click="advancedShow = false">取消</el-button>
+          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
           <el-button type="primary" size="mini" @click="getGroupList">搜索</el-button>
         </div>
       </div>
@@ -37,13 +37,14 @@
             <el-button type="text" size="small" @click="goAppManage(scope.row)">应用管理</el-button>
             <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
             <el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>
-            <!--<el-button type="text" size="small" @click="confirmDelGroup(scope.row)" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
+            <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
+            <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain @click="deleteBatch">删除</el-button>
+          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -62,7 +63,7 @@
             <el-form-item label="分组名称">
               <el-input v-model="addGroupInfo.groupName"></el-input>
             </el-form-item>
-            <el-form-item label="设备自主安装应用">
+            <!--<el-form-item label="设备自主安装应用">
               <div class="test">
                 <el-switch
                         v-model="addGroupInfo.isAppAllow"
@@ -73,7 +74,54 @@
                   <i class="el-icon-question" style="margin-left: 5px" ></i>
                 </el-tooltip>
               </div>
+            </el-form-item>-->
+            <el-form-item label="推流权限控制">
+              <div class="test">
+                <el-switch
+                        v-model="addGroupAuthSelectShow"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+              </div>
             </el-form-item>
+            <div style="padding: 0 0 0 15px" v-show="addGroupAuthSelectShow == '1'">
+              <el-form-item label="安装应用">
+                <div class="test">
+                  <el-switch
+                          v-model="addGroupInfo.isInstallApp"
+                          active-value="1"
+                          inactive-value="0">
+                  </el-switch>
+                  <el-tooltip effect="dark" content="设备推流时是否允许安装应用不被卸载，开启后用户可在推流时安装的应用可在结束后保留，关闭时推流时安装的应用会被立即卸载。" placement="top-start">
+                    <i class="el-icon-question" style="margin-left: 5px" ></i>
+                  </el-tooltip>
+                </div>
+              </el-form-item>
+              <el-form-item label="卸载应用">
+                <div class="test">
+                  <el-switch
+                          v-model="addGroupInfo.isUninstallApp"
+                          active-value="1"
+                          inactive-value="0">
+                  </el-switch>
+                  <el-tooltip effect="dark" content="设备推流时是否允许用户卸载应用，开启后用户无法在推流的时候进行卸载操作，关闭时用户可以正常进行卸载操作。" placement="top-start">
+                    <i class="el-icon-question" style="margin-left: 5px" ></i>
+                  </el-tooltip>
+                </div>
+              </el-form-item>
+              <el-form-item label="返回桌面">
+                <div class="test">
+                  <el-switch
+                          v-model="addGroupInfo.isHome"
+                          active-value="1"
+                          inactive-value="0">
+                  </el-switch>
+                  <el-tooltip effect="dark" content="设备推流时是否允许返回到桌面，关闭后用户推流时返回桌面会立即结束推流，并且无法以APPID为0的形式进行推流。" placement="top-start">
+                    <i class="el-icon-question" style="margin-left: 5px" ></i>
+                  </el-tooltip>
+                </div>
+              </el-form-item>
+            </div>
             <el-form-item>
               <el-button type="primary" @click="addGroup">确定</el-button>
               <el-button @click="addGroupPopShow = false">取消</el-button>
@@ -88,7 +136,7 @@
             <el-form-item label="分组名称">
               <el-input v-model="changeGroupInfo.groupName"></el-input>
             </el-form-item>
-            <el-form-item label="设备自主安装应用">
+            <!--<el-form-item label="设备自主安装应用">
               <div class="test">
                 <el-switch
                         v-model="changeGroupInfo.isAppAllow"
@@ -99,7 +147,7 @@
                   <i class="el-icon-question" style="margin-left: 5px" ></i>
                 </el-tooltip>
               </div>
-            </el-form-item>
+            </el-form-item>-->
             <el-form-item>
               <el-button type="primary" @click="changeGroupName">确定</el-button>
               <el-button @click="changeGroupPopShow = false">取消</el-button>
@@ -107,7 +155,55 @@
           </el-form>
         </div>
       </el-dialog>
+      <!-- 权限控制弹窗 -->
+      <el-dialog title="权限控制" :append-to-body="true" :visible.sync="changeGroupAuthPopShow" width="500px" top="15vh">
+        <div>
+          <el-form ref="form" :model="changeGroupInfo" label-width="130px" label-position="left">
+            <el-form-item label="安装应用">
+              <div class="test">
+                <el-switch
+                        v-model="changeGroupInfo.isInstallApp"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+                <el-tooltip effect="dark" content="设备推流时是否允许安装应用不被卸载，开启后用户可在推流时安装的应用可在结束后保留，关闭时推流时安装的应用会被立即卸载。" placement="top-start">
+                  <i class="el-icon-question" style="margin-left: 5px" ></i>
+                </el-tooltip>
+              </div>
+            </el-form-item>
+            <el-form-item label="卸载应用">
+              <div class="test">
+                <el-switch
+                        v-model="changeGroupInfo.isUninstallApp"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+                <el-tooltip effect="dark" content="设备推流时是否允许用户卸载应用，开启后用户无法在推流的时候进行卸载操作，关闭时用户可以正常进行卸载操作。" placement="top-start">
+                  <i class="el-icon-question" style="margin-left: 5px" ></i>
+                </el-tooltip>
+              </div>
+            </el-form-item>
+            <el-form-item label="返回桌面">
+              <div class="test">
+                <el-switch
+                        v-model="changeGroupInfo.isHome"
+                        active-value="1"
+                        inactive-value="0">
+                </el-switch>
+                <el-tooltip effect="dark" content="设备推流时是否允许返回到桌面，关闭后用户推流时返回桌面会立即结束推流，并且无法以APPID为0的形式进行推流。" placement="top-start">
+                  <i class="el-icon-question" style="margin-left: 5px" ></i>
+                </el-tooltip>
+              </div>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="changeGroupAuth">确定</el-button>
+              <el-button @click="changeGroupAuthPopShow = false">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-dialog>
     </div>
+
     <!-- 上传文件 -->
     <el-dialog title="上传文件" :append-to-body="true"
                :close-on-click-modal="false" :show-close="false" top="15vh"
@@ -160,17 +256,25 @@ export default {
         limit: 20
       },
       addGroupPopShow: false, // 显示添加分组弹窗
+      addGroupAuthSelectShow: false,
       addGroupInfo: {
         groupName: "",
-        isAppAllow: "0"
+        isAppAllow: "0",
+        isInstallApp: "1",
+        isUninstallApp: "1",
+        isHome: "1"
       },
       delGroupPopShow: false, // 显示删除分组弹窗
       changeGroupPopShow: false, // 显示修改分组名称弹窗
       changeGroupInfo: {
         id: 0,
         groupName: '',
-        isAppAllow: ''
+        isAppAllow: '',
+        isInstallApp: "",
+        isUninstallApp: "",
+        isHome: ""
       },
+      changeGroupAuthPopShow: false, // 显示修改分组名称弹窗
       uploadFilePopShow: false,
       uploadFileExtraInfo: {
         id: 0
@@ -222,7 +326,10 @@ export default {
     /* 删除分组确认 */
     confirmDelGroup (row) {
       this.$confirm("确认删除分组-" + row.groupName + "?", "提示", {
-        type: "warning"
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消'
       }).then( () => {
         this.delGroup(row.id)
       }).catch( () => {})
@@ -237,18 +344,12 @@ export default {
     },
     /* 确认修改分组名称 */
     confirmChangeGroupName (row) {
-      this.$confirm("确认修改分组-" + row.groupName + "?", "提示", {
-        type: "warning"
-      }).then( () => {
-        this.changeGroupInfo.id = row.id
-        this.changeGroupInfo.groupName = row.groupName
-        this.changeGroupInfo.isAppAllow = row.isAppAllow
-        this.changeGroupNamePop(row.id)
-      }).catch( () => {})
-    },
-    /* 修改分组名称弹窗 */
-    changeGroupNamePop (id) {
-      this.changeGroupInfo.id = id
+      this.changeGroupInfo.id = row.id
+      this.changeGroupInfo.groupName = row.groupName
+      this.changeGroupInfo.isAppAllow = row.isAppAllow
+      this.changeGroupInfo.isInstallApp = row.isInstallApp
+      this.changeGroupInfo.isUninstallApp = row.isUninstallApp
+      this.changeGroupInfo.isHome = row.isHome
       this.changeGroupPopShow = true
     },
     /* 修改分组名 */
@@ -260,6 +361,29 @@ export default {
         that.getGroupList()
       })
     },
+    /* 权限控制弹窗 */
+    changeGroupAuthPop (row) {
+      this.changeGroupInfo.id = row.id
+      this.changeGroupInfo.groupName = row.groupName
+      this.changeGroupInfo.isAppAllow = row.isAppAllow + ''
+      this.changeGroupInfo.isInstallApp = row.isInstallApp + ''
+      this.changeGroupInfo.isUninstallApp = row.isUninstallApp + ''
+      this.changeGroupInfo.isHome = row.isHome + ''
+      this.changeGroupAuthPopShow = true
+    },
+    /* 权限控制 */
+    changeGroupAuth () {
+      let that = this
+      that.$post(that.$uri.group.infoSave, that.changeGroupInfo).then(res => {
+        that.$message.success("修改成功")
+        that.changeGroupAuthPopShow = false
+        that.getGroupList()
+      })
+    },
+    goLog(row) {
+      this.$store.commit(this.$mutation.LOG_GROUP_ID, row.groupName)
+      this.$router.push("/home/log/group")
+    },
     /* 上传文件弹窗 */
     uploadFilePop (id) {
       this.uploadFileExtraInfo.id = id
@@ -268,7 +392,10 @@ export default {
     popClose () {
       if (this.uploadPopCloseTip) {
         this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           this.uploadFilePopShow = false
           this.uploadPopCloseTip = false
@@ -319,8 +446,11 @@ export default {
     },
     /* 批量删除设备池 */
     deleteBatch () {
-      this.$confirm("确认批量删除分组？", "提示", {
-        type: "warning"
+      this.$confirm("删除分组后会导致分组内的设备恢复出厂设置，清除数据，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
       }).then( () => {
         this.multipleSelection.forEach(v => {
           this.asyncDelete(v.id)

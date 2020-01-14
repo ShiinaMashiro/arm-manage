@@ -141,7 +141,10 @@
       /* 确认保存修改 */
       confirmSaveDev () {
         this.$confirm("确认保存修改？", "提示", {
-          type: "warning"
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
         }).then( () => {
           this.saveDev()
         }).catch( () => {})

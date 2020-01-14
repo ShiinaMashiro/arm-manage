@@ -57,4 +57,32 @@ body {
     margin: 15vh 0;
   }
 }
+
+  .confirm-btn-bule {
+    color: #FFF !important;
+    background-color: #409EFF !important;
+    border-color: #409EFF !important;
+  }
+  .el-icon-c-blue:before {
+    content: "\e7a3";
+    color: #409EFF;
+  }
+.confirm-btn-yellow {
+  color: #FFF !important;
+  background-color: #E5A13C !important;
+  border-color: #E5A13C !important;
+}
+.el-icon-c-yellow:before {
+  content: "\e7a3";
+  color: #E5A13C;
+}
+.confirm-btn-red {
+  color: #FFF !important;
+  background-color: #F46C6C !important;
+  border-color: #F46C6C !important;
+}
+.el-icon-c-red:before {
+  content: "\e7a3";
+  color: #F46C6C;
+}
 </style>

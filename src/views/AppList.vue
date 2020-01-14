@@ -210,10 +210,17 @@
           ids.push(v.id)
         })
         let that = this
-        that.$post(that.$uri.apk.apkOff, {ids}).then(res => {
-          this.$message.success("下架完成")
-          this.getAppList()
-        })
+        this.$confirm('下架后安装应用的云机会对应用进行卸载， 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-yellow',
+          iconClass: 'el-icon-c-yellow',
+          cancelButtonText: '取消'
+        }).then(() => {
+          that.$post(that.$uri.apk.apkOff, {ids}).then(res => {
+            this.$message.success("下架完成")
+            this.getAppList()
+          })
+        }).catch(() => {});
       },
       /* 关闭弹窗并暂停文件传输 */
       closeUploadPop () {
@@ -251,7 +258,10 @@
       tipFileUpload () {
         if (this.addAppPopCloseTip) {
           this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
-            type: "warning"
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
           }).then( () => {
             this.closeUploadPop()
           }).catch( () => {})

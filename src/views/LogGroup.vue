@@ -20,9 +20,26 @@
             </el-date-picker>
           </div>
           <div class="search-main-item">
+            <span>分组名称:</span>
+            <el-select v-model="searchInfo.groupNameLike" placeholder="请选择">
+              <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.label">
+              </el-option>
+            </el-select>
+          </div>
+          <div class="search-main-item">
             <span>设备IP:</span>
             <div class="item-input">
-              <el-input v-model="searchInfo.deviceIp" size="mini"></el-input>
+              <el-input v-model="searchInfo.deviceIpLike" size="mini"></el-input>
+            </div>
+          </div>
+          <div class="search-main-item">
+            <span>操作内容:</span>
+            <div class="item-input">
+              <el-input v-model="searchInfo.operationLike" size="mini"></el-input>
             </div>
           </div>
         </div>
@@ -36,10 +53,12 @@
       <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index"></el-table-column>
-        <el-table-column prop="terminal" label="终端信息"></el-table-column>
-        <el-table-column prop="deviceName" label="设备信息"></el-table-column>
-        <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
-        <el-table-column prop="remark" label="操作内容" min-width="150px"></el-table-column>
+        <el-table-column prop="terminal" label="终端信息" min-width="80px"></el-table-column>
+        <!--<el-table-column prop="caseNo" label="设备池编号" min-width="80px"></el-table-column>-->
+        <!--<el-table-column prop="slotNo" label="槽位号" min-width="80px"></el-table-column>-->
+        <el-table-column prop="deviceIp" label="设备IP" min-width="80px"></el-table-column>
+        <el-table-column prop="groupName" label="分组名称" min-width="80px"></el-table-column>
+        <el-table-column prop="operation" label="操作内容" min-width="150px"></el-table-column>
         <el-table-column label="操作时间">
           <template slot-scope="scope">
             {{scope.row.updateTime | formatDateTime}}
@@ -72,7 +91,7 @@
 
 <script>
   export default {
-    name: "LogDispatch",
+    name: "LogGroup",
     data () {
       return {
         info: {
@@ -123,10 +142,13 @@
         dateValue: [new Date(new Date() - 3600 * 1000 * 24), new Date()],
         advancedShow: true,
         searchInfo: {
-          deviceIp: "",
+          groupNameLike: "",
+          deviceIpLike: "",
+          operationLike: "",
           updateTimeFrom: "",
           updateTimeTo: ""
-        }
+        },
+        options: []
       }
     },
     methods: {
@@ -139,7 +161,7 @@
         let that = this
         that.searchInfo.updateTimeFrom = that.$util.formatDate(that.dateValue[0])
         that.searchInfo.updateTimeTo = that.$util.formatDate(that.dateValue[1])
-        that.$post(that.$uri.log.dispatchLog, {...that.page, ...that.searchInfo}).then(res => {
+        that.$post(that.$uri.log.groupLog, {...that.page, ...that.searchInfo}).then(res => {
           that.info = res
         })
       },
@@ -161,7 +183,7 @@
       /* 删除设备池 */
       async deleteCase (id) {
         let that = this
-        await that.$post(that.$uri.log.dispatchLogDelete, {id})
+        await that.$post(that.$uri.log.groupLogDelete, {id})
       },
       /* 批量删除设备池 */
       deleteCaseBatch () {
@@ -188,15 +210,34 @@
           cancelButtonText: '取消'
         }).then( () => {
           let that = this
-          that.$post(that.$uri.log.dispatchLogDelete, {id}).then(res => {
+          that.$post(that.$uri.log.groupLogDelete, {id}).then(res => {
             that.$message.success("删除成功")
             that.getLogList()
           })
         }).catch( () => {})
+      },
+      /* 获得分组信息 */
+      getGroupList () {
+        let that = this
+        that.$post(that.$uri.group.list, {}).then(res => {
+          let options = []
+          res.list.forEach(v => {
+            options.push({
+              value: v.id,
+              label: v.groupName
+            })
+          })
+          this.options = options
+        })
       }
     },
     mounted () {
+      if (this.$store.state.logGroupId != '') {
+        this.searchInfo.groupNameLike = this.$store.state.logGroupId
+        this.$store.commit(this.$mutation.LOG_GROUP_ID, '')
+      }
       this.getLogList()
+      this.getGroupList()
     }
   };
 </script>

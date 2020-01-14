@@ -51,7 +51,7 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain @click="deleteCaseBatch">删除</el-button>
+          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteCaseBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -177,8 +177,11 @@
       },
       /* 批量删除设备池 */
       deleteCaseBatch () {
-        this.$confirm("确认批量删除用户？", "提示", {
-          type: "warning"
+        this.$confirm("删除后用户将无法登录系统？", "提示", {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-yellow',
+          iconClass: 'el-icon-c-yellow',
+          cancelButtonText: '取消'
         }).then( () => {
           this.multipleSelection.forEach(v => {
             this.deleteCase(v.id)
@@ -257,18 +260,6 @@
           that.changeUserPopShow = false
           that.getUserList()
         })
-      },
-      /* 删除用户 */
-      delUser (id) {
-        this.$confirm("确认删除用户？", "提示", {
-          type: "warning"
-        }).then( () => {
-          let that = this
-          that.$post(that.$uri.user.delete, {id}).then(res => {
-            that.$message.success("删除成功")
-            that.getUserList()
-          })
-        }).catch( () => {})
       }
     },
     mounted () {

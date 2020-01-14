@@ -81,7 +81,9 @@ export const uri = {
         operationLog: '/log/operation', // 操作日志列表
         dispatchLog: '/log/dispatch', // 调度日志列表
         operationLogDelete: '/log/deleteOperation', // 操作日志删除
-        dispatchLogDelete: '/log/deleteDispatch' // 调度日志删除
+        dispatchLogDelete: '/log/deleteDispatch', // 调度日志删除
+        groupLog: '/log/group', // 分组日志列表
+        groupLogDelete: '/log/deleteGroup', // 分组日志删除
     },
     help: { // 帮助中心
         faqList: '/faq/list', // FAQ信息列表
