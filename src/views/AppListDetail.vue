@@ -230,11 +230,14 @@
       },
       /* 修改弹窗 */
       changePop () {
-        if (this.appInfo.framerate == 0) {
-          this.appInfo.framerate = ""
+        for (let k in this.appInfo) {
+          this.appInfo[k] += ''
         }
-        if (this.appInfo.encodeRateMax == 0) {
-          this.appInfo.encodeRateMax = ""
+        if (this.appInfo.framerate == '0') {
+          this.appInfo.framerate = ''
+        }
+        if (this.appInfo.encodeRateMax == '0') {
+          this.appInfo.encodeRateMax = ''
         }
         this.changePopShow = true
       },
