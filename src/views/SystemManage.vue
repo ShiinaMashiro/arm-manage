@@ -75,6 +75,18 @@
             <el-button type="text" @click="frameRateChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
           </div>
         </DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" name="媒体服务器外网地址">
+          <div class="engine-info">
+            <span class="engine-version">{{systemParams.mediaServerWan}}</span>
+            <el-button type="text" @click="mediaServerWanChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
+        </DetailTableItem>
+        <DetailTableItem class="detail-table-body-item" name="媒体服务器内网地址">
+          <div class="engine-info">
+            <span class="engine-version">{{systemParams.mediaServerLan}}</span>
+            <el-button type="text" @click="mediaServerLanChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+          </div>
+        </DetailTableItem>
       </div>
     </div>
 
@@ -390,6 +402,40 @@
         </el-form>
       </div>
     </el-dialog>
+    <!-- 外网 -->
+    <el-dialog title="媒体服务器外网地址" :append-to-body="true" :visible.sync="mediaServerWanChangePopShow" width="500px" top="15vh">
+      <div>
+        <el-form ref="form" :model="mediaServerWanChangeInfo" label-width="130px" label-position="left">
+          <el-form-item label="IP">
+            <div class="test">
+              <el-input v-model="mediaServerWanChangeInfo.mediaServerWan">
+              </el-input>
+            </div>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="mediaServerWanChange">确定</el-button>
+            <el-button @click="mediaServerWanChangePopShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
+    <!-- 外网 -->
+    <el-dialog title="媒体服务器内网地址" :append-to-body="true" :visible.sync="mediaServerLanChangePopShow" width="500px" top="15vh">
+      <div>
+        <el-form ref="form" :model="mediaServerLanChangeInfo" label-width="130px" label-position="left">
+          <el-form-item label="IP">
+            <div class="test">
+              <el-input v-model="mediaServerLanChangeInfo.mediaServerLan">
+              </el-input>
+            </div>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="mediaServerLanChange">确定</el-button>
+            <el-button @click="mediaServerLanChangePopShow = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
     <!-- 设备自主安装应用配置 -->
     <el-dialog title="设备自主安装应用配置" :append-to-body="true" :visible.sync="appAllowChangePopShow" width="500px" top="15vh">
       <div>
@@ -559,6 +605,14 @@
         frameRateChangeInfo: {
           framerate: ""
         },
+        mediaServerLanChangePopShow: false,
+        mediaServerLanChangeInfo: {
+          mediaServerLan: ""
+        },
+        mediaServerWanChangePopShow: false,
+        mediaServerWanChangeInfo: {
+          mediaServerWan: ""
+        },
         caseInfo: {},
         list: [],
         engineList: [],
@@ -652,7 +706,9 @@
           encodeRateMax: "",
           extranetIp: "",
           isAppAllow: "",
-          framerate: ""
+          framerate: "",
+          mediaServerWan: "",
+          mediaServerLan: ""
         },
         systemVersion: ""
       }
@@ -1192,6 +1248,40 @@
         that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
           that.$message.success("修改成功")
           that.frameRateChangePopShow = false
+          that.getSystemParamList()
+        })
+      },
+      /* 修改推流帧率弹窗 */
+      mediaServerWanChangePop () {
+        this.mediaServerWanChangeInfo.mediaServerWan = this.systemParams.mediaServerWan
+        this.mediaServerWanChangePopShow = true
+      },
+      /* 修改推流帧率配置 */
+      mediaServerWanChange () {
+        let that = this
+        this.caseTypeChangeInfo.id = this.systemParamIds.mediaServerWan
+        this.caseTypeChangeInfo.paramName = "mediaServerWan"
+        this.caseTypeChangeInfo.paramValue = this.mediaServerWanChangeInfo.mediaServerWan
+        that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
+          that.$message.success("修改成功")
+          that.mediaServerWanChangePopShow = false
+          that.getSystemParamList()
+        })
+      },
+      /* 修改推流帧率弹窗 */
+      mediaServerLanChangePop () {
+        this.mediaServerLanChangeInfo.mediaServerLan = this.systemParams.mediaServerLan
+        this.mediaServerLanChangePopShow = true
+      },
+      /* 修改推流帧率配置 */
+      mediaServerLanChange () {
+        let that = this
+        this.caseTypeChangeInfo.id = this.systemParamIds.mediaServerLan
+        this.caseTypeChangeInfo.paramName = "mediaServerLan"
+        this.caseTypeChangeInfo.paramValue = this.mediaServerLanChangeInfo.mediaServerLan
+        that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo).then(res => {
+          that.$message.success("修改成功")
+          that.mediaServerLanChangePopShow = false
           that.getSystemParamList()
         })
       }

@@ -52,7 +52,10 @@ export const uri = {
         deviceRestore: '/device/restore', // 设备恢复出厂设置
         deviceDelete: '/device/delete', // 设备删除
         deviceGrouping: '/device/grouping', //
-        updateDeviceIp: '/case/updateDeviceIp' // 设备池IP修改
+        updateDeviceIp: '/case/updateDeviceIp', // 设备池IP修改
+        snapshot: '/device/snapshot/', // 设备截图
+        qrCode: '/device/idCode/', // 云机识别码
+        backHome: '/device/home/', // 云机识别码
     },
     apk: { // 应用模块管理
         apkList: '/apk/list', // 应用信息列表

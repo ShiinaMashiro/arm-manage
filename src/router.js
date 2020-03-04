@@ -30,6 +30,7 @@ import HelpFAQ from "./views/HelpFAQ.vue";
 import HelpFun from "./views/HelpFun.vue";
 import HelpFunShow from "./views/HelpFunShow.vue";
 import LogGroup from "./views/LogGroup.vue";
+import GroupListAuth from "./views/GroupListAuth.vue";
 
 Vue.use(Router);
 
@@ -148,7 +149,15 @@ export default new Router({
           name: "分组列表",
           component: GroupList,
           meta: {
-            changeAuth: "_0400_"
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "group/auth",
+          name: "权限控制",
+          component: GroupListAuth,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
           }
         }, {
           path: "group/dev/manage",
@@ -156,7 +165,7 @@ export default new Router({
           component: GroupListDevManage,
           meta: {
             c2c: true,
-            changeAuth: "_0400_"
+            changeAuth: "_0200_"
           }
         }, {
           path: "group/dev",
@@ -164,7 +173,7 @@ export default new Router({
           component: GroupListDevShow,
           meta: {
             c2c: true,
-            changeAuth: "_0400_",
+            changeAuth: "_0200_",
             refresh: true
           }
         }, {
@@ -173,7 +182,7 @@ export default new Router({
           component: GroupListAppManage,
           meta: {
             c2c: true,
-            changeAuth: "_0400_"
+            changeAuth: "_0200_"
           }
         }, {
           path: "user/list",

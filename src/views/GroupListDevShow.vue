@@ -1,6 +1,22 @@
 <template>
   <div class="dev-list">
-    <div class="device-case-dev border-all">
+    <div class="preview-bar">
+      <div class="preview-bar-operate" v-if="!viewMode">
+        <el-checkbox v-model="allChecked" @change="allCheckedChange" style="margin-right: 10px">全选</el-checkbox>
+        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="rebootOne">重启设备</el-button>
+        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>
+        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>
+        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="snapshotOne">刷新截图</el-button>
+      </div>
+      <div class="preview-bar-operate" v-else>
+      </div>
+      <div>
+        <span>切换视图：</span>
+        <el-button type="text" :disabled="!viewMode" @click="changeMode(false)">预览图</el-button>
+        <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
+      </div>
+    </div>
+    <div class="device-case-dev border-all" v-if="viewMode">
       <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
@@ -92,8 +108,46 @@
         </div>
       </el-dialog>
     </div>
-  </div>
+    <div class="preview-main" v-else>
+      <template v-for="(item, index) in info.list">
+        <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
+          <el-tooltip class="item" effect="dark" :content="item.deviceIp" placement="top-start">
+          <div style="text-align: left" class="snapshot-main-head">
+            <el-checkbox v-model="test[index]" @change="itemCheckedChange">
+                <span>{{item.id}}</span>
+            </el-checkbox>
+          </div>
+          </el-tooltip>
+          <div class="snapshot-main-img" style="position: relative;" @mouseenter="mouseEnter(index)"
+               @mouseleave="mouseLeave(index)">
+            <div v-show="aaa === index" style="position: absolute;left: 0;top: 5px;z-index: 1111;display: flex;flex-direction: column;align-items: flex-start;">
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="rebootOneOne(item.deviceIp)">重启云机</el-button></div>
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="downloadSnapshot(index)">下载截图</el-button></div>
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
+            </div>
+            <el-image @click="h5Test(item.deviceNo)"
+                    style="width: 200px;"
+                    :src="statusImg(item.deviceStatus) || (snapshotSuccess ? '/snapshot/' + item.deviceNo + imgUrl : snapFail)"
+                    fit="cover"></el-image>
+            <!--<div v-show="aaa === index" style="position: absolute;bottom: 0;text-align: center;width: 100%">-->
+              <!---->
+            <!--</div>-->
+          </div>
+        </div>
+      </template>
+    </div>
 
+    <el-dialog
+            title="云机识别码"
+            :visible.sync="qrCodeShow"
+            :modal="false"
+            width="20%">
+            <!--<img :src="qrCodeUrl"/>-->
+            <el-image
+              :src="qrCodeUrl"
+              fit="cover"></el-image>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -101,6 +155,20 @@ export default {
   name: "GroupListDevShow",
   data () {
     return {
+      snapFail: require('../assets/snapfail.png'),
+      snapNotUpdate: require('../assets/notupdate.png'),
+      snapError: require('../assets/snaperror.png'),
+      snapRestart: require('../assets/snaprestart.png'),
+      downloadHref: '',
+      filename: '',
+      qrCodeShow: false,
+      qrCodeUrl: '',
+      aaa: -1,
+      test: [],
+      oprShowList: [],
+      allChecked: false,
+      viewMode: true, // true为列表，false为预览
+      snapshotSuccess: false,
       info: {
         success: false,
         list: [],
@@ -174,9 +242,155 @@ export default {
           value: 0
         }, ...this.options
       ]
+    },
+    hasSelect() {
+      for(let i = 0; i < this.test.length; i++) {
+        if (this.test[i] === true) {
+          return true
+        }
+      }
+      return false
+    },
+    imgUrl() {
+      return this.snapshotSuccess ? '.jpg?temp=' + new Date().getTime() : ''
+    },
+    selectIps() {
+      let ips = []
+      for(let i = 0; i < this.info.list.length; i++) {
+        if (this.test[i] === true) {
+          ips.push(this.info.list[i].deviceIp)
+        }
+      }
+      return ips
     }
   },
   methods: {
+    statusImg(status) {
+      return status === 1 ? this.snapNotUpdate :
+        (status === 3 ? this.snapError :
+        status === 0 ? null : this.snapFail)
+    },
+    downloadSnapshot(index) {
+      let that = this
+      that.$post(that.$uri.device.snapshot, {deviceIps: [that.info.list[index].deviceIp], isSave: 1}).then(res => {
+        if (res.success) {
+          that.downloadHref = '/snapshot/' + that.info.list[index].deviceNo + '.png?temp=' + Math.random()
+          that.filename = that.info.list[index].deviceNo + '.png'
+          let a = document.createElement('a')
+          a.href = that.downloadHref
+          a.download = that.filename
+          a.click()
+        }
+      })
+    },
+    showQrCode(ip) {
+      let that = this
+      that.$post(that.$uri.device.qrCode, {deviceIp: ip}).then(res => {
+        console.log(res)
+        that.qrCodeUrl = res
+        that.qrCodeShow = true
+      })
+    },
+    getImgUrl(no) {
+      return '/snapshot/' + no + '.jpg?temp=' + new Date().getTime()
+    },
+    itemCheckedChange(checked) {
+      if (!checked) {
+        this.allChecked = false
+      }
+    },
+    rebootOne() {
+      this.$confirm("重启设备会导致当前应用缓存丢失，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.$post(that.$uri.device.deviceReboot, {deviceIps: that.selectIps}).then(res => {
+          this.$message.success("重启完成")
+        })
+      }).catch( () => {})
+    },
+    rebootOneOne(ip) {
+      this.$confirm("重启设备会导致当前应用缓存丢失，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.$post(that.$uri.device.deviceReboot, {deviceIps: [ip]}).then(res => {
+          this.$message.success("重启完成")
+        })
+      }).catch( () => {})
+    },
+    homeOne() {
+      this.$confirm("所有设备返回桌面，是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.$post(that.$uri.device.backHome, {deviceIps: that.selectIps}).then(res => {
+          this.$message.success("返回成功")
+        })
+      }).catch( () => {})
+    },
+    recoverOne() {
+      this.$confirm("恢复出厂后设备的应用和数据都会被清除， 是否继续？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-red',
+        iconClass: 'el-icon-c-red',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.selectIps.forEach(ip => {
+          that.$post(that.$uri.device.deviceRestore, {deviceIp: ip}).then(res => {
+          })
+        })
+        that.$message.success("恢复出厂命令已发送")
+      }).catch( () => {})
+    },
+    snapshotOne() {
+      let that = this
+      that.snapshotSuccess = false
+      that.$post(that.$uri.device.snapshot, {deviceIps: that.selectIps, isSave: 0}).then(res => {
+        if (res.success) {
+          that.snapshotSuccess = true
+        }
+      })
+    },
+    mouseEnter(index) {
+      this.aaa = index
+    },
+    mouseLeave(index) {
+      this.aaa = -1
+    },
+    /* 切换视图模式 */
+    changeMode(mode) {
+      this.snapshotSuccess = false
+      this.viewMode = mode
+      this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
+      if (!this.viewMode) {
+        let ips = []
+        this.info.list.forEach(v => {
+          ips.push(v.deviceIp)
+        })
+        let that = this
+        that.$post(that.$uri.device.snapshot, {deviceIps: ips, isSave: 0}).then(res => {
+          if (res.success) {
+            this.snapshotSuccess = true
+          }
+        })
+      }
+    },
+    allCheckedChange(checked) {
+      for(let i = 0; i < this.test.length; i++) {
+        this.test.splice(i, 1, checked)
+      }
+    },
     /* 表单击行事件 */
     checkRow(r, c ,e) {
       this.$refs.multipleTable.toggleRowSelection(r)
@@ -186,13 +400,18 @@ export default {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
         that.info = res
+        that.test = []
+        that.info.list.forEach(v => {
+          that.test.push(false)
+          that.oprShowList.push(false)
+        })
       })
     },
     /* 获取设备列表 */
     getDeviceList2Refresh () {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
-        this.info.list.forEach(v => {
+        that.info.list.forEach(v => {
           res.list.forEach(i => {
             if (v.id === i.id) {
               v.deviceStatus = i.deviceStatus
@@ -381,12 +600,54 @@ export default {
     this.getGroupList()
     this.getEngineVersion()
     this.refreshDevList()
+    this.changeMode(this.$store.state.groupDevShowMode)
   }
 };
 </script>
 
 <style lang="less" scoped>
   .dev-list {
+    .preview-bar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      .preview-bar-operate {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      .preview-bar-cut {
+        font-size: 16px;
+      }
+    }
+    .preview-main {
+      display: flex;
+      flex-direction: row;
+      /*justify-content: space-between;*/
+      flex-wrap: wrap;
+      .snapshot-main {
+        border: 1px solid #DDD;
+        border-radius: 6px;
+        .snapshot-main-head {
+          padding: 0 5px;
+          width: 100%;
+        }
+        .snapshot-main-img {
+
+        }
+      }
+      #snapshot-main :hover {
+        border: 1px solid #409eff;
+        border-radius: 6px;
+      }
+    }
+    .preview-main :after {
+      content: '';
+      /*width: 200px;*/
+    }
     .dev-list-search {
       width: 100%;
       display: flex;

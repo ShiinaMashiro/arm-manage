@@ -92,6 +92,7 @@
             {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
           </template>
         </el-table-column>
+        <el-table-column prop="caseNo" label="机箱号"></el-table-column>
         <el-table-column prop="slotNo" label="槽位号"></el-table-column>
         <el-table-column prop="slotNo" label="终端标志"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>

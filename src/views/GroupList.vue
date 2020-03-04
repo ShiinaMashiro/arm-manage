@@ -104,7 +104,7 @@
                           active-value="1"
                           inactive-value="0">
                   </el-switch>
-                  <el-tooltip effect="dark" content="设备推流时是否允许用户卸载应用，开启后用户无法在推流的时候进行卸载操作，关闭时用户可以正常进行卸载操作。" placement="top-start">
+                  <el-tooltip effect="dark" content="设备推流时是否允许用户卸载应用，关闭后用户无法在推流的时候进行卸载操作，开启时用户可以正常进行卸载操作。" placement="top-start">
                     <i class="el-icon-question" style="margin-left: 5px" ></i>
                   </el-tooltip>
                 </div>
@@ -121,6 +121,7 @@
                   </el-tooltip>
                 </div>
               </el-form-item>
+
             </div>
             <el-form-item>
               <el-button type="primary" @click="addGroup">确定</el-button>
@@ -363,13 +364,15 @@ export default {
     },
     /* 权限控制弹窗 */
     changeGroupAuthPop (row) {
-      this.changeGroupInfo.id = row.id
+      /*this.changeGroupInfo.id = row.id
       this.changeGroupInfo.groupName = row.groupName
       this.changeGroupInfo.isAppAllow = row.isAppAllow + ''
       this.changeGroupInfo.isInstallApp = row.isInstallApp + ''
       this.changeGroupInfo.isUninstallApp = row.isUninstallApp + ''
       this.changeGroupInfo.isHome = row.isHome + ''
-      this.changeGroupAuthPopShow = true
+      this.changeGroupAuthPopShow = true*/
+      this.$store.commit(this.$mutation.GROUP_DETAIL, row)
+      this.$router.push("/home/group/auth")
     },
     /* 权限控制 */
     changeGroupAuth () {

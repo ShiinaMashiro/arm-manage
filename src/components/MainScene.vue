@@ -34,7 +34,10 @@ export default {
     },
     /* 获取展示数据list */
     sceneList () {
-      return this.$store.getters.sceneList
+      console.log(this.$store.state)
+      let state = this.$store.state
+      return state.sideItems[state.sideCheck].children[state.sceneCheck].sceneList
+      // return this.$store.getters.sceneList
     }
   },
   mounted () {

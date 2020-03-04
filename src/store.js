@@ -51,6 +51,10 @@ let sideItems = [
             path: "/home/group/dev",
             author: "_0201_"
           }, {
+            name: "权限控制",
+            path: "/home/group/auth",
+            author: "_0201_"
+          }, {
             name: "应用管理",
             path: "/home/group/app/manage",
             author: "_0201_"
@@ -221,7 +225,8 @@ const state = {
   sceneChildCheck: 0,
   sideItems: sideItems,
   loginTimeout: false,
-  logGroupId: ''
+  logGroupId: '',
+  groupDevShowMode: true, // true为列表，false为预览
 }
 
 let admin = {
@@ -290,7 +295,7 @@ state.sideItems.push(help)
 for (let item in state) {
   sessionStorage.getItem(item) ? state[item] = JSON.parse(sessionStorage.getItem(item)) : false;
 }
-
+console.log(state)
 export default new Vuex.Store({
   state,
   mutations: {
@@ -330,7 +335,7 @@ export default new Vuex.Store({
       console.log("scene")
       console.log(data)
       data.scene ? state.sceneChildCheck = data.checked : state.sceneCheck = data.checked
-      sessionStorage.setItem('sceneCheck', JSON.stringify(data.checked))
+      sessionStorage.setItem(data.scene ? 'sceneChildCheck' : 'sceneCheck', JSON.stringify(data.checked))
     },
     /* 保存token过期回到登陆界面前的路由 */
     [mutation.LOGIN_FORWARD_PATH] (state, path) {
@@ -386,6 +391,11 @@ export default new Vuex.Store({
     /* 保存跳转到分组日志的分组id */
     [mutation.LOG_GROUP_ID] (state, id) {
       state.logGroupId = id
+    },
+    /* 保存显示模式 */
+    [mutation.GROUP_DEV_SHOW_MODE] (state, mode) {
+      state.groupDevShowMode = mode
+      sessionStorage.setItem('groupDevShowMode', JSON.stringify(mode))
     }
   },
   actions: {
@@ -458,9 +468,11 @@ export default new Vuex.Store({
     /* 获取scene list */
     sceneList (state) {
       console.log("sceneList")
+      console.log(state)
       console.log(state.sideCheck)
       console.log(state.sceneCheck)
       console.log(state.sceneChildCheck)
+      console.log(state)
       return state.sideItems[state.sideCheck].children[state.sceneCheck].sceneList
     },
     /* 获取scene list */
@@ -515,7 +527,7 @@ export default new Vuex.Store({
       })
       list.push({
         name: 'IP是否锁定',
-        value: state.caseInfo.isLock === 1 ? "否" : "是"
+        value: state.caseInfo.isLock == 1 ? "否" : "是"
       })
       list.push({
         name: '分层处理器IP',
