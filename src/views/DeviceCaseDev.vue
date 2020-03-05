@@ -8,7 +8,6 @@
         </template>
       </el-table-column>
       <el-table-column prop="slotNo" label="槽位号"></el-table-column>
-      <el-table-column prop="slotNo" label="终端标志"></el-table-column>
       <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
       <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
       <el-table-column prop="version" label="设备版本"></el-table-column>

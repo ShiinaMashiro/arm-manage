@@ -6,7 +6,7 @@
         <el-button type="primary" size="mini" :disabled="!hasSelect" @click="rebootOne">重启设备</el-button>
         <el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>
         <el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>
-        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="snapshotOne">刷新截图</el-button>
+        <el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>
       </div>
       <div class="preview-bar-operate" v-else>
       </div>
@@ -25,7 +25,6 @@
           </template>
         </el-table-column>
         <el-table-column prop="slotNo" label="槽位号"></el-table-column>
-        <el-table-column prop="slotNo" label="终端标志"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
         <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
         <el-table-column prop="version" label="设备版本"></el-table-column>
@@ -112,10 +111,13 @@
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
           <el-tooltip class="item" effect="dark" :content="item.deviceIp" placement="top-start">
-          <div style="text-align: left" class="snapshot-main-head">
-            <el-checkbox v-model="test[index]" @change="itemCheckedChange">
+          <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
+            <el-checkbox v-model="test[index]" @change="itemCheckedChange" style="flex-grow: 1">
                 <span>{{item.id}}</span>
             </el-checkbox>
+            <span :style="item | statusClassFilter" style="padding-right: 5px;font-size: 12px">
+            {{deviceStatusStr[item.deviceIp]}}
+          </span>
           </div>
           </el-tooltip>
           <div class="snapshot-main-img" style="position: relative;" @mouseenter="mouseEnter(index)"
@@ -126,12 +128,14 @@
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
             </div>
             <el-image @click="h5Test(item.deviceNo)"
+                      v-loading="snapshotImgLoading[item.deviceIp]"
+                      element-loading-text="拼命加载中"
+                      element-loading-spinner="el-icon-loading"
+                      element-loading-background="rgba(0, 0, 0, 0.8)"
                     style="width: 200px;"
-                    :src="statusImg(item.deviceStatus) || (snapshotSuccess ? '/snapshot/' + item.deviceNo + imgUrl : snapFail)"
+                    :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"
                     fit="cover"></el-image>
-            <!--<div v-show="aaa === index" style="position: absolute;bottom: 0;text-align: center;width: 100%">-->
-              <!---->
-            <!--</div>-->
+            <!--<img @click="h5Test(item.deviceNo)" style="width: 200px" :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"/>-->
           </div>
         </div>
       </template>
@@ -159,6 +163,9 @@ export default {
       snapNotUpdate: require('../assets/notupdate.png'),
       snapError: require('../assets/snaperror.png'),
       snapRestart: require('../assets/snaprestart.png'),
+      snapshotImg: {},
+      snapshotImgLoading: {},
+      deviceStatusStr: {},
       downloadHref: '',
       filename: '',
       qrCodeShow: false,
@@ -262,13 +269,19 @@ export default {
         }
       }
       return ips
+    },
+    snapshotComplete() {
+      let success = false
+      for (let k in this.snapshotImgLoading) {
+        success = success || this.snapshotImgLoading[k]
+      }
+      return !success
     }
   },
   methods: {
     statusImg(status) {
       return status === 1 ? this.snapNotUpdate :
-        (status === 3 ? this.snapError :
-        status === 0 ? null : this.snapFail)
+        (status === 3 ? this.snapError : null)
     },
     downloadSnapshot(index) {
       let that = this
@@ -335,6 +348,15 @@ export default {
         let that = this
         that.$post(that.$uri.device.backHome, {deviceIps: that.selectIps}).then(res => {
           this.$message.success("返回成功")
+          setTimeout(() => {
+            this.snapshotOne()
+          }, 1000)
+          setTimeout(() => {
+            this.snapshotOne()
+          }, 3000)
+          setTimeout(() => {
+            this.snapshotOne()
+          }, 5000)
         })
       }).catch( () => {})
     },
@@ -348,19 +370,33 @@ export default {
         let that = this
         that.selectIps.forEach(ip => {
           that.$post(that.$uri.device.deviceRestore, {deviceIp: ip}).then(res => {
+            that.$message.success("恢复出厂命令已发送")
+            setTimeout(() => {
+              this.snapshotOne()
+            }, 1000)
+            setTimeout(() => {
+              this.snapshotOne()
+            }, 3000)
+            setTimeout(() => {
+              this.snapshotOne()
+            }, 5000)
           })
         })
-        that.$message.success("恢复出厂命令已发送")
       }).catch( () => {})
     },
     snapshotOne() {
       let that = this
       that.snapshotSuccess = false
-      that.$post(that.$uri.device.snapshot, {deviceIps: that.selectIps, isSave: 0}).then(res => {
-        if (res.success) {
-          that.snapshotSuccess = true
-        }
+      that.selectIps.forEach(ip => {
+        that.$set(that.snapshotImgLoading, ip, true)
+        that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
+          if (res.success) {
+            that.$set(that.snapshotImg, ip, res.data)
+          }
+          that.$set(that.snapshotImgLoading, ip, false)
+        })
       })
+      console.log(that.snapshotImg)
     },
     mouseEnter(index) {
       this.aaa = index
@@ -370,6 +406,7 @@ export default {
     },
     /* 切换视图模式 */
     changeMode(mode) {
+      console.log('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
       this.snapshotSuccess = false
       this.viewMode = mode
       this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
@@ -379,11 +416,14 @@ export default {
           ips.push(v.deviceIp)
         })
         let that = this
-        that.$post(that.$uri.device.snapshot, {deviceIps: ips, isSave: 0}).then(res => {
-          if (res.success) {
-            this.snapshotSuccess = true
-          }
+        ips.forEach(ip => {
+          that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
+            if (res.success) {
+              that.$set(that.snapshotImg, ip, res.data)
+            }
+          })
         })
+        console.log(that.snapshotImg)
       }
     },
     allCheckedChange(checked) {
@@ -404,20 +444,29 @@ export default {
         that.info.list.forEach(v => {
           that.test.push(false)
           that.oprShowList.push(false)
+          // that.snapshotImg[v.deviceIp] = ''
+          that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
         })
+        that.changeMode(that.$store.state.groupDevShowMode)
       })
     },
     /* 获取设备列表 */
     getDeviceList2Refresh () {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
-        that.info.list.forEach(v => {
+        /*that.info.list.forEach(v => {
           res.list.forEach(i => {
             if (v.id === i.id) {
               v.deviceStatus = i.deviceStatus
+              that.$set(that.deviceStatusStr, v.deviceIp, that.statusStrM(i))
             }
           })
+        })*/
+        that.info.list = res.list
+        res.list.forEach(i => {
+            that.$set(that.deviceStatusStr, i.deviceIp, that.statusStrM(i))
         })
+        console.log(that.deviceStatusStr)
       })
     },
     /* 推流 */
@@ -570,13 +619,39 @@ export default {
           this.refreshDevList()
         }, 5000)
       }
-    }
+    },
+    statusStrM (row) {
+      if (row.isFlow === 1) return "推流中"
+      switch (row.deviceStatus) {
+        case 0: return "";
+        case 1: return "未更新";
+        case 2: return "应用安装中";
+        case 3: return "故障";
+        case 4: return "预启动";
+        case 5: return "清理中";
+        case 6: return "升级中";
+        case 7: return "应用结束中";
+      }
+    },
   },
   filters: {
     statusStr (row) {
       if (row.isFlow === 1) return "推流中"
       switch (row.deviceStatus) {
         case 0: return "正常";
+        case 1: return "未更新";
+        case 2: return "应用安装中";
+        case 3: return "故障";
+        case 4: return "预启动";
+        case 5: return "清理中";
+        case 6: return "升级中";
+        case 7: return "应用结束中";
+      }
+    },
+    statusStrPre (row) {
+      if (row.isFlow === 1) return "推流中"
+      switch (row.deviceStatus) {
+        case 0: return "";
         case 1: return "未更新";
         case 2: return "应用安装中";
         case 3: return "故障";
@@ -600,7 +675,7 @@ export default {
     this.getGroupList()
     this.getEngineVersion()
     this.refreshDevList()
-    this.changeMode(this.$store.state.groupDevShowMode)
+
   }
 };
 </script>

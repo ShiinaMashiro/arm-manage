@@ -23,7 +23,7 @@ let loginTimeout = false
 
 axios.interceptors.response.use(
   (res) => {
-    console.log(res)
+    // console.log(res)
     let obj = res.data
     if (res.config.url.startsWith('/device/idCode')) {
       store.commit(vm.$mutation.LOGIN_TIMEOUT, false)
