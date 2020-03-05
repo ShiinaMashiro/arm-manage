@@ -285,7 +285,7 @@ export default {
     },
     downloadSnapshot(index) {
       let that = this
-      that.$post(that.$uri.device.snapshot, {deviceIps: [that.info.list[index].deviceIp], isSave: 1}).then(res => {
+      that.$post(that.$uri.device.snapshot, {deviceIp: [that.info.list[index].deviceIp], isSave: 1}).then(res => {
         if (res.success) {
           that.downloadHref = '/snapshot/' + that.info.list[index].deviceNo + '.png?temp=' + Math.random()
           that.filename = that.info.list[index].deviceNo + '.png'
@@ -299,8 +299,7 @@ export default {
     showQrCode(ip) {
       let that = this
       that.$post(that.$uri.device.qrCode, {deviceIp: ip}).then(res => {
-        console.log(res)
-        that.qrCodeUrl = res
+        that.qrCodeUrl = res.data
         that.qrCodeShow = true
       })
     },
