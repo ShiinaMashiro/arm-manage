@@ -1173,8 +1173,8 @@
       /* 修改公网配置 */
       netIpChange () {
         let that = this
-        if (!/^(?=^.{3,255}$)[a-z0-9][-a-z0-9]{0,62}(\.[a-z0-9][-a-z0-9]{0,62})+(\.[a-z]{2,3})(:\d{2,4})?$/.test(this.netIpChangeInfo.extranetIp)
-          && !/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(:\d{2,4})?$/.test(this.netIpChangeInfo.extranetIp)) {
+        if (!/^(?=^.{3,255}$)[a-z0-9][-a-z0-9]{0,62}(\.[a-z0-9][-a-z0-9]{0,62})+(\.[a-z]{2,3})(:\d{2,6})?$/.test(this.netIpChangeInfo.extranetIp)
+          && !/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(:\d{2,6})?$/.test(this.netIpChangeInfo.extranetIp)) {
           that.$message.error("请输入正确的ip或域名")
           return
         }
