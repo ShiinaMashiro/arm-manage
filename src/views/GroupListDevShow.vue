@@ -1,6 +1,6 @@
 <template>
   <div class="dev-list">
-    <div class="preview-bar">
+    <div class="preview-bar" style="position: fixed; top: 121px; width: 100%; z-index: 2000;background-color: white;height: 100px">
       <div class="preview-bar-operate" v-if="!viewMode">
         <el-checkbox v-model="allChecked" @change="allCheckedChange" style="margin-right: 10px">全选</el-checkbox>
         <el-button type="primary" size="mini" :disabled="!hasSelect" @click="rebootOne">重启设备</el-button>
@@ -10,13 +10,13 @@
       </div>
       <div class="preview-bar-operate" v-else>
       </div>
-      <div>
+      <div style="margin-right: 300px">
         <span>切换视图：</span>
         <el-button type="text" :disabled="!viewMode" @click="changeMode(false)">预览图</el-button>
         <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
       </div>
     </div>
-    <div class="device-case-dev border-all" v-if="viewMode">
+    <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 110px">
       <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
@@ -107,7 +107,7 @@
         </div>
       </el-dialog>
     </div>
-    <div class="preview-main" v-else>
+    <div class="preview-main" v-else  style="margin-top: 110px">
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
           <el-tooltip class="item" effect="dark" :content="item.deviceIp" placement="top-start">
@@ -185,6 +185,7 @@ export default {
         startPage: 1,
         limit: 20
       },
+      oldLimit: 20,
       multipleSelection: [], // 选中的对象列表
       groupDevPopShow: false, // 是否显示分组弹窗
       formLabelWidth: '120px',
@@ -394,18 +395,42 @@ export default {
       this.viewMode = mode
       this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
       if (!this.viewMode) {
+        this.oldLimit = this.page.limit
+        this.page.limit = 1000
+        let that = this
+        that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
+          that.info = res
+          that.test = []
+          that.info.list.forEach(v => {
+            that.test.push(false)
+            that.oprShowList.push(false)
+            // that.snapshotImg[v.deviceIp] = ''
+            that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
+
+            that.$post(that.$uri.device.snapshot, {deviceIp: v.deviceIp, isSave: 0}).then(res => {
+              if (res.success) {
+                that.$set(that.snapshotImg, v.deviceIp, res.data)
+              }
+            })
+          })
+        })
+        /*console.log('XXXXXXXXXXXXXXXXXXXXXX')
+        console.log(this.info.list)
         let ips = []
         this.info.list.forEach(v => {
           ips.push(v.deviceIp)
         })
-        let that = this
+
         ips.forEach(ip => {
           that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
             if (res.success) {
               that.$set(that.snapshotImg, ip, res.data)
             }
           })
-        })
+        })*/
+      } else {
+        this.page.limit = this.oldLimit
+        this.getDeviceList()
       }
     },
     allCheckedChange(checked) {
@@ -429,7 +454,6 @@ export default {
           // that.snapshotImg[v.deviceIp] = ''
           that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
         })
-        that.changeMode(that.$store.state.groupDevShowMode)
       })
     },
     /* 获取设备列表 */
@@ -655,11 +679,10 @@ export default {
     }
   },
   mounted () {
-    this.getDeviceList()
+    this.changeMode(this.$store.state.groupDevShowMode)
     this.getGroupList()
     this.getEngineVersion()
     this.refreshDevList()
-
   }
 };
 </script>
