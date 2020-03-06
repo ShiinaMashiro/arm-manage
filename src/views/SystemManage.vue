@@ -32,8 +32,9 @@
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="管理中心网络配置">
           <div class="engine-info">
-            <div class="engine-version">
+            <div class="engine-version" style="text-align: left">
               <span>IP: {{systemParams.webIp}}</span>
+              <span>端口: {{systemParams.webPort}}</span>
               <span>子网掩码: {{systemParams.webMask}}</span>
             </div>
             <el-button type="text" @click="netChangePop" v-if="$store.getters.checkChangeAuth()">修改</el-button>
@@ -323,6 +324,9 @@
           <el-form-item label="IP">
             <el-input v-model="netChangeInfo.ip"></el-input>
           </el-form-item>
+          <el-form-item label="端口">
+            <el-input v-model="netChangeInfo.port"></el-input>
+          </el-form-item>
           <el-form-item label="子网掩码">
             <el-input v-model="netChangeInfo.mask"></el-input>
           </el-form-item>
@@ -583,6 +587,7 @@
         netChangePopShow: false,
         netChangeInfo: {
           ip: "",
+          port: "",
           mask: ""
         },
         ntpChangePopShow: false,
@@ -698,6 +703,7 @@
         },
         systemParamIds: {
           webIp: "",
+          webPort: "",
           webMask: "",
           caseType: "",
           email: "",
@@ -1124,6 +1130,7 @@
       /* 修改网络配置弹窗 */
       netChangePop () {
         this.netChangeInfo.ip = this.systemParams.webIp
+        this.netChangeInfo.port = this.systemParams.webPort
         this.netChangeInfo.mask = this.systemParams.webMask
         this.netChangePopShow = true
       },
@@ -1134,6 +1141,10 @@
         this.caseTypeChangeInfo.paramName = "webIp"
         this.caseTypeChangeInfo.paramValue = this.netChangeInfo.ip
         let res1 = await that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo)
+        this.caseTypeChangeInfo.id = this.systemParamIds.webPort
+        this.caseTypeChangeInfo.paramName = "webPort"
+        this.caseTypeChangeInfo.paramValue = this.netChangeInfo.port
+        let res2 = await that.$post(that.$uri.system.paramSave, that.caseTypeChangeInfo)
         this.caseTypeChangeInfo.id = this.systemParamIds.webMask
         this.caseTypeChangeInfo.paramName = "webMask"
         this.caseTypeChangeInfo.paramValue = this.netChangeInfo.mask

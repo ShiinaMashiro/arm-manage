@@ -350,12 +350,7 @@ export default {
           setTimeout(() => {
             this.snapshotOne()
           }, 1000)
-          setTimeout(() => {
-            this.snapshotOne()
-          }, 3000)
-          setTimeout(() => {
-            this.snapshotOne()
-          }, 5000)
+
         })
       }).catch( () => {})
     },
@@ -370,15 +365,6 @@ export default {
         that.selectIps.forEach(ip => {
           that.$post(that.$uri.device.deviceRestore, {deviceIp: ip}).then(res => {
             that.$message.success("恢复出厂命令已发送")
-            setTimeout(() => {
-              this.snapshotOne()
-            }, 1000)
-            setTimeout(() => {
-              this.snapshotOne()
-            }, 3000)
-            setTimeout(() => {
-              this.snapshotOne()
-            }, 5000)
           })
         })
       }).catch( () => {})
@@ -395,7 +381,6 @@ export default {
           that.$set(that.snapshotImgLoading, ip, false)
         })
       })
-      console.log(that.snapshotImg)
     },
     mouseEnter(index) {
       this.aaa = index
@@ -405,7 +390,6 @@ export default {
     },
     /* 切换视图模式 */
     changeMode(mode) {
-      console.log('IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII')
       this.snapshotSuccess = false
       this.viewMode = mode
       this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
@@ -422,7 +406,6 @@ export default {
             }
           })
         })
-        console.log(that.snapshotImg)
       }
     },
     allCheckedChange(checked) {
@@ -453,24 +436,27 @@ export default {
     getDeviceList2Refresh () {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
-        /*that.info.list.forEach(v => {
+        that.info.list.forEach(v => {
           res.list.forEach(i => {
-            if (v.id === i.id) {
-              v.deviceStatus = i.deviceStatus
-              that.$set(that.deviceStatusStr, v.deviceIp, that.statusStrM(i))
+            if (v.id === i.id && v.deviceStatus === 1 && i.deviceStatus !== 1) {
+              setTimeout(() => {
+                that.$post(that.$uri.device.snapshot, {deviceIp: v.deviceIp, isSave: 0}).then(res => {
+                  if (res.success) {
+                    that.$set(that.snapshotImg, v.deviceIp, res.data)
+                  }
+                })
+              }, 1000)
             }
           })
-        })*/
+        })
         that.info.list = res.list
         res.list.forEach(i => {
             that.$set(that.deviceStatusStr, i.deviceIp, that.statusStrM(i))
         })
-        console.log(that.deviceStatusStr)
       })
     },
     /* 推流 */
     h5Test (deviceNo) {
-      console.log("aasdasfas")
       let tempwindow = window.open()
       tempwindow.location = this.$store.getters.h5TestUrl(deviceNo)
     },
@@ -490,7 +476,6 @@ export default {
     /* 获取选中的数据 */
     handleSelectionChange (val) {
       this.multipleSelection = val
-      console.log(this.multipleSelection)
     },
     /* 删除设备 */
     async deleteDev (deviceIp) {
