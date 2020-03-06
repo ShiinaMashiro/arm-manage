@@ -395,6 +395,7 @@ export default {
       this.viewMode = mode
       this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
       if (!this.viewMode) {
+        this.allChecked = false
         this.oldLimit = this.page.limit
         this.page.limit = 1000
         let that = this
@@ -404,7 +405,6 @@ export default {
           that.info.list.forEach(v => {
             that.test.push(false)
             that.oprShowList.push(false)
-            // that.snapshotImg[v.deviceIp] = ''
             that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
 
             that.$post(that.$uri.device.snapshot, {deviceIp: v.deviceIp, isSave: 0}).then(res => {
@@ -414,20 +414,6 @@ export default {
             })
           })
         })
-        /*console.log('XXXXXXXXXXXXXXXXXXXXXX')
-        console.log(this.info.list)
-        let ips = []
-        this.info.list.forEach(v => {
-          ips.push(v.deviceIp)
-        })
-
-        ips.forEach(ip => {
-          that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
-            if (res.success) {
-              that.$set(that.snapshotImg, ip, res.data)
-            }
-          })
-        })*/
       } else {
         this.page.limit = this.oldLimit
         this.getDeviceList()
