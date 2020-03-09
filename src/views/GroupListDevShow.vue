@@ -132,7 +132,7 @@
                       element-loading-text="拼命加载中"
                       element-loading-spinner="el-icon-loading"
                       element-loading-background="rgba(0, 0, 0, 0.8)"
-                    style="width: 200px;"
+                    style="width: 144px;"
                     :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"
                     fit="cover"></el-image>
             <!--<img @click="h5Test(item.deviceNo)" style="width: 200px" :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"/>-->
