@@ -174,7 +174,7 @@ export default {
       test: [],
       oprShowList: [],
       allChecked: false,
-      viewMode: true, // true为列表，false为预览
+      viewMode: false, // true为列表，false为预览
       snapshotSuccess: false,
       info: {
         success: false,
