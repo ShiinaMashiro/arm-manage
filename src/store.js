@@ -12,6 +12,7 @@ let sideItems = [
   {
     src: "dev",
     name: "设备管理",
+    guide: true,
     authorCode: "_02",
     queryAuthor: "_0201_",
     updateAuthor: "_0200_",
@@ -65,6 +66,7 @@ let sideItems = [
   }, {
     src: "app",
     name: "应用管理",
+    guide: true,
     authorCode: "_03",
     queryAuthor: "_0301_",
     updateAuthor: "_0300_",
@@ -125,6 +127,7 @@ let sideItems = [
     },*/ {
     src: "log",
     name: "日志管理",
+    guide: true,
     authorCode: "_05",
     queryAuthor: "_0501_",
     updateAuthor: "_0500_",
@@ -148,6 +151,7 @@ let sideItems = [
   }, {
     src: "user",
     name: "用户管理",
+    guide: true,
     authorCode: "_01",
     queryAuthor: "_0101_",
     updateAuthor: "_0100_",
@@ -166,6 +170,7 @@ let sideItems = [
   }, {
     src: "system",
     name: "系统管理",
+    guide: true,
     authorCode: "_00",
     queryAuthor: "_0001_",
     updateAuthor: "_0000_",
@@ -226,7 +231,7 @@ const state = {
   sideItems: sideItems,
   loginTimeout: false,
   logGroupId: '',
-  groupDevShowMode: true, // true为列表，false为预览
+  groupDevShowMode: false, // true为列表，false为预览
 
   deviceWindowMode: {
     show: false,
@@ -515,6 +520,8 @@ export default new Vuex.Store({
       return state.userInfo.authority.indexOf(authorCode) !== -1
     },/* 判断引导弹窗是否显示 */
     isGuideShow: (state) => (popNum) => {
+      console.log("popnum")
+      console.log(popNum)
       return state.guide == popNum
     },
     /* 获取设备池详情页面所需的list */

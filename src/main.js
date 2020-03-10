@@ -15,8 +15,8 @@ import axios from 'axios'
 import VueDraggableResizable from 'vue-draggable-resizable'
 
 Vue.use(mavonEditor)
-Vue.use(ElementUI);
-Vue.config.productionTip = false;
+Vue.use(ElementUI)
+Vue.config.productionTip = false
 Vue.prototype.$post = postData
 Vue.prototype.$uri = uri
 Vue.prototype.$filePost = () => {

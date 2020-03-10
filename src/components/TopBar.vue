@@ -15,7 +15,7 @@
             placement="bottom"
             title=""
             width="250"
-            :value="$store.getters.isGuideShow($store.getters.authorItems.length + 2) && show"
+            :value="$store.getters.isGuideShow(lastGuide) && show"
             trigger="manual">
       <p>如果还有其他问题，可以进入帮助中心查看并下载用户手册。</p>
       <div style="text-align: right; margin: 0">
@@ -46,6 +46,18 @@ export default {
     return {
       userShow: false,
       show: false
+    }
+  },
+  computed: {
+    lastGuide() {
+      let list = this.$store.getters.authorItems
+      let guide = 2
+      list.forEach(i => {
+        if (i.guide) {
+          guide++
+        }
+      })
+      return guide
     }
   },
   mounted() {
