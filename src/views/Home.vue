@@ -9,6 +9,12 @@
       </div>
     </div>
     <div :style="{display: $store.state.guide > 0 ? 'block' : 'none'}" class="mask"></div>
+    <template v-if="$store.state.deviceWindowMode.show">
+      <device-window :id="$store.state.deviceWindowMode.id"
+                     :device-id="$store.state.deviceWindowMode.deviceNo"
+                     @close="deviceWindowClose"
+      ></device-window>
+    </template>
   </div>
 </template>
 
@@ -18,6 +24,7 @@ import TopBar from "@/components/TopBar.vue";
 import SideBar from "@/components/SideBar.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import HomeMainTopBar from "@/components/HomeMainTopBar.vue";
+import DeviceWindow from "@/components/DeviceWindow.vue";
 
 export default {
   name: "home",
@@ -25,7 +32,8 @@ export default {
     HomeMainTopBar,
     TopBar,
     SideBar,
-    UserInfo
+    UserInfo,
+    DeviceWindow
   },
   methods: {
     sideInit() {
@@ -63,6 +71,11 @@ export default {
       }
       this.$store.commit(this.$mutation.SIDE_CHECK, 0)
       this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: 0})
+    },
+    deviceWindowClose () {
+      this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
+        show: false
+      })
     }
   },
   mounted () {

@@ -227,6 +227,12 @@ const state = {
   loginTimeout: false,
   logGroupId: '',
   groupDevShowMode: true, // true为列表，false为预览
+
+  deviceWindowMode: {
+    show: false,
+    id: 0,
+    deviceNo: 0
+  },
 }
 
 let admin = {
@@ -396,7 +402,16 @@ export default new Vuex.Store({
     [mutation.GROUP_DEV_SHOW_MODE] (state, mode) {
       state.groupDevShowMode = mode
       sessionStorage.setItem('groupDevShowMode', JSON.stringify(mode))
-    }
+    },
+    /* 设置设备控制窗口状态 */
+    [mutation.DEVICE_WINDOW_SHOW_MODE] (state, mode) {
+      console.log(mode);
+      state.deviceWindowMode.show = mode.show;
+      if (mode.id && mode.deviceNo) {
+        state.deviceWindowMode.id = mode.id;
+        state.deviceWindowMode.deviceNo = mode.deviceNo;
+      }
+    },
   },
   actions: {
     /* 登陆 */
@@ -454,6 +469,14 @@ export default new Vuex.Store({
         shinoIp = shinoIp.substr(0,shinoIp.indexOf(":"))
       }
       return url.split("shino").join(shinoIp)
+    },
+    /* 获取推流地址 */
+    shinoIp: (state) => () => {
+      let shinoIp = (state.orekiIp || state.webIp) === state.webIp ? "0.0.0.0" : state.orekiIp
+      if (shinoIp.indexOf(":") > 0) {
+        shinoIp = shinoIp.substr(0,shinoIp.indexOf(":"))
+      }
+      return shinoIp;
     },
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {

@@ -119,7 +119,7 @@
             <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
                        v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">分组</el-button>
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
-                       @click="h5Test(scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
+                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -296,10 +296,23 @@
         })
       },
       /* 推流 */
+      /*
       h5Test (deviceNo) {
         console.log("aasdasfas")
         let tempwindow = window.open()
         tempwindow.location = this.$store.getters.h5TestUrl(deviceNo)
+      },
+      */
+      deviceWindowOpen (id, deviceNo) {
+        if (this.$store.state.deviceWindowMode.show) {
+          this.$message.error("同时只能控制一台设备！")
+        } else {
+          this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
+            show: true,
+            id,
+            deviceNo
+          });
+        }
       },
       isCommonCard (row, index) {
         return row.cardType === 1

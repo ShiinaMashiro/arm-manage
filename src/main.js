@@ -12,6 +12,7 @@ import router from "./router";
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import axios from 'axios'
+import VueDraggableResizable from 'vue-draggable-resizable'
 
 Vue.use(mavonEditor)
 Vue.use(ElementUI);
@@ -35,6 +36,8 @@ Vue.prototype.$util = myUtil
 Vue.filter("formatDateTime", function(time) {
   return myUtil.formatDate(new Date(time))
 })
+
+Vue.component('vue-draggable-resizable', VueDraggableResizable)
 
 new Vue({
   router,
