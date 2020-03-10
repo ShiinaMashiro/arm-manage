@@ -15,7 +15,7 @@
             placement="bottom"
             title=""
             width="250"
-            :value="$store.getters.isGuideShow(7) && show"
+            :value="$store.getters.isGuideShow($store.getters.authorItems.length + 2) && show"
             trigger="manual">
       <p>如果还有其他问题，可以进入帮助中心查看并下载用户手册。</p>
       <div style="text-align: right; margin: 0">

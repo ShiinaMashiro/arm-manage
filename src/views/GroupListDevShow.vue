@@ -57,7 +57,7 @@
       <div class="list-bottom">
         <div class="list-bottom-btn">
           <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -132,7 +132,7 @@
                       element-loading-text="拼命加载中"
                       element-loading-spinner="el-icon-loading"
                       element-loading-background="rgba(0, 0, 0, 0.8)"
-                    style="width: 200px;"
+                    style="width: 144px;"
                     :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"
                     fit="cover"></el-image>
             <!--<img @click="h5Test(item.deviceNo)" style="width: 200px" :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"/>-->
@@ -395,6 +395,7 @@ export default {
       this.viewMode = mode
       this.$store.commit(this.$mutation.GROUP_DEV_SHOW_MODE, mode)
       if (!this.viewMode) {
+        this.allChecked = false
         this.oldLimit = this.page.limit
         this.page.limit = 1000
         let that = this
@@ -404,7 +405,6 @@ export default {
           that.info.list.forEach(v => {
             that.test.push(false)
             that.oprShowList.push(false)
-            // that.snapshotImg[v.deviceIp] = ''
             that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
 
             that.$post(that.$uri.device.snapshot, {deviceIp: v.deviceIp, isSave: 0}).then(res => {
@@ -414,20 +414,6 @@ export default {
             })
           })
         })
-        /*console.log('XXXXXXXXXXXXXXXXXXXXXX')
-        console.log(this.info.list)
-        let ips = []
-        this.info.list.forEach(v => {
-          ips.push(v.deviceIp)
-        })
-
-        ips.forEach(ip => {
-          that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
-            if (res.success) {
-              that.$set(that.snapshotImg, ip, res.data)
-            }
-          })
-        })*/
       } else {
         this.page.limit = this.oldLimit
         this.getDeviceList()
