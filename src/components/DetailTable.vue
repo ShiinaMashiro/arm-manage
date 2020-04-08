@@ -39,6 +39,9 @@
             <el-form-item label="初始端口">
               <el-input v-model="caseInfo.initialPort"></el-input>
             </el-form-item>
+            <el-form-item label="ADB端口">
+              <el-input v-model="caseInfo.adbPort"></el-input>
+            </el-form-item>
             <el-form-item label="是否有状态">
               <el-switch v-model="caseInfo.isStatus"
                          active-value="1"

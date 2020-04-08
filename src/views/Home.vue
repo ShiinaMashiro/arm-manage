@@ -15,6 +15,62 @@
                      @close="deviceWindowClose"
       ></device-window>
     </template>
+    <el-dialog
+            :title="$store.state.isAdmin ? '请输入license激活龙境安卓云系统' : '请联系管理员激活系统'"
+            :visible.sync="$store.state.needLicense || $store.state.licenseUpdate"
+            :close-on-click-modal="$store.state.licenseUpdate"
+            :close-on-press-escape="$store.state.licenseUpdate"
+            :show-close="$store.state.licenseUpdate"
+            :center="true"
+            :destroy-on-close="true"
+            @close="licensePopClose"
+            width="550px">
+      <div v-if="$store.state.isAdmin">
+        <div>license:</div>
+        <el-input
+                type="textarea"
+                :rows="5"
+                placeholder="license"
+                v-model="license">
+        </el-input>
+        <div style="width: 100%;text-align: center;padding: 15px 0">
+          <el-button type="primary" style="width: 100px" @click="licenseSystem">激活</el-button>
+        </div>
+
+        <div>说明：管理后台正常使用需要输入License码进行激活解锁。</div>
+        <br/>
+        <div>如何激活？</div>
+        <div>要激活龙境安卓云系统，请从龙境云销售商获取license码，输入正确的激活码点击激活后即可验证激活。</div>
+        <br/>
+        <div>销售商联系方式：</div>
+        <div>QQ：157457734</div>
+        <div>电话：13616513812</div>
+        <div>Email：zx@longene.com.cn</div>
+      </div>
+      <div v-else>
+        <div>系统激活已过期，无法继续使用服务，请联系管理员进行激活。</div>
+      </div>
+    </el-dialog>
+    <el-dialog
+            title="激活成功"
+            :visible.sync="licenseResult"
+            :close-on-click-modal="true"
+            :close-on-press-escape="true"
+            :show-close="true"
+            :center="true"
+            :destroy-on-close="true"
+            width="350px">
+      <div style="display: flex;flex-direction: column;justify-content: center;align-items: center">
+        <svg t="1585290890129" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2250" width="128" height="128"><path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m-74.965333 550.4L346.453333 545.152a42.666667 42.666667 0 1 0-60.330666 60.330667l120.704 120.704a42.666667 42.666667 0 0 0 60.330666 0l301.653334-301.696a42.666667 42.666667 0 1 0-60.288-60.330667l-271.530667 271.488z" fill="#52C41A" p-id="2251"></path></svg>
+        <div>
+          <div>有效期：{{licenseTime}}</div>
+          <div>设备数量：{{licenseInfo.deviceNum}}</div>
+        </div>
+        <div style="width: 100%;text-align: center;padding: 15px 0">
+          <el-button type="primary" style="width: 100px" @click="licenseResult = false">开始使用</el-button>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -35,7 +91,48 @@ export default {
     UserInfo,
     DeviceWindow
   },
+  data() {
+    return {
+      license: '',
+      licenseResult: false,
+      licenseInfo: {
+        seconds: -1,
+        deviceNum: 0
+      }
+    }
+  },
+  computed: {
+    licenseTime() {
+      let s = this.licenseInfo.seconds
+      if (s === -1) {
+        return '永久'
+      }
+      let time = ''
+      let day = parseInt(s/(60 * 60 * 24))
+      if (day > 0) {
+        time += day + '天'
+      }
+      s = s - day * (60 * 60 * 24)
+      let hour = parseInt(s/(60 * 60))
+      if (hour > 0) {
+        time += hour + '小时'
+      }
+      return time
+    }
+  },
   methods: {
+    licenseSystem() {
+      let that = this
+      that.$post(that.$uri.system.license, {licenseCode: that.license}).then(res => {
+        if (res.success) {
+          that.$store.commit(that.$mutation.IS_NEED_LICENSE, false)
+          that.licenseResult = true
+          that.licenseInfo = res.data
+        } else {
+          that.$message.error("激活失败！" + res.message)
+        }
+      })
+    },
     sideInit() {
       console.log("home: " + this.$route.path)
       if (this.$store.state.guide > 0) {
@@ -78,7 +175,22 @@ export default {
       })
     }
   },
+  /*beforeCreate() {
+    let that = this
+    that.$post(that.$uri.user.infoGet, {id: that.$store.state.userInfo.id}).then(res => {
+      if (res.success) {
+        if (res.data.groupId === 1) {
+          that.$store.commit(that.$mutation.IS_ADMIN, true)
+        } else {
+          that.$store.commit(that.$mutation.IS_ADMIN, false)
+        }
+      }
+      console.log("................")
+      console.log(that.$store.state.isAdmin)
+    })
+  },*/
   mounted () {
+    this.$router.push(this.$store.getters.authorItems[0].children[0].path)
     let that = this
     that.$post(that.$uri.system.paramGet, {paramName: "extranetIp"}).then(res => {
       that.$store.commit(that.$mutation.OREKI_IP, res.data.paramValue)

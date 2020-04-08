@@ -13,7 +13,7 @@
         <el-table-column prop="groupName" label="用户组"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="changeUserPop(scope.row)" v-if="$store.getters.checkChangeAuth()">修改</el-button>
+            <el-button type="text" size="small" @click="changeUserPop(scope.row)" v-if="$store.getters.checkChangeAuth() && scope.row.id !== 1">修改</el-button>
             <!--<el-button type="text" size="small" @click="delUser(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
           </template>
         </el-table-column>
@@ -39,7 +39,7 @@
             <el-form-item label="用户组名称">
               <el-input v-model="addUserInfo.groupName"></el-input>
             </el-form-item>
-            <el-card class="box-card" style="margin-bottom: 10px">
+            <!--<el-card class="box-card" style="margin-bottom: 10px">
               <div slot="header" class="clearfix">
                 <span>管理权限</span>
                 <el-button style="float: right; padding: 3px 0" type="text" @click="checkAll">全选</el-button>
@@ -51,6 +51,17 @@
                   <el-checkbox-button :label="item.change">修改</el-checkbox-button>
                 </el-checkbox-group>
               </template>
+            </el-card>-->
+            <el-card class="box-card" style="margin-bottom: 10px" v-if="$store.state.isAdmin">
+              <div slot="header" class="clearfix">
+                <span>关联分组</span>
+                <el-button style="float: right; padding: 3px 0" type="text" @click="checkAllGroup">全选</el-button>
+              </div>
+              <el-checkbox-group v-model="groupSelectList">
+                <template v-for="(group, index) in groupList">
+                  <el-checkbox :label="group.id" :key="group.id">{{group.groupName}}</el-checkbox>
+                </template>
+              </el-checkbox-group>
             </el-card>
             <el-form-item>
               <el-button type="primary" @click="addUser">确定</el-button>
@@ -66,7 +77,7 @@
             <el-form-item label="用户组名称">
               <el-input v-model="changeUserInfo.groupName"></el-input>
             </el-form-item>
-            <el-card class="box-card" style="margin-bottom: 10px">
+            <!--<el-card class="box-card" style="margin-bottom: 10px">
               <div slot="header" class="clearfix">
                 <span>管理权限</span>
                 <el-button style="float: right; padding: 3px 0" type="text" @click="checkAll">全选</el-button>
@@ -78,6 +89,17 @@
                   <el-checkbox-button :label="item.change">修改</el-checkbox-button>
                 </el-checkbox-group>
               </template>
+            </el-card>-->
+            <el-card class="box-card" style="margin-bottom: 10px" v-if="$store.state.isAdmin">
+              <div slot="header" class="clearfix">
+                <span>关联分组</span>
+                <el-button style="float: right; padding: 3px 0" type="text" @click="checkAllGroup">全选</el-button>
+              </div>
+              <el-checkbox-group v-model="groupSelectList">
+                <template v-for="(group, index) in groupList">
+                  <el-checkbox :label="group.id" :key="group.id">{{group.groupName}}</el-checkbox>
+                </template>
+              </el-checkbox-group>
             </el-card>
             <el-form-item>
               <el-button type="primary" @click="changeUser">确定</el-button>
@@ -154,7 +176,9 @@
             change: "_0500_",
             value: []
           }
-        ]
+        ],
+        groupList: [],
+        groupSelectList: []
       }
     },
     methods: {
@@ -198,6 +222,17 @@
           v.value = i === 12 ? [] : [v.query, v.change]
         })
       },
+      checkAllGroup () {
+        let all = []
+        if (this.groupSelectList.length < this.groupList.length) {
+          this.groupList.forEach(g => {
+            all.push(g.id)
+          })
+        }
+        console.log(all)
+        console.log(this.groupSelectList)
+        this.$set(this, 'groupSelectList', all)
+      },
       /* 获取用户组列表 */
       getUserList () {
         let that = this
@@ -220,6 +255,7 @@
         this.authority.forEach(v => {
           v.value = []
         })
+        this.groupSelectList = []
         this.addUserPopShow = true
       },
       /* 添加用户 */
@@ -232,9 +268,16 @@
         this.authority.forEach(v => {
             list = [...list, ...v.value]
         })
-        this.addUserInfo.authority = list.join()
+        // this.addUserInfo.authority = list.join()
+        this.addUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_'
         let that = this
         that.$post(that.$uri.user.groupAdd, that.addUserInfo).then(res => {
+
+          if (that.$store.state.isAdmin && that.groupSelectList.length > 0) {
+            that.$post(that.$uri.user.groupMerge, {userGroupId: res.data.id, groupIds: that.groupSelectList.join(",")}).then(res => {
+              that.groupSelectList = []
+            })
+          }
           that.$message.success("添加成功")
           that.addUserPopShow = false
           that.getUserList()
@@ -255,6 +298,16 @@
           }
           v.value = list
         })
+        let that = this
+        that.$post(that.$uri.group.list, {userGroupId: row.id}).then(res => {
+          if (res.success) {
+            let s = []
+            res.list.forEach(g => {
+              s.push(g.id)
+            })
+            that.groupSelectList = s
+          }
+        })
         this.changeUserPopShow = true
       },
       /* 修改用户 */
@@ -267,17 +320,34 @@
         this.authority.forEach(v => {
           list = [...list, ...v.value]
         })
-        this.changeUserInfo.authority = list.join()
+        // this.changeUserInfo.authority = list.join()
+        this.changeUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_'
         let that = this
         that.$post(that.$uri.user.groupInfoSave, that.changeUserInfo).then(res => {
+          if (that.$store.state.isAdmin) {
+            that.$post(that.$uri.user.groupMerge, {userGroupId: that.changeUserInfo.id, groupIds: that.groupSelectList.join(",")}).then(res => {
+              that.groupSelectList = []
+            })
+          }
           that.$message.success("修改成功")
           that.changeUserPopShow = false
           that.getUserList()
+        })
+      },
+      getGroupList() {
+        let that = this
+        that.$post(that.$uri.group.list, {}).then(res => {
+          if (res.success) {
+            that.groupList = [...res.list]
+          }
         })
       }
     },
     mounted () {
       this.getUserList()
+      if (this.$store.state.isAdmin) {
+        this.getGroupList()
+      }
     }
   };
 </script>

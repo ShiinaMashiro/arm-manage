@@ -48,7 +48,7 @@
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" @click="initDev(scope.row.deviceIp)"
                        v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">恢复出厂</el-button>
             <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
-                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">分组</el-button>
+                       v-if="$store.state.isAdmin && scope.row.cardType !== 2">分组</el-button>
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
                        @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
           </template>
@@ -110,7 +110,7 @@
     <div class="preview-main" v-else  style="margin-top: 110px">
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
-          <el-tooltip class="item" effect="dark" :content="item.deviceIp" placement="top-start">
+          <el-tooltip class="item" effect="dark" :content="item.deviceIp + ' adb端口：' + adbPortFilter(item)" placement="top-start">
           <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
             <el-checkbox v-model="test[index]" @change="itemCheckedChange" style="flex-grow: 1">
                 <span>{{item.id}}</span>
@@ -126,6 +126,8 @@
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="rebootOneOne(item.deviceIp)">重启云机</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="downloadSnapshot(index)">下载截图</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 1)">打开ADB</el-button></div>
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
             </div>
             <el-image @click="deviceWindowOpen(item.id, item.deviceNo)"
                       v-loading="snapshotImgLoading[item.deviceIp]"
@@ -159,6 +161,7 @@ export default {
   name: "GroupListDevShow",
   data () {
     return {
+      adbPort:{},
       snapFail: require('../assets/snapfail.png'),
       snapNotUpdate: require('../assets/notupdate.png'),
       snapError: require('../assets/snaperror.png'),
@@ -280,6 +283,16 @@ export default {
     }
   },
   methods: {
+    adbOpt(deviceIp, on) {
+      let that = this
+      that.$post(that.$uri.device.turnAdb, {deviceIp, on}).then(res => {
+        if (res.success) {
+          that.$message.success((on === 1 ? '开启' : '关闭') + '成功！')
+        } else {
+          that.$message.error((on === 1 ? '开启' : '关闭') + '失败！' + res.message)
+        }
+      })
+    },
     statusImg(status) {
       return status === 1 ? this.snapNotUpdate :
         (status === 3 ? this.snapError : null)
@@ -403,6 +416,17 @@ export default {
           that.info = res
           that.test = []
           that.info.list.forEach(v => {
+            if (that.adbPort[v.caseNo] == null) {
+              that.adbPort[v.caseNo] = 0
+              that.$post(that.$uri.device.caseInfoByCaseNo, {caseNo: v.caseNo}).then(res => {
+                if (res.success) {
+                  that.adbPort[v.caseNo] = res.data.adbPort
+                } else {
+                  that.adbPort[v.caseNo] = null
+                }
+              })
+            }
+
             that.test.push(false)
             that.oprShowList.push(false)
             that.deviceStatusStr[v.deviceIp] = that.statusStrM(v)
@@ -447,6 +471,7 @@ export default {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
         that.info.list.forEach(v => {
+
           res.list.forEach(i => {
             if (v.id === i.id && v.deviceStatus === 1 && i.deviceStatus !== 1) {
               setTimeout(() => {
@@ -639,6 +664,12 @@ export default {
         case 6: return "升级中";
         case 7: return "应用结束中";
       }
+    },
+    adbPortFilter (row) {
+      let port = this.adbPort[row.caseNo] || 0
+      let num1 = parseInt(row.slotNo.substr(0, row.slotNo.indexOf('.')))
+      let num2 = parseInt(row.slotNo.substr(row.slotNo.indexOf('.') + 1))
+      return port + num1 * 2 + num2
     },
   },
   filters: {

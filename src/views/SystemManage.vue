@@ -28,6 +28,7 @@
               <span>后台: {{systemVersion}}</span>
             </div>
             <el-button type="text" @click="systemUpdatePopShow = true" v-if="$store.getters.checkChangeAuth()">管理系统升级</el-button>
+            <el-button type="text" @click="license" v-if="$store.getters.checkChangeAuth()">激活</el-button>
           </div>
         </DetailTableItem>
         <DetailTableItem class="detail-table-body-item" name="管理中心网络配置">
@@ -769,6 +770,9 @@
       }
     },
     methods: {
+      license() {
+        this.$store.commit(this.$mutation.LICENSE_UPDATE, true)
+      },
       logItemShow(item) {
         return this.logItem === item ? {} : {"display": "none"}
       },

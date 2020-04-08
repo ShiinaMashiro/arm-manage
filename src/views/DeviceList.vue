@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.getters.checkChangeAuth()">手动添加</el-button>
+        <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.state.isAdmin">手动添加</el-button>
         <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
       </div>
       <div class="search-advanced" v-show="advancedShow">
@@ -115,9 +115,9 @@
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" :disabled="scope.row.isDistributed === 0" @click="recoverDev(scope.row.deviceIp)">回收</el-button>-->
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" @click="initDev(scope.row.deviceIp)"
-                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">恢复出厂</el-button>
+                       v-if="$store.state.isAdmin && scope.row.cardType !== 2">恢复出厂</el-button>
             <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
-                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">分组</el-button>
+                       v-if="$store.state.isAdmin && scope.row.cardType !== 2">分组</el-button>
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
                        @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
           </template>
@@ -125,8 +125,8 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.state.isAdmin">重启</el-button>
+          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.state.isAdmin">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"

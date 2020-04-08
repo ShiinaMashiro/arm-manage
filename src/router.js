@@ -31,6 +31,9 @@ import HelpFun from "./views/HelpFun.vue";
 import HelpFunShow from "./views/HelpFunShow.vue";
 import LogGroup from "./views/LogGroup.vue";
 import GroupListAuth from "./views/GroupListAuth.vue";
+import FileList from "./views/FileList.vue";
+import FileAdd from "./views/FileAdd.vue";
+import FileIssue from "./views/FileIssue.vue";
 
 Vue.use(Router);
 
@@ -51,7 +54,7 @@ export default new Router({
       path: "/home",
       name: "home",
       component: Home,
-      redirect: '/home/deviceCase',
+      // redirect: '/home/deviceCase',
       children: [
         {
           path: "deviceCase",
@@ -180,6 +183,29 @@ export default new Router({
           path: "group/app/manage",
           name: "应用管理",
           component: GroupListAppManage,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "file/list",
+          name: "文件列表",
+          component: FileList,
+          meta: {
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "file/add",
+          name: "新增文件",
+          component: FileAdd,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "file/issue",
+          name: "文件分发",
+          component: FileIssue,
           meta: {
             c2c: true,
             changeAuth: "_0200_"

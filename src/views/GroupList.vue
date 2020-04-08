@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addGroupPopShow = true" v-if="$store.getters.checkChangeAuth()">新增分组</el-button>
+        <el-button size="small" type="primary" @click="addGroupPopShow = true" v-if="$store.state.isAdmin">新增分组</el-button>
       </div>
       <div class="search-advanced">
         <div class="search-main">
@@ -32,19 +32,19 @@
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>
         <el-table-column label="操作" min-width="200px">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="manage(scope.row)">添加设备</el-button>
+            <el-button type="text" size="small" @click="manage(scope.row)" v-if="$store.state.isAdmin">添加设备</el-button>
             <el-button type="text" size="small" @click="goGroupDev(scope.row)">组内设备</el-button>
             <el-button type="text" size="small" @click="goAppManage(scope.row)">应用管理</el-button>
-            <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
-            <el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>
-            <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
-            <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
+            <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.state.isAdmin">编辑</el-button>
+            <!--<el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>-->
+            <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.state.isAdmin">权限控制</el-button>
+            <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.state.isAdmin">日志监控</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteBatch">删除</el-button>
+          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteBatch"  v-if="$store.state.isAdmin">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"

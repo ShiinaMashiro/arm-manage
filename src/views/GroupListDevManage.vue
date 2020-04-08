@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.getters.checkChangeAuth()">保存修改</el-button>
+        <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.state.isAdmin">保存修改</el-button>
         <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
       </div>
       <div class="search-advanced">
