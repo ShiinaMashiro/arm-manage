@@ -5,8 +5,7 @@
     </div>
 
     <div v-if="info.success" class="device-case border-all">
-      <el-table ref="multipleTable" :data="info.list" stripe @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+      <el-table ref="multipleTable" :data="info.list" stripe @row-click="goCaseDev" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column prop="caseNo" label="设备池编号"></el-table-column>
         <el-table-column prop="deviceNum" label="设备数量"></el-table-column>
         <el-table-column prop="deviceNumIsDistributed" label="受控设备数量"></el-table-column>
@@ -15,16 +14,14 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
-            <el-button type="text" size="small" @click="goCaseDetail(scope.row)">详情</el-button>
-            <el-button type="text" size="small" @click="goCaseDev(scope.row)">设备</el-button>
+            <el-button type="text" size="small" @click.stop="goCaseDetail(scope.row)">详情</el-button>
+            <el-button type="text" size="small" @click.stop="scanDevice(scope.row.id)">扫描设备</el-button>
+            <el-button type="text" size="small" @click.stop="deleteCase(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
-        <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="scanDevice"  v-if="$store.getters.checkChangeAuth()">扫描设备</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteCaseBatch"  v-if="$store.getters.checkChangeAuth()">删除</el-button>
-        </div>
+        <div></div>
         <el-pagination
                 @size-change="sizeChangeHandle"
                 @current-change="currentChangeHandle"
@@ -111,35 +108,33 @@ export default {
       }).catch( () => {})
     },
     /* 扫描设备 */
-    scanDevice () {
+    scanDevice (id) {
       this.$confirm("确认扫描设备？", "提示", {
         confirmButtonText: '确定',
         confirmButtonClass: 'confirm-btn-blue',
         iconClass: 'el-icon-c-blue',
         cancelButtonText: '取消'
       }).then( () => {
-        this.scan(this.$uri.device.scanDevice, {caseIds: this.selectIds})
+        this.scan(this.$uri.device.scanDevice, {caseIds: [id]})
       }).catch( () => {})
     },
     /* 删除设备池 */
-    async deleteCase (id) {
-      let that = this
-      await that.$post(that.$uri.device.caseDelete, {id})
-    },
-    /* 批量删除设备池 */
-    deleteCaseBatch () {
+    deleteCase (id) {
       this.$confirm("删除设备池后会导致设备池内的设备恢复出厂设置，清除数据，是否继续？", "提示", {
         confirmButtonText: '确定',
         confirmButtonClass: 'confirm-btn-red',
         iconClass: 'el-icon-c-red',
         cancelButtonText: '取消'
       }).then( () => {
-        this.multipleSelection.forEach(v => {
-          this.deleteCase(v.id)
-        })
-        this.$message.success("删除完成")
         let that = this
-        setTimeout(() => {that.getDeviceCaseList()}, 1000)
+        that.$post(that.$uri.device.caseDelete, {id}).then(res => {
+          if (res.success) {
+            setTimeout(() => {that.getDeviceCaseList()}, 1000)
+          } else {
+            that.$message.error("删除失败")
+          }
+        })
+
       }).catch( () => {})
     },
     /* 查看设备池详情 */
@@ -170,11 +165,5 @@ export default {
       flex-direction: row;
     }
   }
-}
-.search-btn {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 10px;
 }
 </style>

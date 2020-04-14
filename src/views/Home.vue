@@ -3,7 +3,8 @@
     <TopBar></TopBar>
     <SideBar></SideBar>
     <HomeMainTopBar class="home-main-top-bar-fixed"></HomeMainTopBar>
-    <div class="home-main">
+    <MainScene></MainScene>
+    <div class="home-main" :style="{left: this.$store.state.sideInfo.scene ? '380px' : '230px'}">
       <div class="home-list">
         <router-view></router-view>
       </div>
@@ -25,6 +26,7 @@ import SideBar from "@/components/SideBar.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import HomeMainTopBar from "@/components/HomeMainTopBar.vue";
 import DeviceWindow from "@/components/DeviceWindow.vue";
+import MainScene from "@/components/MainScene.vue";
 
 export default {
   name: "home",
@@ -33,44 +35,38 @@ export default {
     TopBar,
     SideBar,
     UserInfo,
-    DeviceWindow
+    DeviceWindow,
+    MainScene
   },
   methods: {
-    sideInit() {
-      console.log("home: " + this.$route.path)
-      if (this.$store.state.guide > 0) {
-        return
+    sideInit(route) {
+      let path = route.path
+      let sideInfo = {
+        item: null,
+        child: null,
+        scene: null
       }
-      let sideItem = this.$store.state.sideItems
-      for (let i in sideItem) {
-        let children = sideItem[i].children
-        for (let j in children) {
-          if (children[j].path === this.$route.path) {
-            console.log("home i - j: " + i + " - " + j)
-            this.$store.commit(this.$mutation.SIDE_CHECK, i)
-            this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: j})
-            return
+      let sideItems = this.$store.state.sideItems
+      for (let item of sideItems) {
+        for (let child of item.children) {
+          if (child.path === path) {
+            sideInfo.item = item
+            sideInfo.child = child
+            break
           }
-          let scene = children[j].sceneList
-          if (scene) {
-            for (let k in scene) {
-              let path = this.$route.path
-              if (scene[k].path.indexOf("?") >= 0) {
-                path += "?index=" + this.$route.query.index
-              }
-              if (scene[k].path === path) {
-                console.log("home i - j: " + i + " - " + j)
-                this.$store.commit(this.$mutation.SIDE_CHECK, i)
-                this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: j})
-                this.$store.commit(this.$mutation.SCENE_CHECK, {scene: true, checked: k})
-                return
+
+          if (child.sceneList) {
+            for (let scene of child.sceneList) {
+              if (scene.path === path) {
+                sideInfo.item = item
+                sideInfo.child = child
+                sideInfo.scene = scene
               }
             }
           }
         }
       }
-      this.$store.commit(this.$mutation.SIDE_CHECK, 0)
-      this.$store.commit(this.$mutation.SCENE_CHECK, {scene: false, checked: 0})
+      this.$store.commit(this.$mutation.SIDE_INFO, sideInfo)
     },
     deviceWindowClose () {
       this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
@@ -86,10 +82,11 @@ export default {
     that.$post(that.$uri.system.paramGet, {paramName: "webIp"}).then(res => {
       that.$store.commit(that.$mutation.WEB_IP, res.data.paramValue)
     })
-    this.sideInit()
+    this.sideInit(this.$route)
   },
-  updated () {
-    this.sideInit()
+  beforeRouteUpdate (to, from, next) {
+    this.sideInit(to)
+    next()
   }
 };
 </script>
@@ -105,14 +102,16 @@ export default {
   }
   .home-main {
     position: fixed;
-    top: 120px;
-    left: 230px;
+    top: 140px;
     right: 0;
     bottom: 0;
     padding: 0 15px;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: row;
     .home-list {
       margin-top: 10px;
+      flex-grow: 1;
     }
   }
 }

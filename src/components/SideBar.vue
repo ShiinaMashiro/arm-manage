@@ -14,14 +14,12 @@
       </div>
     </el-popover>
 
-    <div :style="sideStyle" class="side-bar" v-popover:guide1>
+    <el-menu :style="sideStyle" class="side-bar el-menu-vertical-demo" :default-active="activeChild" :default-openeds="openItemArray"
+             :router="true" text-color="white" background-color="#252a2f" :unique-opened="true" v-popover:guide1>
       <template v-for="(item, index) in authorItems">
         <SideBarItem v-if="item.name" :key="index" :index="index" :item="item"></SideBarItem>
       </template>
-    </div>
-    <template v-if="mainSceneItem">
-      <MainScene></MainScene>
-    </template>
+    </el-menu>
   </div>
 </template>
 
@@ -48,7 +46,22 @@ export default {
     },
     sideStyle() {
       return this.$store.state.guide > 0 ? {width: "230px"} : {}
+    },
+    openItemArray() {
+      if (!this.$store.state.sideInfo.item) {
+        return []
+      }
+      return [this.$store.state.sideInfo.item.src]
+    },
+    activeChild() {
+      if (!this.$store.state.sideInfo.child) {
+        return ''
+      }
+      return this.$store.state.sideInfo.child.path
     }
+  },
+  methods: {
+
   },
   mounted() {
     this.show = true
@@ -62,16 +75,18 @@ export default {
   top: 50px;
   bottom: 0;
   left: 0;
-  width: 50px;
+  width: 220px;
   overflow: hidden;
   z-index: 1020!important;
-  background-color: #252a2f;
+  /*background-color: #252a2f;*/
   border-top: 1px solid hsla(0,0%,100%,.1);
   transition: all .3s cubic-bezier(0,0,.2,1);
+  outline: invert none medium;
 }
-.side-bar:hover {
+
+/*.side-bar:hover {
   cursor: pointer;
   width: 230px;
   transition-delay: .3s;
-}
+}*/
 </style>

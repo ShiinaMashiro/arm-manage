@@ -1,23 +1,15 @@
 <template>
   <div>
-    <div class="detail-table  border-all">
-      <div class="detail-table-header">
-        <span class="detail-table-header-name">{{$route.name}}</span>
-        <!--<el-dropdown @command="handleCommand"  v-if="$store.getters.checkChangeAuth()">
-          <span class="detail-table-setting">
-            设置<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="networkSet">网络设置</el-dropdown-item>
-            <el-dropdown-item command="nodeSet">分层设置</el-dropdown-item>
-            <el-dropdown-item command="remarkChange">修改备注</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>-->
-      </div>
-      <div class="detail-table-body">
-        <template v-for="(item, index) in list">
+    <div class="detail-table">
+
+      <div v-if="caseInfo">
+        <!--<template v-for="(item, index) in list">
           <DetailTableItem class="detail-table-body-item" :key="index" :name="item.name" :param="item.value"></DetailTableItem>
-        </template>
+        </template>-->
+        <InfoView ref="v1" refName="v1" title="设备池名称" msg="" :list="nameList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="修改备注"></InfoView>
+        <InfoView ref="v2" refName="v2" title="网络设置" msg="设备池的网络，NTP服务器地址等相关内容" :list="netList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="设置"></InfoView>
+        <InfoView ref="v3" refName="v3" title="分层设置" msg="设备池的分层处理器IP，用于管理应用分发等" :list="cenList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="设置"></InfoView>
+        <InfoView ref="v4" refName="v4" title="IP设置" msg="设备池内设备的起始IP，设置后设备池内的设备IP会根据起始IP自动递增" :list="ipList" :info="ipSetInfo" :save="ipSet" editBtnName="设置"></InfoView>
       </div>
 
       <!-- 网络设置 -->
@@ -129,21 +121,24 @@
         </div>
       </el-dialog>
     </div>
-    <div class="detail-setting">
+    <!--<div class="detail-setting">
         <el-button type="info" plain size="small" @click="networkSetPop">网络设置</el-button>
         <el-button type="info" plain size="small" @click="nodeSetPop">分层设置</el-button>
         <el-button type="info" plain size="small" @click="ipSetPop">设备IP设置</el-button>
         <el-button type="info" plain size="small" @click="remarkChangePop">修改备注</el-button>
-    </div>
+    </div>-->
   </div>
 </template>
 
 <script>
-import DetailTableItem from "@/components/DetailTableItem"
-export default {
+  import DetailTableItem from "@/components/DetailTableItem"
+  import InfoView from "@/components/InfoView"
+
+  export default {
   name: "DetailTable",
   components: {
-    DetailTableItem
+    DetailTableItem,
+    InfoView
   },
   data () {
     return {
@@ -152,7 +147,7 @@ export default {
       ipPopShow: false,
       ipSuccessPopShow: false,
       remarkPopShow: false,
-      caseInfo: {},
+      caseInfo: null,
       ipSuccessList: [
         {
           deviceIpBefore: '1.1.1.1',
@@ -183,8 +178,127 @@ export default {
         webIp: "",
         webPort: ""
       },
-      list: []
+      list: [],
+      nameList: [
+        {
+          name: 'ID',
+          key: 'id',
+          edit: false,
+        },{
+          name: '备注',
+          key: 'remark',
+          edit: true,
+          notNull: false,
+          value: ''
+        }
+      ],
+      netList: [
+        {
+          name: '网关',
+          key: 'route',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '子网掩码',
+          key: 'netmask',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: 'DNS',
+          key: 'dns',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: 'NTP地址',
+          key: 'ntpAddress',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '初始端口',
+          key: 'initialPort',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: 'ADB端口',
+          key: 'adbPort',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '是否有状态',
+          key: 'isStatus',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '是否锁定',
+          key: 'isLock',
+          edit: true,
+          notNull: true,
+          value: ''
+        }
+      ],
+      cenList: [
+        {
+          name: '分层处理器IP',
+          key: 'nodeIp',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '备用分层处理器IP',
+          key: 'nodeIpBak',
+          edit: true,
+          notNull: true,
+          value: ''
+        }
+      ],
+      ipList: [
+        {
+          name: '设备池起始IP',
+          key: 'initialIp',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '网关',
+          key: 'route',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '子网掩码',
+          key: 'netmask',
+          edit: true,
+          notNull: true,
+          value: ''
+        },{
+          name: '网管IP',
+          key: 'webIp',
+          edit: true,
+          notNull: true,
+          value: ''
+        }
+      ]
     }
+  },
+  computed: {
+    ipSetInfo() {
+      return {
+        caseId: this.caseInfo.id,
+        initialIp: this.caseInfo.nodeIp,
+        route: this.caseInfo.route,
+        netmask: "255.255.0.0",
+        webIp: "",
+        webPort: ""
+      }
+    }
+
   },
   methods: {
     /* 修改设备池信息 */
@@ -197,6 +311,23 @@ export default {
         that.$message.success("修改成功")
         // 把修改保存到store
         that.$store.commit(that.$mutation.CASE_DETAIL, that.caseInfo)
+        // 刷新数据
+        this.list = this.$store.getters.detailTableList
+      })
+    },
+    /* 修改设备池信息 */
+    saveCaseInfoNew (info, refName) {
+      console.log('saveCaseInfoNew')
+      console.log(info)
+      let that = this
+      that.$post(that.$uri.device.caseInfoSave, info).then(res => {
+        that.networkPopShow = false
+        that.nodePopShow = false
+        that.remarkPopShow = false
+        that.$message.success("修改成功")
+        that.$refs[refName].isEdit = false
+        // 把修改保存到store
+        that.$store.commit(that.$mutation.CASE_DETAIL, that.info)
         // 刷新数据
         this.list = this.$store.getters.detailTableList
       })
@@ -214,14 +345,14 @@ export default {
       this.saveCaseInfo()
     },
     /* ip设置 */
-    ipSet () {
+    ipSet (info, refName) {
       let that = this
-      if (!/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|20\d|21[0-5])$/.test(this.ipChangeInfo.initialIp)){
+      if (!/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|20\d|21[0-5])$/.test(info.initialIp)){
         that.$message.error("初始IP末位请务必在1-215之间")
         return
       }
       let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-      if (!reg.test(this.ipChangeInfo.route) || !reg.test(this.ipChangeInfo.webIp) || !reg.test(this.ipChangeInfo.netmask)){
+      if (!reg.test(info.route) || !reg.test(info.webIp) || !reg.test(info.netmask)){
         that.$message.error("请填写正确的ip")
         return
       }
@@ -232,8 +363,7 @@ export default {
         iconClass: 'el-icon-c-red',
         cancelButtonText: '取消'
       }).then(() => {
-        that.ipChangeInfo.caseId = that.caseInfo.id
-        that.$post(that.$uri.device.updateDeviceIp, that.ipChangeInfo).then(res => {
+        that.$post(that.$uri.device.updateDeviceIp, info).then(res => {
           if (res.success) {
             that.ipSuccessList = res.list
             that.ipSuccessPopShow = true
@@ -292,6 +422,7 @@ export default {
 
 <style lang="less" scoped>
 .detail-table {
+  padding-bottom: 50px;
   .detail-table-header {
     padding-left: 12px;
     background: #f5f6fa;
@@ -321,7 +452,7 @@ export default {
   }
   .detail-table-body {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;

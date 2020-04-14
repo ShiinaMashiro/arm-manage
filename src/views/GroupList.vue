@@ -3,25 +3,15 @@
     <div class="dev-list-search">
       <div class="search-btn">
         <el-button size="small" type="primary" @click="addGroupPopShow = true" v-if="$store.getters.checkChangeAuth()">新增分组</el-button>
-      </div>
-      <div class="search-advanced">
-        <div class="search-main">
-          <div class="search-main-item">
-            <span>分组名称:</span>
-            <div class="item-input">
-              <el-input v-model="searchInfo.groupNameLike" size="mini"></el-input>
-            </div>
-          </div>
-        </div>
-        <div class="search-btn">
-          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
-          <el-button type="primary" size="mini" @click="getGroupList">搜索</el-button>
+        <div @keyup.enter="getGroupList">
+          <el-input size="small" placeholder="输入分组名称 搜索" v-model="searchInfo.groupNameLike" style="width: 230px">
+            <el-button slot="append" icon="el-icon-search" @click="getGroupList"></el-button>
+          </el-input>
         </div>
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%" @row-click="checkRow" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+      <el-table ref="multipleTable" :data="info.list" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
         <el-table-column label="组内设备数量">
@@ -39,12 +29,12 @@
             <el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>
             <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
             <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
+            <el-button type="text" size="small" @click="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteBatch">删除</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -443,24 +433,22 @@ export default {
       }
     },
     /* 删除设备池 */
-    async asyncDelete (id) {
-      let that = this
-      await that.$post(that.$uri.group.delete, {id})
-    },
-    /* 批量删除设备池 */
-    deleteBatch () {
+    deleteDev (id) {
       this.$confirm("删除分组后会导致分组内的设备恢复出厂设置，清除数据，是否继续？", "提示", {
         confirmButtonText: '确定',
         confirmButtonClass: 'confirm-btn-red',
         iconClass: 'el-icon-c-red',
         cancelButtonText: '取消'
       }).then( () => {
-        this.multipleSelection.forEach(v => {
-          this.asyncDelete(v.id)
-        })
-        this.$message.success("删除完成")
         let that = this
-        setTimeout(() => {that.getGroupList()}, 1000)
+        that.$post(that.$uri.group.delete, {id}).then(res => {
+          if (res.success) {
+            that.$message.success("删除完成")
+            setTimeout(() => {that.getGroupList()}, 1000)
+          } else {
+            that.$message.error("删除失败")
+          }
+        })
       }).catch( () => {})
     },
     /* 管理 */

@@ -2,7 +2,11 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.getters.checkChangeAuth()">手动添加</el-button>
+        <div class="search-btn-pre">
+          <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.getters.checkChangeAuth()">手动添加</el-button>
+          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
+          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+        </div>
         <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
       </div>
       <div class="search-advanced" v-show="advancedShow">
@@ -85,7 +89,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
@@ -125,8 +129,7 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"

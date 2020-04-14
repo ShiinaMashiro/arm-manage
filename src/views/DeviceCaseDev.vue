@@ -1,71 +1,79 @@
 <template>
-  <div class="device-case-dev border-all">
-    <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
-      <el-table-column prop="id" label="ID" min-width="50px">
-        <template slot-scope="scope">
-          {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
-        </template>
-      </el-table-column>
-      <el-table-column prop="slotNo" label="槽位号"></el-table-column>
-      <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
-      <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-      <el-table-column prop="version" label="设备版本"></el-table-column>
-      <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
-      <el-table-column label="状态">
-        <template slot-scope="scope">
-          <span :style="scope.row | statusClassFilter">
-            {{scope.row | statusStr}}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="groupName" label="分组"></el-table-column>
-      <el-table-column prop="disk" label="空间">
-        <template slot-scope="scope">
-          {{scope.row.disk}}/{{scope.row.diskSd}}
-        </template>
-      </el-table-column>
-      <el-table-column min-width="120px" label="操作">
-        <template slot-scope="scope">
-          <!--<el-button type="text" size="small" :disabled="scope.row.isDistributed === 0" @click="recoverDev(scope.row.deviceIp)">回收</el-button>-->
-          <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" @click="initDev(scope.row.deviceIp)"
-                     v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">恢复出厂</el-button>
-          <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
-                     v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">分组</el-button>
-          <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
-                     @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div class="list-bottom">
-      <div class="list-bottom-btn">
+  <div>
+    <div class="search-btn">
+      <div class="search-btn-pre">
+        <el-button size="small" type="primary" @click="scanCaseNode"  v-if="$store.getters.checkChangeAuth()">扫描分层处理器</el-button>
         <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
         <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
       </div>
-      <el-pagination
-              @size-change="sizeChangeHandle"
-              @current-change="currentChangeHandle"
-              :current-page="page.startPage"
-              :page-sizes="[20, 50, 100]"
-              :page-size="page.limit"
-              layout="total, sizes, prev, pager, next"
-              :total="info.total">
-      </el-pagination>
     </div>
-    <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
-      <el-select v-model="groupInfo.groupId" placeholder="请选择">
-        <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-        </el-option>
-      </el-select>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="groupDevPopShow = false">取 消</el-button>
-        <el-button type="primary" @click="groupDev">确 定</el-button>
+    <div class="device-case-dev border-all">
+      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
+        <el-table-column prop="id" label="ID" min-width="50px">
+          <template slot-scope="scope">
+            {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="slotNo" label="槽位号"></el-table-column>
+        <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
+        <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
+        <el-table-column prop="version" label="设备版本"></el-table-column>
+        <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <span :style="scope.row | statusClassFilter">
+              {{scope.row | statusStr}}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="groupName" label="分组"></el-table-column>
+        <el-table-column prop="disk" label="空间">
+          <template slot-scope="scope">
+            {{scope.row.disk}}/{{scope.row.diskSd}}
+          </template>
+        </el-table-column>
+        <el-table-column min-width="120px" label="操作">
+          <template slot-scope="scope">
+            <!--<el-button type="text" size="small" :disabled="scope.row.isDistributed === 0" @click="recoverDev(scope.row.deviceIp)">回收</el-button>-->
+            <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" @click="initDev(scope.row.deviceIp)"
+                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">恢复出厂</el-button>
+            <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
+                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">分组</el-button>
+            <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
+                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="list-bottom">
+        <div class="list-bottom-btn">
+
+        </div>
+        <el-pagination
+                @size-change="sizeChangeHandle"
+                @current-change="currentChangeHandle"
+                :current-page="page.startPage"
+                :page-sizes="[20, 50, 100]"
+                :page-size="page.limit"
+                layout="total, sizes, prev, pager, next"
+                :total="info.total">
+        </el-pagination>
       </div>
-    </el-dialog>
+      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
+        <el-select v-model="groupInfo.groupId" placeholder="请选择">
+          <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+          </el-option>
+        </el-select>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="groupDevPopShow = false">取 消</el-button>
+          <el-button type="primary" @click="groupDev">确 定</el-button>
+        </div>
+      </el-dialog>
+    </div>
   </div>
 </template>
 

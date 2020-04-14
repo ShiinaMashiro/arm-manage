@@ -18,7 +18,7 @@ import GroupListDevManage from "./views/GroupListDevManage.vue";
 import GroupListDevShow from "./views/GroupListDevShow.vue";
 import UserList from "./views/UserList.vue";
 import UserGroupList from "./views/UserGroupList.vue";
-import SystemManage from "./views/SystemManage.vue";
+import SystemManage from "./views/SystemSetting.vue";
 import Manage from "./views/Manage.vue";
 import FunClass from "./views/FunClass.vue";
 import Fun from "./views/Fun.vue";
@@ -31,6 +31,7 @@ import HelpFun from "./views/HelpFun.vue";
 import HelpFunShow from "./views/HelpFunShow.vue";
 import LogGroup from "./views/LogGroup.vue";
 import GroupListAuth from "./views/GroupListAuth.vue";
+import LogSetting from "./views/LogSetting.vue";
 
 Vue.use(Router);
 
@@ -202,6 +203,13 @@ export default new Router({
           path: "system",
           name: "系统管理",
           component: SystemManage,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "system/log",
+          name: "日志服务器管理",
+          component: LogSetting,
           meta: {
             changeAuth: "_0000_"
           }

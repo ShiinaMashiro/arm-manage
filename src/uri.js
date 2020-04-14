@@ -24,6 +24,8 @@ export const uri = {
         engineCodeAdd: '/bmEngine/saveAdd', // 引擎编码新增
         engineCodeChange: '/bmEngine/saveEdit', // 引擎编码修改
         engineCodeDelete: '/bmEngine/delete', // 引擎编码删除
+        license: '/system/activateLicense/', // license激活接口
+        licenseGet: '/system/getLicense'
     },
     user: { // 用户管理模块
         list: '/user/list', // 用户信息列表
@@ -35,11 +37,13 @@ export const uri = {
         groupInfo: '/userGroup/edit', // 用户组信息
         groupAdd: '/userGroup/saveAdd', // 用户组新增
         groupInfoSave: '/userGroup/saveEdit', // 用户组修改
-        groupDelete: '/userGroup/delete' // 用户组删除
+        groupDelete: '/userGroup/delete', // 用户组删除
+        groupMerge: '/userGroup/saveGroupUserGroupMerge/', // 用户组关联分组
     },
     device: { // 设备管理模块
         caseList: '/case/list', // 设备池列表
         caseInfo: '/case/edit', // 设备池信息
+        caseInfoByCaseNo: '/case/getByCaseNo', // 设备池信息
         caseInfoSave: '/case/saveEdit', // 设备池信息修改
         scanNode: '/case/scanNode', // 扫描分层处理器
         scanDevice: '/case/scanDevice', // 扫描设备
@@ -56,6 +60,7 @@ export const uri = {
         snapshot: '/device/snapshot/', // 设备截图
         qrCode: '/device/idCode/', // 云机识别码
         backHome: '/device/home/', // 云机识别码
+        turnAdb: '/device/turnAdb/', // 开关ADB
     },
     apk: { // 应用模块管理
         apkList: '/apk/list', // 应用信息列表
@@ -105,5 +110,12 @@ export const uri = {
         funModify: '/introduction/saveEdit', // 功能介绍信息修改
         funDelete: '/introduction/delete', // 功能介绍信息删除
         funImgAdd: '/uploadFile', // 功能介绍信息图片增加
+    },
+    file: {
+        fileList: '/fileIssue/list/', //文件信息列表
+        fileInfo: '/fileIssue/edit/', //文件信息
+        fileAdd: '/fileIssue/saveAdd/', //文件新增
+        fileDel: '/fileIssue/delete/', //文件删除
+        fileIssue: '/fileIssue/issue/', //文件分发
     }
 }

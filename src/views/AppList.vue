@@ -3,7 +3,12 @@
     <div class="dev-list-search">
       <div class="search-btn">
         <el-button size="small" type="primary" @click="addAppPopShow = true" v-if="$store.getters.checkChangeAuth()">新增/更新应用</el-button>
-        <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
+        <div @keyup.enter="getAppList">
+          <el-input size="small" placeholder="输入应用名称/apk名称/APPID 搜索" v-model="searchInfo.appNameLike" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="getAppList"></el-button>
+          </el-input>
+        </div>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -33,8 +38,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column prop="appName" label="应用名称"></el-table-column>
         <el-table-column prop="packageName" label="包名"></el-table-column>
         <el-table-column prop="versionName" label="版本"></el-table-column>
@@ -43,12 +47,12 @@
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="goDetail(scope.row)">编辑</el-button>
             <el-button type="text" size="small" @click="goGroup(scope.row)">分组</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" @click="apkOffBatch(scope.row)">下架</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" v-if="$store.getters.checkChangeAuth()" @click="apkOffBatch">下架</el-button>
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -179,6 +183,8 @@
       /* 获取应用列表 */
       getAppList () {
         let that = this
+        that.searchInfo.apkNameLike = that.searchInfo.appNameLike
+        that.searchInfo.appid = that.searchInfo.appNameLike
         that.$post(that.$uri.apk.apkList, {...that.page, ...that.searchInfo}).then(res => {
           that.info = res
         })
@@ -204,11 +210,7 @@
         await that.$post(that.$uri.apk.apkOff, {id})
       },
       /* 批量下架应用 */
-      apkOffBatch () {
-        let ids = []
-        this.multipleSelection.forEach(v => {
-          ids.push(v.id)
-        })
+      apkOffBatch (row) {
         let that = this
         this.$confirm('下架后安装应用的云机会对应用进行卸载， 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -216,7 +218,7 @@
           iconClass: 'el-icon-c-yellow',
           cancelButtonText: '取消'
         }).then(() => {
-          that.$post(that.$uri.apk.apkOff, {ids}).then(res => {
+          that.$post(that.$uri.apk.apkOff, {ids: [row.id]}).then(res => {
             this.$message.success("下架完成")
             this.getAppList()
           })

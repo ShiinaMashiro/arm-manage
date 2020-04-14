@@ -1,21 +1,11 @@
 <template>
-  <div class="main-scene">
-    <div class="nav-title">
-      <div class="i-back" v-if="$route.meta.c2c" @click="$router.back()">
-        <i class="el-icon-arrow-left"></i>
-      </div>
-      <span v-else>{{$store.getters.sceneName || "帮助中心"}}</span>
-    </div>
+  <div class="main-scene" v-if="$store.state.sideInfo.scene">
     <nav class="nav-list">
-      <div v-show="!$route.meta.c2c">
-        <template v-for="(item, index) in childrenList">
-          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" :item="item"></MainSceneItem>
-        </template>
-      </div>
-      <div v-if="$route.meta.c2c">
+      <div>
         <template v-for="(item, index) in sceneList">
-          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :index="index" :item="item" :scene="true"></MainSceneItem>
+          <MainSceneItem v-if="$store.getters.checkChildAuthor(item.author)" :key="index" :item="item"></MainSceneItem>
         </template>
+        <MainSceneItem :key="-1" :item="backItem" :back="true"></MainSceneItem>
       </div>
     </nav>
   </div>
@@ -34,10 +24,14 @@ export default {
     },
     /* 获取展示数据list */
     sceneList () {
-      console.log(this.$store.state)
-      let state = this.$store.state
-      return state.sideItems[state.sideCheck].children[state.sceneCheck].sceneList
-      // return this.$store.getters.sceneList
+      return this.$store.state.sideInfo.child.sceneList
+    },
+    backItem() {
+      return {
+        name: this.$store.state.sideInfo.child.name,
+        path: this.$store.state.sideInfo.child.path
+      }
+
     }
   },
   mounted () {
@@ -50,17 +44,17 @@ export default {
 
 <style lang="less" scoped>
 .main-scene {
-  width: 180px;
   position: fixed;
-  top: 50px;
-  left: 50px;
+  top: 140px;
+  left: 230px;
   bottom: 0;
+  width: 145px;
   overflow: hidden;
   display: flex;
+  border-right: 1px solid #DDD;
   flex-direction: column;
   align-items: stretch;
-  background-color: #EAEDF1;
-  z-index: 999!important;
+  z-index: 1999!important;
   .nav-title {
     font-weight: bold;
     text-indent: 20px;

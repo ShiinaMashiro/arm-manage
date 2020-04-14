@@ -6,6 +6,62 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "7964505",
+      "name": "删除",
+      "font_class": "shanchu",
+      "unicode": "e630",
+      "unicode_decimal": 58928
+    },
+    {
+      "icon_id": "7964506",
+      "name": "添加",
+      "font_class": "tianjia",
+      "unicode": "e631",
+      "unicode_decimal": 58929
+    },
+    {
+      "icon_id": "7511488",
+      "name": "下载",
+      "font_class": "xiazai",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
+      "icon_id": "933708",
+      "name": "收益",
+      "font_class": "shouyi",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "1059049",
+      "name": "脚本",
+      "font_class": "jiaoben",
+      "unicode": "e681",
+      "unicode_decimal": 59009
+    },
+    {
+      "icon_id": "12196818",
+      "name": "收益",
+      "font_class": "shouyi-copy",
+      "unicode": "e8b2",
+      "unicode_decimal": 59570
+    },
+    {
+      "icon_id": "12196819",
+      "name": "脚本",
+      "font_class": "jiaoben-copy",
+      "unicode": "e8b3",
+      "unicode_decimal": 59571
+    },
+    {
+      "icon_id": "3248639",
+      "name": "管理员",
+      "font_class": "guanliyuan",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
       "icon_id": "1301",
       "name": "应用",
       "font_class": "yingyong",
@@ -39,13 +95,6 @@
       "font_class": "slsrizhifuwu",
       "unicode": "e74d",
       "unicode_decimal": 59213
-    },
-    {
-      "icon_id": "3248639",
-      "name": "管理员",
-      "font_class": "guanliyuan",
-      "unicode": "e601",
-      "unicode_decimal": 58881
     },
     {
       "icon_id": "5583375",

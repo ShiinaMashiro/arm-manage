@@ -1,124 +1,123 @@
 <template>
   <div class="detail-table">
-    <div class="detail-table-header">
-      <span class="detail-table-header-name">{{$route.name}}</span>
-      <!--<el-dropdown @command="handleCommand"  v-if="$store.getters.checkChangeAuth()">
-        <span class="detail-table-setting">
-          设置<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="change">修改设置</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>-->
-    </div>
-    <div class="detail-table-body">
-      <template v-for="(item, index) in list">
-        <DetailTableItem class="detail-table-body-item" :key="index" :name="item.name" :param="item.value">
-        </DetailTableItem>
-      </template>
-    </div>
-    <!-- 网络设置 -->
-    <el-dialog title="修改设置" :append-to-body="true" :visible.sync="changePopShow" width="500px" top="15vh">
-      <div>
-        <el-form ref="form" :model="appInfo" :rules="rules" label-width="180px" label-position="left">
-          <el-form-item label="类名" prop="activity">
-            <el-input v-model="appInfo.activity"></el-input>
-          </el-form-item>
-          <el-form-item label="推流最大码率" prop="encodeRateMax">
-            <div class="test">
-              <el-input v-model="appInfo.encodeRateMax" :placeholder="rateTip">
-                <div slot="suffix">kb/s</div>
-              </el-input>
-              <el-tooltip effect="dark" content="推流最大码率主要用于调节推流清晰度，根据网络实时进行适配，保证良好的推流体验，设置建议值1000-6000" placement="top-start">
-                <i class="el-icon-question" style="margin-left: 5px" ></i>
-              </el-tooltip>
+    <div>
+      <div class="info-view">
+        <div class="info-view-title">应用信息</div>
+        <div class="info-view-main">
+          <div class="info-view-item"><span>APPID：</span><span>{{appInfo.appId}}</span></div>
+          <div class="info-view-item"><span>文件名：</span><span>{{appInfo.apkName}}</span></div>
+          <div class="info-view-item"><span>版本：</span><span>{{appInfo.versionName}}</span></div>
+          <div class="info-view-item"><span>版本号：</span><span>{{appInfo.versionCode}}</span></div>
+          <div class="info-view-item"><span>包名：</span><span>{{appInfo.packageName}}</span></div>
+          <div class="info-view-item"><span>应用状态：</span><span>{{appInfo.apkStatus === 1 ? '正常' : '下架'}}</span></div>
+        </div>
+      </div>
+      <div class="info-view" @keyup.enter="saveAppInfo(changePopInfo)">
+        <div class="info-view-title">应用设置</div>
+        <div class="info-view-main">
+          <span class="info-view-item" style="font-size: 14px">基础设置，用于设置应用在推流时的表现</span>
+            <div class="info-view-item">
+              <span style="color: red;" v-if="changePopShow">*</span>
+              <span>类名：</span>
+              <span v-if="!changePopShow">{{appInfo.activity}}</span>
+              <el-input v-else size="mini" v-model="changePopInfo.activity" style="width: 150px"></el-input>
             </div>
-          </el-form-item>
-          <el-form-item label="推流帧率" prop="framerate">
-            <div class="test">
-              <el-input v-model="appInfo.framerate" :placeholder="frameTip">
-              </el-input>
-              <el-tooltip effect="dark" content="推流帧率为应用推流时的最大帧数，建议值为1-60." placement="top-start">
-                <i class="el-icon-question" style="margin-left: 5px" ></i>
-              </el-tooltip>
+            <div class="info-view-item">
+              <span style="color: red;" v-if="changePopShow">*</span>
+              <span>推流最大码率：</span>
+              <span v-if="!changePopShow">{{appInfo.encodeRateMax}}</span>
+              <el-input v-else size="mini" v-model="changePopInfo.encodeRateMax" style="width: 150px"></el-input>
             </div>
-          </el-form-item>
-          <el-form-item label="是否授权">
-            <el-switch v-model="appInfo.isRoot"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="是否预启动">
-            <el-switch v-model="appInfo.isPrestart"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="是否上传定位信息">
-            <el-switch v-model="appInfo.isUploadLocationInfo"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="是否开启传感器">
-            <el-switch v-model="appInfo.isSensor"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="推出是否清理用户数据">
-            <el-switch v-model="appInfo.isClean"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="退出后是否重启设备">
-            <el-switch v-model="appInfo.isReboot"
-                       active-value="1"
-                       inactive-value="0"></el-switch>
-          </el-form-item>
-          <el-form-item label="退出后是否关闭应用" prop="isStopApp">
-            <el-select v-model="appInfo.isStopApp" placeholder="请选择" size="small">
-              <el-option label="关闭应用" value="0"></el-option>
-              <el-option label="不关闭并放入后台" value="1"></el-option>
-              <el-option label="不关闭并留在前台" value="2"></el-option>
+            <div class="info-view-item">
+              <span style="color: red;" v-if="changePopShow">*</span>
+              <span>推流帧数：</span>
+              <span v-if="!changePopShow">{{appInfo.framerate}}</span>
+              <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
+            </div>
+          <div class="info-view-item-btn">
+            <el-button size="small" type="info" v-if="!changePopShow" @click="changePop()">设置</el-button>
+            <el-button size="small" type="info" :disabled="!canChangePop" v-if="changePopShow" @click="saveAppInfo(changePopInfo)">保存</el-button>
+            <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
+          </div>
+        </div>
+      </div>
+      <div class="info-view" @keyup.enter="saveAppInfo(switchPopInfo)">
+        <div class="info-view-title">功能开关</div>
+        <div class="info-view-main">
+          <span class="info-view-item" style="font-size: 14px">设置应用在推流时拥有的设备功能及退出后是否保留数据和应用进程</span>
+          <div class="info-view-item">
+            <span>ROOT授权：</span>
+            <span v-if="!switchPopShow">{{appInfo.isRoot === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isRoot" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>预启动：</span>
+            <span v-if="!switchPopShow">{{appInfo.isPrestart === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isPrestart" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>上传定位信息：</span>
+            <span v-if="!switchPopShow">{{appInfo.isUploadLocationInfo === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isUploadLocationInfo" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>传感器：</span>
+            <span v-if="!switchPopShow">{{appInfo.isSensor === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isSensor" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>清理用户数据：</span>
+            <span v-if="!switchPopShow">{{appInfo.isClean === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isClean" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>退出后重启设备：</span>
+            <span v-if="!switchPopShow">{{appInfo.isReboot === 0 ? '关' : '开'}}</span>
+            <el-switch v-else v-model="switchPopInfo.isReboot" :active-value="1" :inactive-value="0"></el-switch>
+          </div>
+          <div class="info-view-item">
+            <span>退出后关闭应用：</span>
+            <span v-if="!switchPopShow">{{appInfo.isStopApp === 0 ? '关闭应用' : (appInfo.isStopApp === 1 ? '不关闭并放入后台' : '不关闭并留在前台')}}</span>
+            <el-select v-else v-model="switchPopInfo.isStopApp" placeholder="请选择" size="small">
+              <el-option label="关闭应用" :value="0"></el-option>
+              <el-option label="不关闭并放入后台" :value="1"></el-option>
+              <el-option label="不关闭并留在前台" :value="2"></el-option>
             </el-select>
-          </el-form-item>
-          <div class="popup-flex">
-            <div>
-              <el-button type="primary" @click="saveAppInfo">确定</el-button>
-              <el-button @click="changePopShow = false">取消</el-button>
+          </div>
+          <div class="info-view-item-btn">
+            <el-button size="small" type="info" v-if="!switchPopShow" @click="switchPop()">设置</el-button>
+            <el-button size="small" type="info" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo)">保存</el-button>
+            <el-button size="small" type="info" v-if="switchPopShow" @click="switchPopShow = false">取消</el-button>
+          </div>
+        </div>
+      </div>
+      <div class="info-view" @keyup.enter="whiteAddSave()">
+        <div class="info-view-title">白名单设置</div>
+        <div class="info-view-main">
+          <span class="info-view-item" style="font-size: 14px">设置应用推流时可以同步启动的其他apk包名，推流时未在白名单内的包名启动时会退出推流</span>
+          <div class="info-view-item" style="align-items: flex-start;height: auto">
+            <span>当前白名单：</span>
+            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
+              <div v-for="(white, index) in whiteList" :key="white" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+                <span v-if="!whitePopShow">{{white}}</span>
+                <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                  <el-input size="mini" v-model="whiteList[index]" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteWhite(index)">&#xe630;</i>
+                </div>
+              </div>
+              <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+                <div v-if="whitePopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                  <el-input size="mini" v-model="whiteAddValue" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="whiteAdd()">&#xe631;</i>
+                </div>
+              </div>
             </div>
           </div>
-        </el-form>
+          <div class="info-view-item-btn">
+            <el-button size="small" type="info" v-if="!whitePopShow" @click="whitePop()">设置</el-button>
+            <el-button size="small" type="info" v-if="whitePopShow" @click="whiteAddSave()">保存</el-button>
+            <el-button size="small" type="info" v-if="whitePopShow" @click="cancelWhitePop()">取消</el-button>
+          </div>
+        </div>
       </div>
-    </el-dialog>
-    <!-- 白名单配置 -->
-    <el-dialog title="应用白名单" :append-to-body="true" :visible.sync="changeWhitePopShow" width="500px" top="15vh">
-      <div>
-        <el-form ref="form" :model="appInfo" label-width="130px" label-position="left">
-          <el-form-item label="">
-            <el-button type="text" @click="addWhiteShow = true" v-if="!addWhiteShow">新增白名单</el-button>
-          </el-form-item>
-          <el-form-item label="">
-            <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
-              <template v-for="(item, index) in whiteList">
-                <div style="display: flex;flex-direction: row;justify-content: space-between">
-                  <span :key="index">{{item}}</span>
-                  <el-button type="text" @click="whiteDel(index)">删除</el-button>
-                </div>
-              </template>
-            </div>
-          </el-form-item>
-          <el-form-item label="包名" v-if="addWhiteShow">
-            <el-input v-model="addWhiteName"></el-input>
-          </el-form-item>
-          <el-form-item  v-if="addWhiteShow">
-            <el-button type="primary" @click="whiteAdd">确定</el-button>
-            <el-button @click="addWhiteShow = false">取消</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-    </el-dialog>
-    <div class="detail-setting">
-      <el-button type="info" plain size="small" @click="changePop">修改设置</el-button>
-      <el-button type="info" plain size="small" @click="changeWhitePop">白名单设置</el-button>
     </div>
   </div>
 </template>
@@ -137,10 +136,16 @@
         frameRate: 0,
         maxRate: 0,
         changePopShow: false,
+        changePopInfo: {},
+        switchPopShow: false,
+        switchPopInfo: {},
+        whitePopShow: false,
+        whitePopInfo: {},
         changeWhitePopShow: false,
         addWhiteShow: false,
         addWhiteName: '',
         whiteList: [],
+        whiteAddValue: '',
         appInfo: {},
         list: [],
         rules: {
@@ -198,11 +203,17 @@
       },
       rateTip() {
         return "默认系统设置的码率(" + this.maxRate + ")"
+      },
+      canChangePop() {
+        return this.changePopInfo.activity && this.changePopInfo.encodeRateMax && this.changePopInfo.framerate
       }
     },
     methods: {
+      deleteWhite(index) {
+        this.whiteList.splice(index, 1)
+      },
       /* 修改设备池信息 */
-      saveAppInfo () {
+      saveAppInfo (info) {
         let that = this
         that.loading = this.$loading({
           lock: true,
@@ -210,43 +221,34 @@
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
-        that.$refs.form.validate(valid => {
-          if (valid) {
-            if (!that.appInfo.framerate) {
-              that.appInfo.framerate = 0
-            }
-            if (!that.appInfo.encodeRateMax) {
-              that.appInfo.encodeRateMax = 0
-            }
-            that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
-              that.changePopShow = false
-              that.loading.close()
-              that.$message.success("修改成功")
-              // 刷新数据
-              that.getDetailList()
-            })
-          }
+        that.$post(that.$uri.apk.apkInfoSave, info).then(res => {
+          that.changePopShow = false
+          that.switchPopShow = false
+          that.whitePopShow = false
+          that.loading.close()
+          that.$message.success("修改成功")
+          // 刷新数据
+          that.getDetailList()
         })
       },
       /* 修改弹窗 */
       changePop () {
-        for (let k in this.appInfo) {
-          this.appInfo[k] += ''
-        }
-        if (this.appInfo.framerate == '0') {
-          this.appInfo.framerate = ''
-        }
-        if (this.appInfo.encodeRateMax == '0') {
-          this.appInfo.encodeRateMax = ''
-        }
+        this.changePopInfo = JSON.parse(JSON.stringify(this.appInfo))
         this.changePopShow = true
       },
-      /* 白名单弹窗 */
-      changeWhitePop () {
-        if (this.appInfo.whiteList) {
-          this.whiteList = this.appInfo.whiteList.split(';')
-        }
-        this.changeWhitePopShow = true
+      /* 修改弹窗 */
+      switchPop () {
+        this.switchPopInfo = JSON.parse(JSON.stringify(this.appInfo))
+        this.switchPopShow = true
+      },
+      /* 修改弹窗 */
+      whitePop () {
+        this.whitePopInfo = JSON.parse(JSON.stringify(this.appInfo))
+        this.whitePopShow = true
+      },
+      cancelWhitePop() {
+        this.whiteList = this.appInfo.whiteList.split(';')
+        this.whitePopShow = false
       },
       /* 白名单删除 */
       whiteDel (index) {
@@ -268,16 +270,16 @@
       /* 白名单新增 */
       whiteAdd () {
         let that = this
-        console.log(that.addWhiteName)
-        if (!/^[a-zA-Z0-9.]{1,150}$/.test(that.addWhiteName)) {
+        if (!/^[a-zA-Z0-9.]{1,150}$/.test(that.whiteAddValue)) {
           that.$message.warning("包名只允许字母数字和小数点")
           return
         }
-        that.whiteList.push(that.addWhiteName)
-        this.appInfo.whiteList = this.whiteList.join(";")
-        that.$post(that.$uri.apk.apkInfoSave, that.appInfo).then(res => {
-
-        })
+        that.whiteList.push(that.whiteAddValue)
+        that.whiteAddValue = ''
+      },
+      whiteAddSave() {
+        this.whitePopInfo.whiteList = this.whiteList.join(";")
+        this.saveAppInfo(this.whitePopInfo)
       },
       /* 下拉菜单事件 */
       handleCommand (command) {
@@ -288,98 +290,8 @@
         let that = this
         that.$post(that.$uri.apk.apkInfo, {id: that.id}).then(res => {
           let v = res.data
-          v.apkStatus += ""
-          v.versionCode += ""
-          v.appId += ""
-          v.isRoot += ""
-          v.isPrestart += ""
           that.appInfo = v
-          that.appInfo.isStopApp = that.appInfo.isStopApp + ""
-          let list = []
-          list.push({
-            name: "应用名称",
-            value: v.appName
-          })
-          list.push({
-            name: "文件名",
-            value: v.apkName
-          })
-          list.push({
-            name: "版本",
-            value: v.versionName
-          })
-          list.push({
-            name: "版本号",
-            value: v.versionCode
-          })
-          list.push({
-            name: "包名",
-            value: v.packageName
-          })
-          list.push({
-            name: "应用状态",
-            value: v.apkStatus === "1" ? "正常" : "下架"
-          })
-          list.push({
-            name: "APPID",
-            value: v.appId
-          })
-          list.push({
-            name: "类名",
-            value: v.activity
-          })
-          list.push({
-            name: "是否授权",
-            value: v.isRoot == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "是否预启动",
-            value: v.isPrestart == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "是否清理用户数据",
-            value: v.isClean == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "应用退出后是否重启设备",
-            value: v.isReboot == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "是否上传定位信息",
-            value: v.isUploadLocationInfo == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "是否开启传感器",
-            value: v.isSensor == "1" ? "是" : "否"
-          })
-          list.push({
-            name: "应用退出后是否关闭",
-            value: v.isStopApp == "0" ? "关闭应用" : (v.isStopApp == "1" ? "不关闭并放入后台" : "不关闭并留在前台")
-          })
-          list.push({
-            name: "推流帧率",
-            value: (v.framerate || this.frameRate) + ""
-          })
-          if (v.encodeRateMax > 0) {
-            list.push({
-              name: "推流最大码率",
-              value: v.encodeRateMax + ""
-            })
-            that.list = list
-          } else {
-            that.$post(that.$uri.system.paramGet, {paramName: 'encodeRateMax'}).then(res => {
-              that.maxRate = v.encodeRateMax
-              if (res.success) {
-                that.maxRate = res.data.paramValue
-              }
-              list.push({
-                name: "推流最大码率",
-                value: that.maxRate + ""
-              })
-              that.list = list
-
-            })
-          }
+          that.whiteList = that.appInfo.whiteList.split(';')
         })
       }
     },
@@ -399,6 +311,7 @@
 <style lang="less" scoped>
 
   .detail-table {
+    padding-bottom: 40px;
     .detail-table-header {
       padding-left: 12px;
       background: #f5f6fa;
@@ -448,5 +361,41 @@
     flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
+  }
+  .info-view {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px;
+    border-bottom: 1px solid #E1E6EB;
+    .info-view-title {
+      text-align: left;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 5px 10px;
+    }
+    .info-view-main {
+      padding: 10px 10px 10px 120px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+      justify-content: flex-start;
+      .info-view-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 2px 0;
+        height: 30px;
+      }
+      .info-view-item-btn {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 5px 0;
+      }
+    }
   }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="nav-list-item" :style="checkStyle" @click="check">
-    <span>{{item.name}}</span>
+    <span><span v-if="back">< 返回</span>{{item.name}}</span>
+    <span style="color: #888" v-if="!back">></span>
   </div>
 </template>
 
@@ -8,10 +9,8 @@
 export default {
   name: "MainSceneItem",
   props: {
-    value: Number,
-    index: Number,
     item: Object,
-    scene: Boolean
+    back: Boolean
   },
   data () {
     return {
@@ -20,19 +19,12 @@ export default {
   },
   computed: {
     checkStyle () {
-      // console.log("style")
-      // console.log(this.$store.state.sceneChildCheck)
-      // console.log(this.$store.state.sceneCheck)
-      // console.log(this.index)
-      let check = this.scene ? this.$store.state.sceneChildCheck : this.$store.state.sceneCheck
-      return this.index == check ? {backgroundColor: '#fff!important'} : {}
+      return this.$store.state.sideInfo.scene.path === this.item.path ? {backgroundColor: '#F4F6F8!important'} : {}
     }
   },
   methods: {
     check () {
-      this.$emit('input', this.index)
-      // this.$store.commit(this.$mutation.SCENE_CHECK, {checked: this.index, scene: this.scene})
-      this.$router.replace(this.item.path)
+      this.$router.push(this.item.path)
     }
   }
 };
@@ -41,10 +33,10 @@ export default {
 <style lang="less" scoped>
 .nav-list-item {
   height: 40px;
-  padding: 0 0 0 30px;
+  padding: 0 10px 0 30px;
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   span {
     font-size: 12px;

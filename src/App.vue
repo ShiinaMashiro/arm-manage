@@ -49,6 +49,19 @@ body {
   align-items: center;
 }
 
+.search-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.search-btn-pre {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
 .el-dialog__wrapper {
   display: flex;
   justify-content: center;
@@ -56,6 +69,19 @@ body {
   .el-dialog {
     margin: 15vh 0;
   }
+}
+.el-submenu__title {
+  text-align: left;
+}
+.el-menu-item {
+  text-align: left;
+}
+.is-active {
+
+}
+
+.el-button {
+  border-radius: 0!important;
 }
 
   .confirm-btn-bule {

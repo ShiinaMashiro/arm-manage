@@ -179,6 +179,11 @@ let sideItems = [
         name: "系统信息",
         path: '/home/system',
         author: '_0001_'
+      },
+      {
+        name: "日志服务器配置",
+        path: '/home/system/log',
+        author: '_0001_'
       }
     ]
   }
@@ -238,6 +243,11 @@ const state = {
     id: 0,
     deviceNo: 0
   },
+  sideInfo: {
+    item: null,
+    child: null,
+    scene: null
+  }
 }
 
 let admin = {
@@ -417,6 +427,11 @@ export default new Vuex.Store({
         state.deviceWindowMode.deviceNo = mode.deviceNo;
       }
     },
+    /* 设置sideItem信息 */
+    [mutation.SIDE_INFO] (state, sideInfo) {
+      state.sideInfo = sideInfo
+      sessionStorage.setItem('sideInfo', JSON.stringify(sideInfo))
+    },
   },
   actions: {
     /* 登陆 */
@@ -520,8 +535,6 @@ export default new Vuex.Store({
       return state.userInfo.authority.indexOf(authorCode) !== -1
     },/* 判断引导弹窗是否显示 */
     isGuideShow: (state) => (popNum) => {
-      console.log("popnum")
-      console.log(popNum)
       return state.guide == popNum
     },
     /* 获取设备池详情页面所需的list */
