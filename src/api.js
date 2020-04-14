@@ -41,6 +41,8 @@ axios.interceptors.response.use(
 
           router.push("/")
         }
+      } else if (obj.code === '10016') {
+        store.commit(vm.$mutation.IS_NEED_LICENSE, true)
       } else {
         let mes = obj.message || "请求失败"
         vm.$message.error(mes)
@@ -51,6 +53,7 @@ axios.interceptors.response.use(
   (error) => {
     console.log(error)
     vm.$message.error("请求错误")
+
     return Promise.reject(error)
   }
 )

@@ -21,6 +21,7 @@ let sideItems = [
         name: "设备池",
         path: '/home/deviceCase',
         author: '_0201_',
+        isAdmin: true,
         sceneList: [
           {
             name: "设备池详情",
@@ -58,6 +59,22 @@ let sideItems = [
           }, {
             name: "应用管理",
             path: "/home/group/app/manage",
+            author: "_0201_"
+          }
+        ]
+      },
+      {
+        name: "文件分发",
+        path: '/home/file/list',
+        author: '_0201_',
+        sceneList: [
+          {
+            name: "新增文件",
+            path: "/home/file/add",
+            author: "_0201_"
+          }, {
+            name: "文件分发",
+            path: "/home/file/issue",
             author: "_0201_"
           }
         ]
@@ -202,10 +219,12 @@ const state = {
     token: '',
     authority: '_0000_,_0001_,_0100_,_0101_,_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,_0500_,_0501_'
   },
+  isAdmin: false,
   caseInfo: {
     id: 0,
     caseNo: "",
     initialPort: 0,
+    adbPort: 0,
     route: "",
     netmask: "",
     dns: "",
@@ -247,7 +266,9 @@ const state = {
     item: null,
     child: null,
     scene: null
-  }
+  },
+  needLicense: false,
+  licenseUpdate: false
 }
 
 let admin = {
@@ -432,6 +453,21 @@ export default new Vuex.Store({
       state.sideInfo = sideInfo
       sessionStorage.setItem('sideInfo', JSON.stringify(sideInfo))
     },
+    /* 设置用户管理员状态 */
+    [mutation.IS_ADMIN] (state, isAdmin) {
+      state.isAdmin = isAdmin
+      sessionStorage.setItem('isAdmin', JSON.stringify(isAdmin))
+    },
+    /* 设置是否需要激活系统 */
+    [mutation.IS_NEED_LICENSE] (state, needLicense) {
+      state.needLicense = needLicense
+      sessionStorage.setItem('needLicense', JSON.stringify(needLicense))
+    },
+    /* 设置是否需要激活系统 */
+    [mutation.LICENSE_UPDATE] (state, licenseUpdate) {
+      state.licenseUpdate = licenseUpdate
+      // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
   },
   actions: {
     /* 登陆 */
@@ -443,6 +479,9 @@ export default new Vuex.Store({
         // if (true){
           commit(mutation.GUIDE, 1)
         }
+
+        commit(mutation.IS_ADMIN, res.data.groupId === 1)
+
         router.push("/home")
       })
     },
@@ -533,9 +572,10 @@ export default new Vuex.Store({
     /* 判断用户是否有权限 */
     checkChildAuthor: (state) => (authorCode) => {
       return state.userInfo.authority.indexOf(authorCode) !== -1
-    },/* 判断引导弹窗是否显示 */
+    },
+    /* 判断引导弹窗是否显示 */
     isGuideShow: (state) => (popNum) => {
-      return state.guide == popNum
+      return state.guide === popNum
     },
     /* 获取设备池详情页面所需的list */
     detailTableList (state) {
@@ -551,6 +591,10 @@ export default new Vuex.Store({
       list.push({
         name: '初始端口',
         value: state.caseInfo.initialPort
+      })
+      list.push({
+        name: 'ADB端口',
+        value: state.caseInfo.adbPort
       })
       list.push({
         name: '网关',
