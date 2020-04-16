@@ -35,6 +35,8 @@ import LogSetting from "./views/LogSetting.vue";
 import FileList from "./views/FileList.vue";
 import FileAdd from "./views/FileAdd.vue";
 import FileIssue from "./views/FileIssue.vue";
+import AppUpload from "./views/AppUpload.vue";
+import Overview from "./views/Overview.vue";
 
 Vue.use(Router);
 
@@ -55,9 +57,12 @@ export default new Router({
       path: "/home",
       name: "home",
       component: Home,
-      redirect: '/home/deviceCase',
       children: [
         {
+          path: "overview",
+          name: "预览",
+          component: Overview,
+        },{
           path: "deviceCase",
           name: "设备池列表",
           component: DeviceCase,
@@ -93,6 +98,13 @@ export default new Router({
           path: "app/list",
           name: "应用列表",
           component: AppList,
+          meta: {
+            changeAuth: "_0300_"
+          }
+        }, {
+          path: "app/upload",
+          name: "应用上传",
+          component: AppUpload,
           meta: {
             changeAuth: "_0300_"
           }

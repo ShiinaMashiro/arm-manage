@@ -2,9 +2,9 @@
   <div class="home">
     <TopBar></TopBar>
     <SideBar></SideBar>
-    <HomeMainTopBar class="home-main-top-bar-fixed"></HomeMainTopBar>
+    <HomeMainTopBar class="home-main-top-bar-fixed" v-show="$store.state.sideInfo.item.src !== 'overview'"></HomeMainTopBar>
     <MainScene></MainScene>
-    <div class="home-main" :style="{left: this.$store.state.sideInfo.scene ? '380px' : '230px'}">
+    <div class="home-main" :style="{left: this.$store.state.sideInfo.scene ? '380px' : '230px', top: ($store.state.sideInfo.item.src !== 'overview') ? '140px' : '50px'}">
       <div class="home-list">
         <router-view></router-view>
       </div>
@@ -24,7 +24,6 @@
             :show-close="$store.state.licenseUpdate"
             :center="true"
             :destroy-on-close="true"
-            @close="licensePopClose"
             width="550px">
       <div v-if="$store.state.isAdmin">
         <div>license:</div>
@@ -137,7 +136,7 @@ export default {
       })
     },
     sideInit(route) {
-      let path = route.path
+      let path = route.fullPath
       let sideInfo = {
         item: null,
         child: null,
@@ -145,22 +144,26 @@ export default {
       }
       let sideItems = this.$store.state.sideItems
       for (let item of sideItems) {
-        for (let child of item.children) {
-          if (child.path === path) {
-            sideInfo.item = item
-            sideInfo.child = child
-            break
-          }
+        if (item.children) {
+          for (let child of item.children) {
+            if (child.path === path) {
+              sideInfo.item = item
+              sideInfo.child = child
+              break
+            }
 
-          if (child.sceneList) {
-            for (let scene of child.sceneList) {
-              if (scene.path === path) {
-                sideInfo.item = item
-                sideInfo.child = child
-                sideInfo.scene = scene
+            if (child.sceneList) {
+              for (let scene of child.sceneList) {
+                if (scene.path === path) {
+                  sideInfo.item = item
+                  sideInfo.child = child
+                  sideInfo.scene = scene
+                }
               }
             }
           }
+        } else {
+          sideInfo.item = item
         }
       }
       this.$store.commit(this.$mutation.SIDE_INFO, sideInfo)
@@ -180,9 +183,21 @@ export default {
       that.$store.commit(that.$mutation.WEB_IP, res.data.paramValue)
     })
     this.sideInit(this.$route)
+
+    if (this.$route.path === '/home') {
+      let sideItems = this.$store.getters.authorItems
+      this.$router.push(sideItems[0].path || sideItems[0].children[0].path)
+    }
   },
   beforeRouteUpdate (to, from, next) {
     this.sideInit(to)
+    console.log('home update')
+    console.log(to.path)
+    let page = this.$store.getters.isChildren(to.path)
+    console.log(page)
+    if (page) {
+      this.$store.commit(this.$mutation.VISIT_PAGE, page)
+    }
     next()
   }
 };

@@ -27,6 +27,7 @@
     methods: {
       showFun(index) {
         this.$store.commit(this.$mutation.FUN, this.funList)
+        this.$store.commit(this.$mutation.HELP_INDEX, index)
         this.$router.push("/home/help/fun/show?index=" + index)
       }
     }

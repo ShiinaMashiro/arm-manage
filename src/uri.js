@@ -61,6 +61,9 @@ export const uri = {
         qrCode: '/device/idCode/', // 云机识别码
         backHome: '/device/home/', // 云机识别码
         turnAdb: '/device/turnAdb/', // 开关ADB
+        startApp: '/device/startApp/', // 开关ADB
+        stopApp: '/device/stopApp/', // 开关ADB
+        sync: '/device/sync/', // 开关ADB
     },
     apk: { // 应用模块管理
         apkList: '/apk/list', // 应用信息列表

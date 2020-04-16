@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addAppPopShow = true" v-if="$store.getters.checkChangeAuth()">新增/更新应用</el-button>
+        <el-button size="small" type="primary" @click="$router.push('/home/app/upload')" v-if="$store.getters.checkChangeAuth()">新增/更新应用</el-button>
         <div @keyup.enter="getAppList">
           <el-input size="small" placeholder="输入应用名称/apk名称/APPID 搜索" v-model="searchInfo.appNameLike" style="width: 320px">
             <el-button slot="append" icon="el-icon-search" @click="getAppList"></el-button>
@@ -185,7 +185,7 @@
         let that = this
         that.searchInfo.apkNameLike = that.searchInfo.appNameLike
         that.searchInfo.appid = that.searchInfo.appNameLike
-        that.$post(that.$uri.apk.apkList, {...that.page, ...that.searchInfo}).then(res => {
+        that.$post(that.$uri.apk.apkList, {...that.page, queryParam: that.searchInfo.appNameLike}).then(res => {
           that.info = res
         })
       },

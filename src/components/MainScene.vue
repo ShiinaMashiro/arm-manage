@@ -35,9 +35,7 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.path === "/home") {
-      this.$router.push(this.childrenList[0].path)
-    }
+
   }
 };
 </script>

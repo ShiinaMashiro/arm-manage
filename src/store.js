@@ -10,6 +10,13 @@ const vm = new Vue()
 
 let sideItems = [
   {
+    src: "overview",
+    name: "预览",
+    authorCode: "_09",
+    queryAuthor: "_0901_",
+    updateAuthor: "_0900_",
+    path: '/home/overview'
+  },{
     src: "dev",
     name: "设备管理",
     guide: true,
@@ -21,45 +28,63 @@ let sideItems = [
         name: "设备池",
         path: '/home/deviceCase',
         author: '_0201_',
+        queryAuthor: "1-1",
+        updateAuthor: "1-0",
         isAdmin: true,
         sceneList: [
           {
             name: "设备池详情",
             path: "/home/deviceCaseDetail",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "1_1-1",
+            updateAuthor: "1_1-0",
           }, {
             name: "池内设备",
             path: "/home/deviceCaseDev",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "1_2-1",
+            updateAuthor: "1_2-0",
           }
         ]
       },
       {
         name: "设备列表",
         path: '/home/deviceList',
-        author: '_0201_'
+        author: '_0201_',
+        queryAuthor: "2-1",
+        updateAuthor: "2-0",
       },
       {
         name: "分组列表",
         path: '/home/group/list',
         author: '_0201_',
+        queryAuthor: "3-1",
+        updateAuthor: "3-0",
         sceneList: [
           {
             name: "新增设备",
             path: "/home/group/dev/manage",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "3_1-1",
+            updateAuthor: "3_1-0",
           }, {
             name: "组内设备",
             path: "/home/group/dev",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "3_2-1",
+            updateAuthor: "3_3-0",
           }, {
             name: "权限控制",
             path: "/home/group/auth",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "3_3-1",
+            updateAuthor: "3_3-0",
           }, {
             name: "应用管理",
             path: "/home/group/app/manage",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "3_4-1",
+            updateAuthor: "3_4-0",
           }
         ]
       },
@@ -67,15 +92,21 @@ let sideItems = [
         name: "文件分发",
         path: '/home/file/list',
         author: '_0201_',
+        queryAuthor: "4-1",
+        updateAuthor: "4-0",
         sceneList: [
           {
             name: "新增文件",
             path: "/home/file/add",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "4_1-1",
+            updateAuthor: "4_1-0",
           }, {
             name: "文件分发",
             path: "/home/file/issue",
-            author: "_0201_"
+            author: "_0201_",
+            queryAuthor: "4_2-1",
+            updateAuthor: "4_2-0",
           }
         ]
       }
@@ -92,8 +123,14 @@ let sideItems = [
         name: "应用列表",
         path: '/home/app/list',
         author: '_0301_',
+        queryAuthor: "5-1",
+        updateAuthor: "5-0",
         sceneList: [
           {
+            name: "应用上传",
+            path: "/home/app/upload",
+            author: "_0301_"
+          },{
             name: "应用详情",
             path: "/home/app/detail",
             author: "_0301_"
@@ -106,42 +143,18 @@ let sideItems = [
       }, {
         name: "应用恢复",
         path: "/home/app/recover",
-        author: "_0300_"
+        author: "_0300_",
+        queryAuthor: "6-1",
+        updateAuthor: "6-0",
       }, {
         name: "应用监控",
         path: "/home/app/monitor",
-        author: "_0300_"
+        author: "_0300_",
+        queryAuthor: "7-1",
+        updateAuthor: "7-0",
       }
     ]
-  }, /*{
-      src: "group",
-      name: "分组管理",
-      authorCode: "_04",
-      queryAuthor: "_0401_",
-      updateAuthor: "_0400_",
-      children: [
-        {
-          name: "分组列表",
-          path: '/home/group/list',
-          author: '_0401_',
-          sceneList: [
-            {
-              name: "设备管理",
-              path: "/home/group/dev/manage",
-              author: "_0401_"
-            }, {
-              name: "组内设备",
-              path: "/home/group/dev",
-              author: "_0401_"
-            }, {
-              name: "应用管理",
-              path: "/home/group/app/manage",
-              author: "_0401_"
-            }
-          ]
-        }
-      ]
-    },*/ {
+  }, {
     src: "log",
     name: "日志管理",
     guide: true,
@@ -152,17 +165,23 @@ let sideItems = [
       {
         name: "操作日志",
         path: '/home/log/operation',
-        author: '_0501_'
+        author: '_0501_',
+        queryAuthor: "8-1",
+        updateAuthor: "8-0",
       },
       {
         name: "调度日志",
         path: '/home/log/dispatch',
-        author: '_0501_'
+        author: '_0501_',
+        queryAuthor: "9-1",
+        updateAuthor: "9-0",
       },
       {
         name: "分组日志",
         path: '/home/log/group',
-        author: '_0501_'
+        author: '_0501_',
+        queryAuthor: "10-1",
+        updateAuthor: "10-0",
       }
     ]
   }, {
@@ -176,12 +195,16 @@ let sideItems = [
       {
         name: "用户列表",
         path: '/home/user/list',
-        author: '_0101_'
+        author: '_0101_',
+        queryAuthor: "11-1",
+        updateAuthor: "11-0",
       },
       {
         name: "用户组列表",
         path: '/home/user/group/list',
-        author: '_0101_'
+        author: '_0101_',
+        queryAuthor: "12-1",
+        updateAuthor: "12-0",
       }
     ]
   }, {
@@ -195,12 +218,16 @@ let sideItems = [
       {
         name: "系统信息",
         path: '/home/system',
-        author: '_0001_'
+        author: '_0001_',
+        queryAuthor: "13-1",
+        updateAuthor: "13-0",
       },
       {
         name: "日志服务器配置",
         path: '/home/system/log',
-        author: '_0001_'
+        author: '_0001_',
+        queryAuthor: "14-1",
+        updateAuthor: "14-0",
       }
     ]
   }
@@ -268,7 +295,14 @@ const state = {
     scene: null
   },
   needLicense: false,
-  licenseUpdate: false
+  licenseUpdate: false,
+  devSyncInfo: {
+    mainDev: '',
+    syncDevs: []
+  },
+  latelyPages: [],
+  normalPageInfo: {},
+  helpIndex: 0
 }
 
 let admin = {
@@ -448,6 +482,12 @@ export default new Vuex.Store({
         state.deviceWindowMode.deviceNo = mode.deviceNo;
       }
     },
+    /* 设置设备控制窗口状态 */
+    [mutation.DEVICE_SYNC_SHOW_MODE] (state, mode) {
+      console.log(mode);
+        state.devSyncInfo.mainDev = mode.mainDev;
+        state.devSyncInfo.syncDevs = mode.syncDevs;
+    },
     /* 设置sideItem信息 */
     [mutation.SIDE_INFO] (state, sideInfo) {
       state.sideInfo = sideInfo
@@ -463,10 +503,43 @@ export default new Vuex.Store({
       state.needLicense = needLicense
       sessionStorage.setItem('needLicense', JSON.stringify(needLicense))
     },
-    /* 设置是否需要激活系统 */
+    /*  */
     [mutation.LICENSE_UPDATE] (state, licenseUpdate) {
       state.licenseUpdate = licenseUpdate
       // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
+    /*  */
+    [mutation.HELP_INDEX] (state, index) {
+      state.helpIndex = index
+      // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
+    /*  */
+    [mutation.VISIT_PAGE] (state, page) {
+      let repeatBool = false
+      state.latelyPages.forEach(p => {
+        if (p.path === page.path) {
+          repeatBool = true
+        }
+      })
+      if (!repeatBool) {
+        if (state.latelyPages.length < 4) {
+          state.latelyPages.push(page)
+        } else {
+          state.latelyPages.splice(0, 1)
+          state.latelyPages.push(page)
+        }
+      }
+
+      if (!state.normalPageInfo[page.path]) {
+        state.normalPageInfo[page.path] = {
+          name: page.name,
+          path: page.path,
+          weight: 0
+        }
+      }
+      state.normalPageInfo[page.path].weight ++
+      sessionStorage.setItem('latelyPages', JSON.stringify(state.latelyPages))
+      sessionStorage.setItem('normalPageInfo', JSON.stringify(state.normalPageInfo))
     },
   },
   actions: {
@@ -540,12 +613,40 @@ export default new Vuex.Store({
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
       let list = []
+      if (state.isAdmin) {
+        return state.sideItems
+      }
       state.sideItems.forEach(i => {
         if (state.userInfo.authority.indexOf(i.authorCode) !== -1) {
           list.push(i)
+
+          let children = i.children
+          if (children) {
+            for(let j = children.length-1; j>=0; j--){
+              if(state.userInfo.authority.indexOf(children[j].queryAuthor) === -1){
+                children.splice(j,1);
+              }
+            }
+          }
         }
       })
       return list
+    },
+    isChildren: (state) => (path) => {
+      let page = null
+      state.sideItems.forEach(side => {
+        if (side.children) {
+          side.children.forEach(child => {
+            if (child.path === path) {
+              page = {
+                name: child.name,
+                path: child.path
+              }
+            }
+          })
+        }
+      })
+      return page
     },
     /* 获取scene list */
     sceneList (state) {
@@ -577,76 +678,20 @@ export default new Vuex.Store({
     isGuideShow: (state) => (popNum) => {
       return state.guide === popNum
     },
+    latelyPages(state) {
+      return state.latelyPages.slice(0, state.latelyPages.length).reverse()
+    },
+    normalPages(state) {
+      let list = []
+      for (let key in state.normalPageInfo) {
+        list.push(state.normalPageInfo[key])
+      }
+      return list.slice(0, list.length > 4 ? 4 : list.length).sort((a1, a2) => { return a2.weight - a1.weight})
+    },
     /* 获取设备池详情页面所需的list */
     detailTableList (state) {
       let list = []
-      list.push({
-        name: 'ID',
-        value: state.caseInfo.id
-      })
-      list.push({
-        name: '设备池编号',
-        value: state.caseInfo.caseNo
-      })
-      list.push({
-        name: '初始端口',
-        value: state.caseInfo.initialPort
-      })
-      list.push({
-        name: 'ADB端口',
-        value: state.caseInfo.adbPort
-      })
-      list.push({
-        name: '网关',
-        value: state.caseInfo.route
-      })
-      list.push({
-        name: '掩码',
-        value: state.caseInfo.netmask
-      })
-      list.push({
-        name: 'DNS',
-        value: state.caseInfo.dns
-      })
-      list.push({
-        name: '是否有状态',
-        value: state.caseInfo.isStatus ? "有" : "无"
-      })
-      list.push({
-        name: 'IP是否锁定',
-        value: state.caseInfo.isLock == 1 ? "否" : "是"
-      })
-      list.push({
-        name: '分层处理器IP',
-        value: state.caseInfo.nodeIp
-      })
-      list.push({
-        name: '备用分层处理器IP',
-        value: state.caseInfo.nodeIpBak
-      })
-      list.push({
-        name: '备注',
-        value: state.caseInfo.remark
-      })
-      list.push({
-        name: '设备数量',
-        value: state.caseInfo.deviceNum
-      })
-      list.push({
-        name: '受控设备数量',
-        value: state.caseInfo.deviceNumIsDistributed
-      })
-      list.push({
-        name: '故障设备数量',
-        value: state.caseInfo.deviceNumIsFault
-      })
-      list.push({
-        name: 'NTP服务器地址',
-        value: state.caseInfo.ntpAddress
-      })
-      list.forEach(v => {
-        v.value += ''
-      })
+
       return list
     }
   }

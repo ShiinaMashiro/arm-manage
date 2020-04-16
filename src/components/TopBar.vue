@@ -24,7 +24,15 @@
     </el-popover>
     <div class="arm-info">
       <TopBarItem2 class="sys-link" :jump="true" path="/home/help/faq" v-popover:guide3>
-        <span>帮助中心</span>
+        <el-dropdown @command="handleCommand">
+          <span class="el-dropdown-link" style="color: white">
+            帮助中心<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="faq">FAQ</el-dropdown-item>
+            <el-dropdown-item command="fun">功能介绍</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </TopBarItem2>
       <TopBarItem class="head-icon" v-model="userShow">
         <img class="img" src="../assets/user__easyico.png" />
@@ -60,6 +68,11 @@ export default {
       return guide
     }
   },
+  methods: {
+    handleCommand(c) {
+        this.$router.push('/home/help/' + c)
+    }
+  },
   mounted() {
     this.show = true
   }
@@ -74,7 +87,7 @@ export default {
   left: 0;
   top: 0;
   position: fixed;
-  z-index: 1030 !important;
+  z-index: 1000 !important;
   display: flex;
   flex-direction: row;
   align-items: stretch;

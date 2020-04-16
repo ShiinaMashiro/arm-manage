@@ -1,12 +1,14 @@
 <template>
   <div class="home-main-all">
     <el-breadcrumb separator="/" class="home-main-breadcrumb">
-      <el-breadcrumb-item v-if="$store.state.sideInfo.item">{{$store.state.sideInfo.item.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="$store.state.sideInfo.item">{{$store.state.sideInfo.item.name || '帮助中心'}}</el-breadcrumb-item>
       <el-breadcrumb-item v-if="$store.state.sideInfo.child">{{$store.state.sideInfo.child.name}}</el-breadcrumb-item>
       <el-breadcrumb-item v-if="$store.state.sideInfo.scene">{{$store.state.sideInfo.scene.name}}</el-breadcrumb-item>
     </el-breadcrumb>
-    <div class="home-main-top-bar">
-      <span>{{$route.meta.fun ? $store.state.fun.title + "功能介绍" : $route.name}}</span>
+    <div class="home-main-top-bar-t">
+      <div class="home-main-top-bar">
+        <span>{{$route.meta.fun ? $store.state.fun.title + "功能介绍" : $route.name}}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -34,7 +36,7 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  height: 50px;
+  height: 45px;
   span {
     border-left: 2px solid #88B7E0;
     font-weight: 600;
@@ -44,4 +46,8 @@ export default {
     text-indent: 8px;
   }
 }
+  .home-main-top-bar-t {
+    width: 100%;
+    padding-bottom: 5px;
+  }
 </style>

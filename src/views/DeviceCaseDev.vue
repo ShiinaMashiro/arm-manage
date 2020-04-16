@@ -59,7 +59,8 @@
                 :total="info.total">
         </el-pagination>
       </div>
-      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
+      <Drawer title="设备分组" :visible.sync="groupDevPopShow" @handClick="groupDev">
+      <!--<el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">-->
         <el-select v-model="groupInfo.groupId" placeholder="请选择">
           <el-option
                   v-for="item in options"
@@ -68,18 +69,22 @@
                   :value="item.value">
           </el-option>
         </el-select>
-        <div slot="footer" class="dialog-footer">
+        <!--<div slot="footer" class="dialog-footer">
           <el-button @click="groupDevPopShow = false">取 消</el-button>
           <el-button type="primary" @click="groupDev">确 定</el-button>
-        </div>
-      </el-dialog>
+        </div>-->
+      </Drawer>>
     </div>
   </div>
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
 export default {
   name: "DeviceCaseDev",
+  components: {
+    Drawer
+  },
   data () {
     return {
       info: {

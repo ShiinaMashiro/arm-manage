@@ -12,7 +12,7 @@
     </div>
     <div class="device-case-dev border-all">
       <el-table ref="multipleTable" :data="info.list" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="index"></el-table-column>
+        <el-table-column type="index" label="ID"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
         <el-table-column label="组内设备数量">
           <template slot-scope="scope">
@@ -26,7 +26,7 @@
             <el-button type="text" size="small" @click="goGroupDev(scope.row)">组内设备</el-button>
             <el-button type="text" size="small" @click="goAppManage(scope.row)">应用管理</el-button>
             <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
-            <el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>
+            <!--<el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>-->
             <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
             <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
             <el-button type="text" size="small" @click="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
@@ -47,24 +47,12 @@
         </el-pagination>
       </div>
       <!-- 新增分组弹窗 -->
-      <el-dialog title="新增分组" :append-to-body="true" :visible.sync="addGroupPopShow" width="500px" top="15vh">
-        <div>
-          <el-form ref="form" :model="addGroupInfo" label-width="130px" label-position="left">
+      <Drawer title="新增分组" :visible.sync="addGroupPopShow" @handClick="addGroup">
+        <div style="font-size: 12px">
+          <el-form ref="form" :model="addGroupInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
             <el-form-item label="分组名称">
-              <el-input v-model="addGroupInfo.groupName"></el-input>
+              <el-input size="mini" v-model="addGroupInfo.groupName"></el-input>
             </el-form-item>
-            <!--<el-form-item label="设备自主安装应用">
-              <div class="test">
-                <el-switch
-                        v-model="addGroupInfo.isAppAllow"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                <el-tooltip effect="dark" content="允许用户在推流设备桌面时，通过apk包的形式安装应用并且不在同步时对应用进行删除。" placement="top-start">
-                  <i class="el-icon-question" style="margin-left: 5px" ></i>
-                </el-tooltip>
-              </div>
-            </el-form-item>-->
             <el-form-item label="推流权限控制">
               <div class="test">
                 <el-switch
@@ -74,7 +62,7 @@
                 </el-switch>
               </div>
             </el-form-item>
-            <div style="padding: 0 0 0 15px" v-show="addGroupAuthSelectShow == '1'">
+            <div style="padding: 0 0 0 15px;flex-grow: 1" v-show="addGroupAuthSelectShow == '1'">
               <el-form-item label="安装应用">
                 <div class="test">
                   <el-switch
@@ -111,94 +99,29 @@
                   </el-tooltip>
                 </div>
               </el-form-item>
-
             </div>
-            <el-form-item>
-              <el-button type="primary" @click="addGroup">确定</el-button>
-              <el-button @click="addGroupPopShow = false">取消</el-button>
-            </el-form-item>
           </el-form>
         </div>
-      </el-dialog>
+      </Drawer>
+
       <!-- 修改分组弹窗 -->
-      <el-dialog title="修改分组名称" :append-to-body="true" :visible.sync="changeGroupPopShow" width="500px" top="15vh">
+      <Drawer title="修改分组名称" :visible.sync="changeGroupPopShow" @handClick="changeGroupName">
         <div>
           <el-form ref="form" :model="changeGroupInfo" label-width="130px" label-position="left">
             <el-form-item label="分组名称">
               <el-input v-model="changeGroupInfo.groupName"></el-input>
             </el-form-item>
-            <!--<el-form-item label="设备自主安装应用">
-              <div class="test">
-                <el-switch
-                        v-model="changeGroupInfo.isAppAllow"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                <el-tooltip effect="dark" content="允许用户在推流设备桌面时，通过apk包的形式安装应用并且不在同步时对应用进行删除。" placement="top-start">
-                  <i class="el-icon-question" style="margin-left: 5px" ></i>
-                </el-tooltip>
-              </div>
-            </el-form-item>-->
-            <el-form-item>
-              <el-button type="primary" @click="changeGroupName">确定</el-button>
-              <el-button @click="changeGroupPopShow = false">取消</el-button>
-            </el-form-item>
+
           </el-form>
         </div>
-      </el-dialog>
-      <!-- 权限控制弹窗 -->
-      <el-dialog title="权限控制" :append-to-body="true" :visible.sync="changeGroupAuthPopShow" width="500px" top="15vh">
-        <div>
-          <el-form ref="form" :model="changeGroupInfo" label-width="130px" label-position="left">
-            <el-form-item label="安装应用">
-              <div class="test">
-                <el-switch
-                        v-model="changeGroupInfo.isInstallApp"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                <el-tooltip effect="dark" content="设备推流时是否允许安装应用不被卸载，开启后用户可在推流时安装的应用可在结束后保留，关闭时推流时安装的应用会被立即卸载。" placement="top-start">
-                  <i class="el-icon-question" style="margin-left: 5px" ></i>
-                </el-tooltip>
-              </div>
-            </el-form-item>
-            <el-form-item label="卸载应用">
-              <div class="test">
-                <el-switch
-                        v-model="changeGroupInfo.isUninstallApp"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                <el-tooltip effect="dark" content="设备推流时是否允许用户卸载应用，开启后用户无法在推流的时候进行卸载操作，关闭时用户可以正常进行卸载操作。" placement="top-start">
-                  <i class="el-icon-question" style="margin-left: 5px" ></i>
-                </el-tooltip>
-              </div>
-            </el-form-item>
-            <el-form-item label="返回桌面">
-              <div class="test">
-                <el-switch
-                        v-model="changeGroupInfo.isHome"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                <el-tooltip effect="dark" content="设备推流时是否允许返回到桌面，关闭后用户推流时返回桌面会立即结束推流，并且无法以APPID为0的形式进行推流。" placement="top-start">
-                  <i class="el-icon-question" style="margin-left: 5px" ></i>
-                </el-tooltip>
-              </div>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="changeGroupAuth">确定</el-button>
-              <el-button @click="changeGroupAuthPopShow = false">取消</el-button>
-            </el-form-item>
-          </el-form>
-        </div>
-      </el-dialog>
+      </Drawer>
     </div>
 
     <!-- 上传文件 -->
-    <el-dialog title="上传文件" :append-to-body="true"
+    <Drawer title="上传文件" :visible.sync="uploadFilePopShow" @handClick="submitUpload" :before-close="popClose">
+    <!--<el-dialog title="上传文件" :append-to-body="true"
                :close-on-click-modal="false" :show-close="false" top="15vh"
-               :visible.sync="uploadFilePopShow" width="500px">
+               :visible.sync="uploadFilePopShow" width="500px">-->
       <div>
         <el-form ref="form" :model="uploadFileExtraInfo" label-width="130px" label-position="left">
           <el-form-item>
@@ -221,19 +144,23 @@
               <!--<div slot="tip" class="el-upload__tip">只能上传apk文件</div>-->
             </el-upload>
           </el-form-item>
-          <el-form-item>
+          <!--<el-form-item>
             <el-button type="primary" :disabled="uploadPopCloseTip" @click="submitUpload">确定</el-button>
             <el-button @click="popClose">取消</el-button>
-          </el-form-item>
+          </el-form-item>-->
         </el-form>
       </div>
-    </el-dialog>
+    </Drawer>
   </div>
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
 export default {
   name: "GroupList",
+  components: {
+    Drawer
+  },
   data () {
     return {
       info: {

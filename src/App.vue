@@ -42,6 +42,13 @@ body {
 .iconfont {
   color: white;
 }
+span {
+  outline: invert none medium;
+}
+div::-webkit-scrollbar {display:none}
+.el-input__inner {
+  border-radius: 0!important;
+}
 .popup-flex {
   display: flex;
   flex-direction: column;

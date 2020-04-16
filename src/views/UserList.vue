@@ -64,7 +64,8 @@
         </el-pagination>
       </div>
       <!-- 添加用户 -->
-      <el-dialog title="添加用户" :append-to-body="true" :visible.sync="addUserPopShow" width="500px" top="15vh">
+      <Drawer title="添加用户" :visible.sync="addUserPopShow" @handClick="addUser">
+      <!--<el-dialog title="添加用户" :append-to-body="true" :visible.sync="addUserPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
             <el-form-item label="用户名">
@@ -86,15 +87,16 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item>
+            <!--<el-form-item>
               <el-button type="primary" @click="addUser">确定</el-button>
               <el-button @click="addUserPopShow = false">取消</el-button>
-            </el-form-item>
+            </el-form-item>-->
           </el-form>
         </div>
-      </el-dialog>
+      </Drawer>
       <!-- 修改用户 -->
-      <el-dialog title="修改用户" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px" top="15vh">
+      <Drawer title="修改用户" :visible.sync="changeUserPopShow" @handClick="changeUser">
+      <!--<el-dialog title="修改用户" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
             <el-form-item label="用户名">
@@ -110,21 +112,23 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item>
+            <!--<el-form-item>
               <el-button type="primary" @click="changeUser">确定</el-button>
               <el-button @click="changeUserPopShow = false">取消</el-button>
-            </el-form-item>
+            </el-form-item>-->
           </el-form>
         </div>
-      </el-dialog>
+      </Drawer>
     </div>
   </div>
 
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
   export default {
     name: "UserList",
+    components: {Drawer},
     data () {
       return {
         info: {

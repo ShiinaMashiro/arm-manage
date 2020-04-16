@@ -566,7 +566,7 @@
           content: ''
         },
         logChangePopShow: false,
-        systemUpdatePopShow: false,
+          systemUpdatePopShow: false,
         caseTypeChangePopShow: false,
         engineUploadTip: false,
         systemUploadTip: false,

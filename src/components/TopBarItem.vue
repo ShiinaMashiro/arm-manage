@@ -5,7 +5,8 @@
       <UserInfo @change="changePasswordPop"></UserInfo>
     </template>
     <!-- 修改密码 -->
-    <el-dialog title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px" top="15vh">
+    <Drawer title="重新分发" :visible.sync="changePasswordPopShow" @handClick="changePassword">
+    <!--<Drawer title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px" top="15vh">-->
       <div>
         <el-form ref="form" :model="changeInfo" label-width="130px" label-position="left">
           <el-form-item label="原密码">
@@ -17,21 +18,22 @@
           <el-form-item label="重复新密码">
             <el-input v-model="changeInfo.newPassword2" type="password"></el-input>
           </el-form-item>
-          <el-form-item>
+          <!--<el-form-item>
             <el-button type="primary" @click="changePassword">确定</el-button>
             <el-button @click="changePasswordPopShow = false">取消</el-button>
-          </el-form-item>
+          </el-form-item>-->
         </el-form>
       </div>
-    </el-dialog>
+    </Drawer>
   </div>
 </template>
 
 <script>
 import UserInfo from "@/components/UserInfo.vue";
+import Drawer from "@/components/Drawer.vue";
 export default {
   name: "TopBarItem",
-  components: {UserInfo},
+  components: {UserInfo, Drawer},
   data () {
     return {
       show: false,

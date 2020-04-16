@@ -1,16 +1,34 @@
 <template>
   <div class="dev-list">
-    <div class="preview-bar" style="position: fixed; top: 121px; width: 100%; z-index: 2000;background-color: white;height: 100px">
+    <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 100px">
       <div class="preview-bar-operate" v-if="!viewMode">
+        <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
+          <el-button type="primary" size="mini" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
+        </div>
         <el-checkbox v-model="allChecked" @change="allCheckedChange" style="margin-right: 10px">全选</el-checkbox>
-        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="rebootOne">重启设备</el-button>
-        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>
-        <el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>
-        <el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>
+        <el-dropdown split-button size="mini" @command="handleCommand">
+          批量操作
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item :disabled="!hasSelect" command="startApk">启动应用</el-dropdown-item>
+            <el-dropdown-item :disabled="!hasSelect" command="stopApk">停止应用</el-dropdown-item>
+            <el-dropdown-item :disabled="!hasSelect" command="reboot">重启设备</el-dropdown-item>
+            <el-dropdown-item :disabled="!hasSelect" command="home">一键HOME</el-dropdown-item>
+            <el-dropdown-item :disabled="!hasSelect" command="recover">恢复出厂设置</el-dropdown-item>
+            <el-dropdown-item :disabled="!hasSelect || !snapshotComplete" command="snapshot">刷新截图</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-button type="info" size="mini" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
+        <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>-->
+        <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>-->
+        <!--<el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>-->
       </div>
       <div class="preview-bar-operate" v-else>
+        <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
+          <el-button type="primary" size="mini" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
+        </div>
+        <el-button type="primary" size="mini"  :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
       </div>
-      <div style="margin-right: 300px">
+      <div style="margin-right: 420px">
         <span>切换视图：</span>
         <el-button type="text" :disabled="!viewMode" @click="changeMode(false)">预览图</el-button>
         <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
@@ -56,7 +74,7 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
+          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>-->
           <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
         </div>
         <el-pagination
@@ -69,7 +87,8 @@
                 :total="info.total">
         </el-pagination>
       </div>
-      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
+      <Drawer title="设备分组" :visible.sync="groupDevPopShow" @handClick="groupDev">
+      <!--<el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">-->
         <el-select v-model="groupInfo.groupId" placeholder="请选择">
           <el-option
                   v-for="item in options"
@@ -78,12 +97,13 @@
                   :value="item.value">
           </el-option>
         </el-select>
-        <div slot="footer" class="dialog-footer">
+       <!-- <div slot="footer" class="dialog-footer">
           <el-button @click="groupDevPopShow = false">取 消</el-button>
           <el-button type="primary" @click="groupDev">确 定</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">
+        </div>-->
+      </Drawer>
+      <Drawer title="手动添加" :visible.sync="addDevicePopShow" @handClick="addDev">
+      <!--<el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addDevInfo" label-width="130px" label-position="left">
             <el-form-item label="分层处理器IP">
@@ -99,13 +119,13 @@
             <el-form-item label="备用处理器IP">
               <el-input v-model="addDevInfo.deviceIp"></el-input>
             </el-form-item>
-            <el-form-item>
+            <!--<el-form-item>
               <el-button type="primary" @click="addDev">确定</el-button>
               <el-button @click="addDevicePopShow = false">取消</el-button>
-            </el-form-item>
+            </el-form-item>-->
           </el-form>
         </div>
-      </el-dialog>
+      </Drawer>
     </div>
     <div class="preview-main" v-else  style="margin-top: 110px">
       <template v-for="(item, index) in info.list">
@@ -143,6 +163,45 @@
       </template>
     </div>
 
+    <Drawer :title="isApkStart ? '启动应用' : '停止应用'" :visible.sync="apkStartStopShow" @handClick="startStopApk()">
+      <div>
+        <el-form ref="form" size="mini" label-width="130px" label-position="left">
+          <el-form-item label="选择应用">
+            <el-select v-model="startStopAppid" placeholder="请选择">
+              <el-option
+                      v-for="item in groupAppList"
+                      :key="item.appId"
+                      :label="item.appName + ' ' + item.versionName"
+                      :value="item.appId">
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+    </Drawer>
+
+    <el-drawer
+            ref="sync"
+            :visible.sync="devSyncShow"
+            :append-to-body="true"
+            size="100%"
+            direction="rtl"
+            :show-close="false"
+            :destroy-on-close="true"
+            :before-close="handleSyncClose">
+      <div slot="title" style="display: flex;flex-direction: row;justify-content: flex-start;align-items: flex-end;margin-bottom: -10px;padding-top: 10px">
+        <div style="font-size: 20px;font-weight: 600;min-width: 120px;color: black;padding-right: 50px">云机同步操作</div>
+        <div style="font-size: 12px;min-width: 400px">
+          <div>1.同步云机数不要超过30台，否则很有可能发生卡顿情况。同步过程中发生部分云机画面延迟时，可直接操作云机。</div>
+          <div style="margin-top: 5px">2.自主安装的应用会影响到同步操作，如发生不同步的情况，可直接操作云机。</div>
+        </div>
+        <div style="flex-grow: 1;text-align: right">
+          <el-button type="primary" style="width: 80px" size="mini" @click="$refs.sync.closeDrawer()">退出同步</el-button>
+        </div>
+      </div>
+      <DeviceSync style="border-top: thin solid #ddd" :devList="devSyncList" :deviceStatusStr="deviceStatusStr" @fail="devSyncShow = false"></DeviceSync>
+    </el-drawer>
+
     <el-dialog
             title="云机识别码"
             :visible.sync="qrCodeShow"
@@ -157,10 +216,19 @@
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
+  import DeviceSync from '@/components/DeviceSync'
 export default {
   name: "GroupListDevShow",
+  components: {Drawer, DeviceSync},
   data () {
     return {
+      devSyncShow: false,
+      devSyncList: [],
+      apkStartStopShow: false,
+      isApkStart: false,
+      startStopAppid: null,
+      groupAppList: [],
       adbPort:{},
       snapFail: require('../assets/snapfail.png'),
       snapNotUpdate: require('../assets/notupdate.png'),
@@ -283,6 +351,77 @@ export default {
     }
   },
   methods: {
+    handleSyncClose(done) {
+      let that = this
+      this.$confirm('退出同步？')
+        .then(_ => {
+          that.devSyncList = []
+          done();
+        })
+        .catch(_ => {});
+    },
+    devSync() {
+      let devs = []
+      for(let i = 0; i < this.info.list.length; i++) {
+        if (this.test[i] === true) {
+          devs.push(this.info.list[i])
+        }
+      }
+      if (devs.length < 2) {
+        this.$message.warning('请选择2台以上的设备')
+        return
+      }
+      this.devSyncList = devs
+      this.devSyncShow = true
+
+    },
+    getGroupAppList() {
+      let that = this
+      that.$post(that.$uri.apk.apkList, {
+        apkStatus: 1,
+        groupId: that.$store.state.groupInfo.id
+      }).then(res => {
+        that.groupAppList = res.list
+      })
+    },
+    startStopApk() {
+      if (!this.startStopAppid) {
+        this.$message.warning('请选择应用')
+        return
+      }
+      let uri = this.isApkStart ? this.$uri.device.startApp  : this.$uri.device.stopApp
+      let that = this
+      that.$post(uri, {
+        deviceIps: that.selectIps,
+        appId: that.startStopAppid
+      }).then(res => {
+        if (res.success) {
+          that.$message.success(that.isApkStart ? '启动应用成功' : '停止应用成功')
+          that.apkStartStopShow = false
+        } else {
+          that.$message.error(that.isApkStart ? '启动应用失败' : '停止应用失败')
+        }
+      })
+    },
+    handleCommand(command) {
+      console.log(command)
+      switch (command) {
+        case 'reboot': this.rebootOne(); break
+        case 'home': this.homeOne(); break
+        case 'recover': this.recoverOne(); break
+        case 'snapshot': this.snapshotOne(); break
+        case 'startApk':
+          this.apkStartStopShow = true
+          this.getGroupAppList()
+          this.isApkStart = true
+          break
+        case 'stopApk':
+          this.apkStartStopShow = true
+          this.getGroupAppList()
+          this.isApkStart = false
+          break
+      }
+    },
     adbOpt(deviceIp, on) {
       let that = this
       that.$post(that.$uri.device.turnAdb, {deviceIp, on}).then(res => {
@@ -647,7 +786,7 @@ export default {
     refreshDevList () {
       if (this.$route.meta.refresh) {
         this.getDeviceList2Refresh()
-        setTimeout(() => {
+        this.timeoutId = setTimeout(() => {
           this.refreshDevList()
         }, 5000)
       }
@@ -713,6 +852,9 @@ export default {
     this.getGroupList()
     this.getEngineVersion()
     this.refreshDevList()
+  },
+  beforeDestroy() {
+    clearTimeout(this.timeoutId)
   }
 };
 </script>

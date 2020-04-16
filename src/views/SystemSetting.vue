@@ -1,5 +1,62 @@
 <template>
   <div style="padding-bottom: 40px">
+    <div class="info-view">
+      <div class="info-view-title">设备引擎升级</div>
+      <div class="info-view-main">
+        <span class="info-view-item" style="font-size: 14px">检查当前版本并对设备引擎进行升级</span>
+        <div class="info-view-item-btn">
+          <el-button size="small" type="info" @click="engineUpdatePopShow = true">引擎升级</el-button>
+          <el-button size="small" type="info" @click="checkVersion()">版本检查</el-button>
+        </div>
+      </div>
+    </div>
+    <div class="info-view">
+      <div class="info-view-title">设备引擎版本管理</div>
+      <div class="info-view-main">
+        <span class="info-view-item" style="font-size: 14px">设备引擎版本对应的引擎版本</span>
+        <div class="info-view-item" style="align-items: flex-start;height: auto">
+          <span>当前白名单：</span>
+          <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
+            <div v-for="(version, index) in engineVersionList" :key="version.code" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+              <span v-if="!enginePopShow">{{'引擎编码：' + version.code + '   引擎版本：' + version.content}}</span>
+              <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                引擎编码：<el-input size="mini" v-model="engineVersionList[index].code" style="width: 80px;margin-right: 10px"></el-input>
+                引擎版本：<el-input size="mini" v-model="engineVersionList[index].content" style="width: 80px"></el-input>
+                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteVersion(index)">&#xe630;</i>
+              </div>
+            </div>
+            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+              <div v-if="enginePopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                 引擎编码：<el-input size="mini" v-model="versionAddInfo.code" style="width: 80px;margin-right: 10px"></el-input>
+                 引擎版本：<el-input size="mini" v-model="versionAddInfo.content" style="width: 80px;"></el-input>
+                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAdd()">&#xe631;</i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="info-view-item-btn">
+          <el-button size="small" type="info" v-if="!enginePopShow" @click="enginePopShow = true">设置</el-button>
+          <el-button size="small" type="info" v-if="enginePopShow" @click="enginePopShow = false">完成</el-button>
+        </div>
+      </div>
+    </div>
+    <div class="info-view">
+      <div class="info-view-title">管理系统升级</div>
+      <div class="info-view-main">
+        <span class="info-view-item" style="font-size: 14px">检查当前版本并对管理系统进行升级</span>
+        <div class="info-view-item">
+          <span>前端版本：</span>
+          <span>2.0.0</span>
+        </div>
+        <div class="info-view-item">
+          <span>后台版本：</span>
+          <span>{{systemVersion}}</span>
+        </div>
+        <div class="info-view-item-btn">
+          <el-button size="small" type="info" @click="systemUpdatePopShow = true">升级</el-button>
+        </div>
+      </div>
+    </div>
     <div v-if="sysInfo" class="info-view" @keyup.enter="saveSysInfo(changePopInfo)">
       <div class="info-view-title">系统网络设置</div>
       <div class="info-view-main">
@@ -121,30 +178,129 @@
         <span class="info-view-item" style="font-size: 14px">查看和管理您的license凭证</span>
         <div class="info-view-item">
           <span>license码：</span>
-          <span>{{sysInfo.webIp}}</span>
+          <span>{{licenseInfo.code}}</span>
         </div>
         <div class="info-view-item">
           <span>有效期：</span>
-          <span>{{sysInfo.webPort}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.webPort" style="width: 150px"></el-input>
+          <span>{{licenseInfo.seconds | secondsFilter}}</span>
         </div>
         <div class="info-view-item">
           <span>设备数量：</span>
-          <span>{{sysInfo.webMask}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.webMask" style="width: 150px"></el-input>
+          <span>{{licenseInfo.deviceNum}}</span>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" @click="changePop()">升级</el-button>
+          <el-button size="small" type="info" @click="license()">升级</el-button>
         </div>
       </div>
     </div>
+
+    <!-- 引擎升级 -->
+    <Drawer title="引擎升级" :visible.sync="engineUpdatePopShow" @handClick="submitUpload" :before-close="engineUploadPopClose">
+    <!--<el-dialog title="引擎升级" :append-to-body="true"
+               :close-on-click-modal="false" :show-close="false" top="15vh"
+               :visible.sync="engineUpdatePopShow" width="500px">-->
+      <div>
+        <el-form ref="form" :model="engineUpdateExtraInfo" label-width="130px" label-position="left">
+          <el-form-item label="系统当前版本">
+            <div style="display: flex;flex-direction: column;justify-content: flex-start">
+              <template v-for="(item, index) in engineList">
+                <span style="line-height: normal" :key="index">{{item.engineTypeName}}: {{item.versionName}}-{{item.versionCode}}</span>
+              </template>
+            </div>
+          </el-form-item>
+          <el-form-item label="类型">
+            <div class="item-input">
+              <el-select v-model="engineUpdateExtraInfo.engineType" size="samll" placeholder="引擎版本">
+                <el-option
+                        v-for="item in engineOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+          </el-form-item>
+          <el-form-item label="版本号">
+            <el-input v-model="engineUpdateExtraInfo.versionName"></el-input>
+          </el-form-item>
+          <el-form-item label="版本序号">
+            <el-input v-model="engineUpdateExtraInfo.versionCode"></el-input>
+          </el-form-item>
+          <el-form-item label="升级文件">
+            <el-upload
+                    class="upload-demo"
+                    ref="upload"
+                    :headers="$store.getters.getHeaders"
+                    :action="$uri.system.engineUpdate"
+                    :data="engineUpdateExtraInfo"
+                    accept="apk"
+                    :limit="1"
+                    :multiple="false"
+                    :on-success="handleSuccess"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :before-upload="handleUploadEngine"
+                    :on-progress="handleProgressEngine"
+                    :auto-upload="false">
+              <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="MD5">
+            <el-input v-model="engineUpdateExtraInfo.md5"></el-input>
+          </el-form-item>
+          <!--<el-form-item>
+            <el-button type="primary" :disabled="engineUploadTip" @click="submitUpload">确定</el-button>
+            <el-button @click="engineUploadPopClose">取消</el-button>
+          </el-form-item>-->
+        </el-form>
+      </div>
+    </Drawer>
+
+    <!-- 管理系统升级 -->
+    <Drawer title="管理系统升级" :visible.sync="systemUpdatePopShow" @handClick="systemUpdate" :before-close="systemUploadPopClose">
+    <!--<el-dialog title="管理系统升级" :append-to-body="true"
+               :close-on-click-modal="false" :show-close="false" top="15vh"
+               :visible.sync="systemUpdatePopShow" width="500px">-->
+      <div>
+        <el-form ref="form" label-width="130px" label-position="left">
+          <el-form-item label="系统当前版本">
+            <span>{{systemVersion}}</span>
+          </el-form-item>
+          <el-form-item label="升级文件">
+            <el-upload
+                    class="upload-demo"
+                    ref="systemUpdate"
+                    :headers="$store.getters.getHeaders"
+                    :action="$uri.system.update"
+                    :limit="1"
+                    :multiple="false"
+                    :on-success="handleSuccess2"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :before-upload="handleUploadSystem"
+                    :on-progress="handleProgressSystem"
+                    :auto-upload="false">
+              <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            </el-upload>
+          </el-form-item>
+          <!--<el-form-item>
+            <el-button type="primary" :disabled="systemUploadTip" @click="systemUpdate">确定</el-button>
+            <el-button @click="systemUploadPopClose">取消</el-button>
+          </el-form-item>-->
+        </el-form>
+      </div>
+    </Drawer>
   </div>
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
   let that
   export default {
     name: "SystemSetting",
+    components: {
+      Drawer
+    },
     data() {
       return {
         sysInfo: null,
@@ -159,17 +315,239 @@
         phoneAddValue: '',
         changePopInfo: null,
         licenseInfo: null,
+        systemVersion: '',
+        engineVersionList: [],
+        enginePopShow: false,
+        versionAddInfo: {
+          code: '',
+          content: ''
+        },
+        engineUpdatePopShow: false,
+        engineUploadTip: false,
+        engineList: [],
+        engineUpdateExtraInfo: {
+          engineType: "",
+          versionName: "",
+          versionCode: "",
+          md5: ""
+        },
+        systemUpdatePopShow: false,
+
       }
     },
+    computed: {
+      engineOptions () {
+        let list = []
+        this.engineList.forEach(v => {
+          list.push({
+            label: v.engineTypeName,
+            value: v.engineType
+          })
+        })
+        return list
+      },
+    },
     filters: {
-      caseTypeFilter (val) {
-        switch (val) {
-          case "0": return "32路"
-          case "1": return "80路"
+      secondsFilter (s) {
+        if (s === -1) {
+          return '永久'
         }
+        let time = ''
+        let day = parseInt(s/(60 * 60 * 24))
+        if (day > 0) {
+          time += day + '天'
+        }
+        s = s - day * (60 * 60 * 24)
+        let hour = parseInt(s/(60 * 60))
+        if (hour > 0) {
+          time += hour + '小时'
+        }
+        return time
       }
     },
     methods: {
+      handleProgressSystem (event, file, fileList) {
+        if (!this.systemUploadTip) {
+          this.$refs.systemUpdate.abort(file)
+          this.$refs.systemUpdate.clearFiles()
+        }
+      },
+      handleUploadSystem () {
+        this.systemUploadTip = true
+      },
+      /* 系统升级 */
+      systemUpdate() {
+        this.$refs.systemUpdate.submit();
+      },
+      handleSuccess2 (response, file, fileList) {
+        if (response.success) {
+          this.systemUpdatePopShow = false
+          this.systemUpdatePopShow = false
+          this.systemUploadTip = false
+          this.$refs.systemUpdate.clearFiles()
+          this.$message.success("升级成功")
+        } else {
+          console.log(response)
+          this.$message.error(response.message)
+          this.$refs.systemUpdate.clearFiles()
+        }
+      },
+      systemUploadPopClose () {
+        if (this.systemUploadTip) {
+          this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
+          }).then( () => {
+            this.systemUpdatePopShow = false
+            this.systemUploadTip = false
+            this.$refs.systemUpdate.clearFiles()
+          }).catch( () => {})
+        } else {
+          this.systemUpdatePopShow = false
+          this.systemUploadTip = false
+          this.$refs.systemUpdate.clearFiles()
+        }
+      },
+      engineUploadPopClose () {
+        if (this.engineUploadTip) {
+          this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
+          }).then( () => {
+            this.engineUpdatePopShow = false
+            this.engineUploadTip = false
+            this.$refs.upload.clearFiles()
+          }).catch( () => {})
+        } else {
+          this.engineUpdatePopShow = false
+          this.engineUploadTip = false
+          this.$refs.upload.clearFiles()
+        }
+      },
+      /* 上传文件 */
+      submitUpload() {
+        let that = this
+        this.$post(that.$uri.system.engineCheckVersionCode, that.engineUpdateExtraInfo).then(res => {
+          let msg = res.success ? "" : res.message
+          msg += "\n如果确认无误，请点击确认按钮进行升级。"
+          this.$confirm(msg, "提示", {
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
+          }).then(() => {
+            this.$refs.upload.submit();
+          }).catch(() => {});
+        })
+      },
+      handleProgressEngine (event, file, fileList) {
+        if (!this.engineUploadTip) {
+          this.$refs.upload.abort(file)
+          this.$refs.upload.clearFiles()
+        }
+      },
+      handleSuccess(response, file, fileList) {
+        if (response.success) {
+          this.engineUpdatePopShow = false
+          this.engineUpdatePopShow = false
+          this.engineUploadTip = false
+          this.$refs.upload.clearFiles()
+          this.$message.success("升级成功")
+        } else {
+          console.log(response)
+          this.$message.error(response.message)
+          this.$refs.upload.clearFiles()
+        }
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleUploadEngine () {
+        this.engineUploadTip = true
+      },
+      /* 获取引擎列表 */
+      getEngineList () {
+        let that = this
+        that.$post(that.$uri.system.engineList, {}).then(res => {
+          that.engineList = res.data
+        })
+      },
+      /* 版本检查 */
+      checkVersion () {
+        this.$confirm("开始检查设备版本，低版本将自动升级？", "提示", {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消'
+        }).then( () => {
+          let that = this
+          that.$post(that.$uri.system.engineVersionCheck, {}).then(res => {
+            that.$message.success("设备版本检查成功")
+          })
+        }).catch( () => {})
+      },
+      deleteVersion(index) {
+        let that = this
+        this.$confirm('删除后引擎版本将无法识别，是否继续?', '提示', {
+          confirmButtonText: '确定',
+          confirmButtonClass: 'confirm-btn-yellow',
+          iconClass: 'el-icon-c-yellow',
+          cancelButtonText: '取消'
+        }).then(() => {
+          that.$post(that.$uri.system.engineCodeDelete, {code: that.engineVersionList[index.code]}).then(res => {
+            if (res.success) {
+              that.$message.success("删除成功")
+              that.engineVersionList.splice(index, 1)
+            } else {
+              that.$message.error("删除失败，错误信息：" + res.message + "，错误码：" + res.code)
+            }
+          })
+        }).catch(() => {})
+      },
+      versionAdd () {
+        let that = this
+        if (!/^[0-9]{1,4}$/.test(that.versionAddInfo.code) || !/^[0-9a-zA-Z_]{1,20}$/.test(that.versionAddInfo.content)) {
+          that.$message.error("请按正确的格式输入参数")
+          return
+        }
+        that.$post(that.$uri.system.engineCodeAdd, that.versionAddInfo).then(res => {
+          if (res.success) {
+            that.$message.success("添加引擎版本成功")
+            that.versionAddInfo = {code:'', content: ''}
+            that.$post(that.$uri.system.engineCodeList).then(res => {
+              if (res.success) {
+                that.engineVersionList = res.list
+              } else {
+                that.$message.error("获取信息失败，" + res.message)
+              }
+            })
+          } else {
+            that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
+          }
+        })
+      },
+      getEngineVersionList() {
+        that.$post(that.$uri.system.engineCodeList).then(res => {
+          if (res.success) {
+            that.engineVersionList = res.list
+          }
+        })
+      },
+      license() {
+        this.$store.commit(this.$mutation.LICENSE_UPDATE, true)
+      },
+      getSystemVersion() {
+        that.$post(that.$uri.system.paramVersion, {}).then(res => {
+          that.systemVersion = res.data
+        })
+      },
       getSysInfo() {
         that.$post(that.$uri.system.paramList, {}).then(res => {
           if (res.success) {
@@ -283,6 +661,9 @@
     mounted() {
       that.getSysInfo()
       that.getLicenseInfo()
+      that.getSystemVersion()
+      that.getEngineVersionList()
+      that.getEngineList()
     }
   };
 </script>

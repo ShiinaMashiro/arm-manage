@@ -26,8 +26,18 @@
       </div>
     </el-popover>
   </div>-->
-
-  <el-submenu :index="item.src">
+  <el-menu-item :index="item.path" v-if="item.path">
+    <i class="iconfont" v-if="item.src === 'dev'">&#xe8a8;</i>
+    <i class="iconfont" v-if="item.src === 'group'">&#xe8b1;</i>
+    <i class="iconfont" v-if="item.src === 'log'">&#xe74d;</i>
+    <i class="iconfont" v-if="item.src === 'system'">&#xe610;</i>
+    <i class="iconfont" v-if="item.src === 'user'">&#xe638;</i>
+    <i class="iconfont" v-if="item.src === 'app'">&#xe600;</i>
+    <i class="iconfont" v-if="item.src === 'admin'">&#xe601;</i>
+    <i class="iconfont" v-if="item.src === 'overview'">&#xe615;</i>
+    <span style="margin-left: 5px">{{item.name}}</span>
+  </el-menu-item>
+  <el-submenu :index="item.src" v-else>
     <template slot="title">
       <i class="iconfont" v-if="item.src === 'dev'">&#xe8a8;</i>
       <i class="iconfont" v-if="item.src === 'group'">&#xe8b1;</i>
@@ -36,6 +46,7 @@
       <i class="iconfont" v-if="item.src === 'user'">&#xe638;</i>
       <i class="iconfont" v-if="item.src === 'app'">&#xe600;</i>
       <i class="iconfont" v-if="item.src === 'admin'">&#xe601;</i>
+      <i class="iconfont" v-if="item.src === 'overview'">&#xe615;</i>
       <span style="margin-left: 5px">{{item.name}}</span>
     </template>
     <template v-for="(child, ind) in item.children">

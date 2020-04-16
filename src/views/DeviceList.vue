@@ -141,7 +141,8 @@
                 :total="info.total">
         </el-pagination>
       </div>
-      <el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">
+      <Drawer title="设备分组" :visible.sync="groupDevPopShow" @handClick="groupDev">
+      <!--<el-dialog title="设备分组" :append-to-body="true" :visible.sync="groupDevPopShow"  width="500px" top="15vh">-->
         <el-select v-model="groupInfo.groupId" placeholder="请选择">
           <el-option
                   v-for="item in options"
@@ -150,12 +151,13 @@
                   :value="item.value">
           </el-option>
         </el-select>
-        <div slot="footer" class="dialog-footer">
+        <!--<div slot="footer" class="dialog-footer">
           <el-button @click="groupDevPopShow = false">取 消</el-button>
           <el-button type="primary" @click="groupDev">确 定</el-button>
-        </div>
-      </el-dialog>
-      <el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">
+        </div>-->
+      </Drawer>
+      <Drawer title="手动添加" :visible.sync="addDevicePopShow" @handClick="addDev">
+      <!--<el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addDevInfo" label-width="150px" label-position="left">
             <el-form-item label="分层处理器选择">
@@ -171,21 +173,23 @@
             <el-form-item label="IP">
               <el-input v-model="addDevInfo.deviceIp"></el-input>
             </el-form-item>
-            <el-form-item>
+            <!--<el-form-item>
               <el-button type="primary" @click="addDev">确定</el-button>
               <el-button @click="addDevicePopShow = false">取消</el-button>
-            </el-form-item>
+            </el-form-item>-->
           </el-form>
         </div>
-      </el-dialog>
+      </Drawer>
     </div>
   </div>
 
 </template>
 
 <script>
+  import Drawer from '@/components/Drawer'
   export default {
     name: "DeviceList",
+    components: {Drawer},
     data () {
       return {
         info: {
