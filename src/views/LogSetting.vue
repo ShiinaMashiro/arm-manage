@@ -3,7 +3,7 @@
     <div v-if="logInfo" class="info-view" @keyup.enter="saveLogInfo()">
       <div class="info-view-title">日志服务器配置</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">配置日志服务器，确定日志输出方式及日志级别</span>
+        <span class="info-view-item" style="font-size: 12px">配置日志服务器，确定日志输出方式及日志级别</span>
         <div class="info-view-item">
           <span>日志输出方式：</span>
           <span v-if="!changePopShow">{{logInfo.output | logOutput}}</span>
@@ -15,7 +15,7 @@
         </div>
         <div class="info-view-item">
           <span>日志文件大小：</span>
-          <span v-if="!changePopShow">{{logInfo.fileSize}}</span>
+          <span v-if="!changePopShow">{{logInfo.fileSize}} M</span>
           <el-input v-else size="mini" v-model="changePopInfo.fileSize" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item">
@@ -57,8 +57,8 @@
           </el-select>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!changePopShow" @click="changePop()">设置</el-button>
-          <el-button size="small" type="info" v-if="changePopShow" @click="saveLogInfo()">保存</el-button>
+          <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="changePopShow" @click="saveLogInfo()">保存</el-button>
           <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
         </div>
       </div>

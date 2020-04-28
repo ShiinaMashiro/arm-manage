@@ -7,7 +7,7 @@
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
           <div v-if="deviceMessage" class="message"> {{ deviceMessage }} </div>
-          <div id="target" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
+          <div :id="target" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
         </div>
         <div class="footer" :style="{ width: deviceWidth + 'px' }">
           <el-tooltip class="tooltip" effect="dark" content="返回键" placement="top-start">
@@ -16,9 +16,9 @@
           <el-tooltip class="tooltip" effect="dark" content="主页键" placement="top">
             <div class="home" @click="homeClick"></div>
           </el-tooltip>
-          <el-tooltip class="tooltip" effect="dark" content="任务键" placement="top">
+          <!--<el-tooltip class="tooltip" effect="dark" content="任务键" placement="top">
             <div class="recent" @click="recentClick"></div>
-          </el-tooltip>
+          </el-tooltip>-->
           <el-tooltip class="tooltip" effect="dark" content="音量+" placement="top">
             <div class="vol-up" @click="volUpClick"></div>
           </el-tooltip>
@@ -40,6 +40,7 @@ export default {
   name: "DeviceWindow",
   props: {
     id: Number,
+    target: String,
     deviceId: Number,
     appid: {
       type: String,
@@ -50,7 +51,7 @@ export default {
       default: true
     },
     ip: String,
-    port: Number,
+    port: Number
   },
   data () {
     return {
@@ -64,6 +65,14 @@ export default {
       deviceMessage: ""
     }
   },
+  /*watch: {
+    ['player.state'](v) {
+      console.log(v)
+      if (v == 'connected') {
+        this.deviceMessage = '';
+      }
+    }
+  },*/
   beforeMount () {
     window.addEventListener('resize', this.computeDeviceSize);
     this.computeDeviceSize();
@@ -72,9 +81,9 @@ export default {
     LongeneClient.LoggingControl.setLogLevel('info');
 
     let shinoIp = this.$store.getters.shinoIp();
-    this.player = LongeneClient.createAppPlayer('target', {
+    this.player = LongeneClient.createAppPlayer(this.target, {
       keyboard: true,
-      mediaType: 'image',
+      mediaType: this.isVideo ? 'video' : 'image',
       orientation: 'portrait'
     });
     this.player.open({
@@ -93,9 +102,15 @@ export default {
       }
     })
     this.deviceMessage = '正在连接中...';
+    // this.deviceMessage = '';
+    console.log(this.player)
+    this.player.on('orientationchange', () => {
+      console.log('1234')
+    })
 
     this.player.on('statechange', () => {
-      if (this.player.state == 'playing') {
+      console.log(this.player.state)
+      if (this.player.state == 'connected') {
         this.deviceMessage = '';
       }
     })
@@ -119,8 +134,8 @@ export default {
     computeDeviceSize () {
       let clientWidth = document.documentElement.clientWidth;
 
-      this.deviceWidth = Math.floor(clientWidth * 0.2);
-      this.deviceHeight = Math.floor(this.deviceWidth * 16 / 9);
+      this.deviceWidth = 144;
+      this.deviceHeight = 256;
 
       if (this.player) {
         let orientation = this.player.orientation;
@@ -158,7 +173,6 @@ export default {
     recentClick () {
       if (this.player) {
         this.player.openRecent();
-        this.$emit('openRecent')
       }
     },
 
@@ -209,21 +223,21 @@ export default {
   .window {
     pointer-events: visible;
     .header {
-      height: 36px;
+      height: 26px;
       background: #252a2f;
       text-align: center;
-      font-size: 18px;
+      font-size: 14px;
       line-height: 36px;
       color: #fff;
       cursor:move;
       .id {
         float: left;
-        line-height: 36px;
+        line-height: 26px;
         padding: 0 10px;
       }
       .close {
         float: right;
-        line-height: 36px;
+        line-height: 26px;
         padding: 0 10px;
         cursor: pointer;
       }
@@ -245,14 +259,14 @@ export default {
 
     .footer {
       background: #252a2f;
-      height: 36px;
+      height: 26px;
       display: flex;
       justify-content: space-around;
       align-items: center;
 
       & > div {
-        width: 24px;
-        height: 24px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
       }
 

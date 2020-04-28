@@ -31,7 +31,7 @@
       },
       beforeClose: {
         type: Function,
-        default: () => {}
+        default: (done) => {done()}
       }
     },
     data() {

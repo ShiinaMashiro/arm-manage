@@ -17,6 +17,9 @@
           <el-tooltip class="tooltip" effect="dark" content="主页键" placement="top">
             <div class="home" @click="homeClick"></div>
           </el-tooltip>
+          <el-tooltip class="tooltip" effect="dark" content="截图" placement="top">
+            <div class="snapshot" @click="snapshotClick"></div>
+          </el-tooltip>
           <el-tooltip class="tooltip" effect="dark" content="任务键" placement="top">
             <div class="recent" @click="recentClick"></div>
           </el-tooltip>
@@ -32,6 +35,21 @@
         </div>
       </div>
     </vue-draggable-resizable>
+    <el-dialog
+            title="设备截图"
+            :visible.sync="dialogVisible"
+            :modal="false"
+            :append-to-body="true"
+            width="30%">
+      <div style="display: flex;flex-direction: column;">
+        <el-image v-if="url"
+                  style="width: 100%;"
+                  :src="url"
+                  fit="cover"></el-image>
+        <el-button type="primary" size="medium" style="margin: 10px 0" @click="downloadPng">下载图片</el-button>
+        <span style="font-size: 12px;color: red">如无法下载，可右键-图片另存为(图片已默认保存至云机相册内)</span>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -46,7 +64,8 @@ export default {
     appid: {
       type: String,
       default: "0"
-    }
+    },
+    ip: String
   },
   data () {
     return {
@@ -57,7 +76,9 @@ export default {
       player: null,
       deviceWidth: 720,
       deviceHeight: 1280,
-      deviceMessage: ""
+      deviceMessage: "",
+      dialogVisible: false,
+      url: ''
     }
   },
   beforeMount () {
@@ -108,6 +129,14 @@ export default {
     }
   },
   methods: {
+    downloadPng() {
+      let downloadHref = '/snapshot/' + this.deviceId + '.png?temp=' + Math.random()
+      let filename = this.deviceId + '.png'
+      let a = document.createElement('a')
+      a.href = downloadHref
+      a.download = filename
+      a.click()
+    },
     computeDeviceSize () {
       let clientWidth = document.documentElement.clientWidth;
 
@@ -145,6 +174,13 @@ export default {
       if (this.player) {
         this.player.emitHome();
       }
+    },
+    snapshotClick() {
+      let that = this
+      that.$post(that.$uri.device.snapshot, {deviceIp: that.ip, isSave: 1}).then(res => {
+        that.url = res.data
+        that.dialogVisible = true
+      })
     },
 
     recentClick () {
@@ -249,6 +285,11 @@ export default {
 
       .return {
         background: url('../assets/i_back.png') no-repeat;
+        background-size: 100% 100%;
+      }
+
+      .snapshot {
+        background: url('../assets/i_jt.png') no-repeat;
         background-size: 100% 100%;
       }
 

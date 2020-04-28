@@ -24,6 +24,11 @@ export default {
     },
     /* 获取展示数据list */
     sceneList () {
+      if (this.$route.path === '/home/app/upload') {
+        return [this.$store.state.sideInfo.child.sceneList[0]]
+      } else if (this.$route.path.startsWith('/home/app/')) {
+        return this.$store.state.sideInfo.child.sceneList.slice(1, this.$store.state.sideInfo.child.sceneList.length)
+      }
       return this.$store.state.sideInfo.child.sceneList
     },
     backItem() {

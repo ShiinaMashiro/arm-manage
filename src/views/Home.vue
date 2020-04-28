@@ -13,6 +13,7 @@
     <template v-if="$store.state.deviceWindowMode.show">
       <device-window :id="$store.state.deviceWindowMode.id"
                      :device-id="$store.state.deviceWindowMode.deviceNo"
+                     :ip="$store.state.deviceWindowMode.ip"
                      @close="deviceWindowClose"
       ></device-window>
     </template>
@@ -190,6 +191,9 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
+    if (!from.path.startsWith('/home/group')) {
+      this.$store.commit(this.$mutation.GROUP_DETAIL, {})
+    }
     this.sideInit(to)
     console.log('home update')
     console.log(to.path)
@@ -222,7 +226,7 @@ export default {
     display: flex;
     flex-direction: row;
     .home-list {
-      margin-top: 10px;
+      margin-top: 0px;
       flex-grow: 1;
     }
   }

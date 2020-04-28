@@ -1,13 +1,15 @@
 <template>
   <div class="dev-list">
-    <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 100px">
+    <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 60px;border-bottom: 1px solid #efefef">
       <div class="preview-bar-operate" v-if="!viewMode">
         <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
-          <el-button type="primary" size="mini" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
+          <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
         </div>
         <el-checkbox v-model="allChecked" @change="allCheckedChange" style="margin-right: 10px">全选</el-checkbox>
-        <el-dropdown split-button size="mini" @command="handleCommand">
-          批量操作
+        <el-dropdown  @command="handleCommand">
+            <el-button size="small">
+              批量操作<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item :disabled="!hasSelect" command="startApk">启动应用</el-dropdown-item>
             <el-dropdown-item :disabled="!hasSelect" command="stopApk">停止应用</el-dropdown-item>
@@ -17,25 +19,25 @@
             <el-dropdown-item :disabled="!hasSelect || !snapshotComplete" command="snapshot">刷新截图</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="info" size="mini" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
+        <el-button type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>-->
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>-->
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>-->
       </div>
       <div class="preview-bar-operate" v-else>
-        <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
-          <el-button type="primary" size="mini" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
+        <div style="padding: 0 10px 0 0; margin-right: 10px">
+          <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
         </div>
-        <el-button type="primary" size="mini"  :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
+        <el-button type="primary" size="small"  :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
       </div>
       <div style="margin-right: 420px">
-        <span>切换视图：</span>
+        <span style="font-size: 14px">切换视图：</span>
         <el-button type="text" :disabled="!viewMode" @click="changeMode(false)">预览图</el-button>
         <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
       </div>
     </div>
-    <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 110px">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+    <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 70px">
+      <el-table ref="multipleTable" :data="info.list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" :row-key="rowKey" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
@@ -45,7 +47,7 @@
         <el-table-column prop="slotNo" label="槽位号"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
         <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-        <el-table-column prop="version" label="设备版本"></el-table-column>
+        <el-table-column prop="version" label="设备版本" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
@@ -127,7 +129,7 @@
         </div>
       </Drawer>
     </div>
-    <div class="preview-main" v-else  style="margin-top: 110px">
+    <div class="preview-main" v-else  style="margin-top: 70px;">
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
           <el-tooltip class="item" effect="dark" :content="item.deviceIp + ' adb端口：' + adbPortFilter(item)" placement="top-start">
@@ -149,7 +151,7 @@
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 1)">打开ADB</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
             </div>
-            <el-image @click="deviceWindowOpen(item.id, item.deviceNo)"
+            <el-image @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
                       v-loading="snapshotImgLoading[item.deviceIp]"
                       element-loading-text="拼命加载中"
                       element-loading-spinner="el-icon-loading"
@@ -166,16 +168,31 @@
     <Drawer :title="isApkStart ? '启动应用' : '停止应用'" :visible.sync="apkStartStopShow" @handClick="startStopApk()">
       <div>
         <el-form ref="form" size="mini" label-width="130px" label-position="left">
-          <el-form-item label="选择应用">
-            <el-select v-model="startStopAppid" placeholder="请选择">
+          <el-form-item label="分组应用列表：">
+            <!--<el-select v-model="startStopAppid" placeholder="请选择">
               <el-option
                       v-for="item in groupAppList"
                       :key="item.appId"
                       :label="item.appName + ' ' + item.versionName"
                       :value="item.appId">
               </el-option>
-            </el-select>
+            </el-select>-->
           </el-form-item>
+          <el-table
+                  size="mini"
+                  highlight-current-row
+                  :data="groupAppList"
+                  @current-change="handleCurrentChange"
+                  style="width: 100%">
+            <el-table-column
+                    prop="appName"
+                    label="应用名称">
+            </el-table-column>
+            <el-table-column
+                    prop="versionName"
+                    label="版本">
+            </el-table-column>
+          </el-table>
         </el-form>
       </div>
     </Drawer>
@@ -351,6 +368,9 @@ export default {
     }
   },
   methods: {
+    handleCurrentChange(row) {
+      this.startStopAppid = row.appId
+    },
     handleSyncClose(done) {
       let that = this
       this.$confirm('退出同步？')
@@ -595,7 +615,9 @@ export default {
     getDeviceList () {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
-        that.info = res
+        that.$set(this, 'info', res)
+        // that.info = res
+        console.log(res)
         that.test = []
         that.info.list.forEach(v => {
           that.test.push(false)
@@ -610,8 +632,11 @@ export default {
       let that = this
       that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
         that.info.list.forEach(v => {
-
           res.list.forEach(i => {
+            if (v.id === i.id) {
+              v.deviceStatus = i.deviceStatus
+              v.isFlow = i.isFlow
+            }
             if (v.id === i.id && v.deviceStatus === 1 && i.deviceStatus !== 1) {
               setTimeout(() => {
                 that.$post(that.$uri.device.snapshot, {deviceIp: v.deviceIp, isSave: 0}).then(res => {
@@ -623,7 +648,6 @@ export default {
             }
           })
         })
-        that.info.list = res.list
         res.list.forEach(i => {
             that.$set(that.deviceStatusStr, i.deviceIp, that.statusStrM(i))
         })
@@ -636,19 +660,23 @@ export default {
       tempwindow.location = this.$store.getters.h5TestUrl(deviceNo)
     },
     */
-    deviceWindowOpen (id, deviceNo) {
+    deviceWindowOpen (id, deviceNo, ip) {
       if (this.$store.state.deviceWindowMode.show) {
         this.$message.error("同时只能控制一台设备！")
       } else {
         this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
           show: true,
           id,
-          deviceNo
+          deviceNo,
+          ip: ip
         });
       }
     },
     isCommonCard (row, index) {
       return row.cardType === 1
+    },
+    rowKey (row) {
+      return row.id
     },
     /* 当前页改变 */
     currentChangeHandle (val) {
@@ -792,7 +820,7 @@ export default {
       }
     },
     statusStrM (row) {
-      if (row.isFlow === 1) return "推流中"
+      if (row.isFlow === 1 && row.deviceStatus === 0) return "推流中"
       switch (row.deviceStatus) {
         case 0: return "";
         case 1: return "未更新";
@@ -810,6 +838,17 @@ export default {
       let num2 = parseInt(row.slotNo.substr(row.slotNo.indexOf('.') + 1))
       return port + num1 * 2 + num2
     },
+    statusClass (row) {
+      console.log(row.id)
+      console.log(row.isFlow)
+      console.log(row.deviceStatus)
+      if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
+      switch (row.deviceStatus) {
+        case 0: return {color: "#333"};
+        case 3: return {color: "red"};
+        default: return {color: "#eab820"}
+      }
+    }
   },
   filters: {
     statusStr (row) {

@@ -20,7 +20,7 @@
       </div>-->
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" tooltip-effect="dark" style="width: 100%" @row-click="checkRow">
+      <el-table ref="multipleTable" size="mini" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" tooltip-effect="dark" style="width: 100%" @row-click="checkRow">
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="fileName" label="文件名"></el-table-column>
         <el-table-column prop="downPath" label="服务器保存相对路径"></el-table-column>

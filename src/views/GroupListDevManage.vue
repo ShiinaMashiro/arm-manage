@@ -3,9 +3,17 @@
     <div class="dev-list-search">
       <div class="search-btn">
         <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.state.isAdmin">保存修改</el-button>
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <el-select v-model="searchInfo.engineType" size="small" placeholder="引擎版本" style="margin-left: 10px">
+          <el-option
+                  v-for="item in searchOptions.version"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+          </el-option>
+        </el-select>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
-      <div class="search-advanced">
+      <!--<div class="search-advanced">
         <div class="search-main">
           <div class="search-main-item">
             <span>选择引擎版本:</span>
@@ -23,14 +31,14 @@
         </div>
         <div class="search-btn">
           <el-button type="primary" size="mini" @click="init">搜索</el-button>
-          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
+          &lt;!&ndash;<el-button size="mini" @click="advancedShow = false">取消</el-button>&ndash;&gt;
         </div>
-      </div>
+      </div>-->
     </div>
     <div class="device-case-dev border-all">
       <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="未分配设备" name="first">
-          <el-table ref="multipleTableFirst" :data="infoFirst.list" max-height="400px"
+          <el-table ref="multipleTableFirst" :data="infoFirst.list" max-height="400px" :header-cell-style="{backgroundColor: '#efefef'}"
                     @row-click="checkRowFirst"
                     tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeFirst">
             <el-table-column type="selection"></el-table-column>
@@ -42,7 +50,7 @@
             <el-table-column prop="slotNo" label="槽位号"></el-table-column>
             <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
             <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-            <el-table-column prop="version" label="设备版本"></el-table-column>
+            <el-table-column prop="version" label="设备版本" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
             <el-table-column label="状态">
               <template slot-scope="scope">
@@ -60,7 +68,7 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="分组内设备" name="second">
-          <el-table ref="multipleTableSecond" :data="infoSecond.list" max-height="400px"
+          <el-table ref="multipleTableSecond" :data="infoSecond.list" max-height="400px" :header-cell-style="{backgroundColor: '#efefef'}"
                     @row-click="checkRowSecond"
                     tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeSecond">
             <el-table-column type="selection"></el-table-column>
@@ -73,7 +81,7 @@
             <el-table-column prop="slotNo" label="终端标志"></el-table-column>
             <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
             <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-            <el-table-column prop="version" label="设备版本"></el-table-column>
+            <el-table-column prop="version" label="设备版本" :show-overflow-tooltip="true"></el-table-column>
             <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
             <el-table-column label="状态">
               <template slot-scope="scope">
@@ -127,6 +135,11 @@ export default {
           value: 0
         }, ...this.options
       ]
+    }
+  },
+  watch: {
+    ['searchInfo.engineType']() {
+      this.init()
     }
   },
   methods: {
@@ -257,7 +270,7 @@ export default {
       .search-btn {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
       .search-advanced {
         display: flex;

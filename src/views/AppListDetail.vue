@@ -15,7 +15,7 @@
       <div class="info-view" @keyup.enter="saveAppInfo(changePopInfo)">
         <div class="info-view-title">应用设置</div>
         <div class="info-view-main">
-          <span class="info-view-item" style="font-size: 14px">基础设置，用于设置应用在推流时的表现</span>
+          <span class="info-view-item" style="font-size: 12px">基础设置，用于设置应用在推流时的表现</span>
             <div class="info-view-item">
               <span style="color: red;" v-if="changePopShow">*</span>
               <span>类名：</span>
@@ -35,8 +35,8 @@
               <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
             </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="info" v-if="!changePopShow" @click="changePop()">设置</el-button>
-            <el-button size="small" type="info" :disabled="!canChangePop" v-if="changePopShow" @click="saveAppInfo(changePopInfo)">保存</el-button>
+            <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+            <el-button size="small" type="primary" :disabled="!canChangePop" v-if="changePopShow" @click="saveAppInfo(changePopInfo)">保存</el-button>
             <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
           </div>
         </div>
@@ -44,7 +44,7 @@
       <div class="info-view" @keyup.enter="saveAppInfo(switchPopInfo)">
         <div class="info-view-title">功能开关</div>
         <div class="info-view-main">
-          <span class="info-view-item" style="font-size: 14px">设置应用在推流时拥有的设备功能及退出后是否保留数据和应用进程</span>
+          <span class="info-view-item" style="font-size: 12px">设置应用在推流时拥有的设备功能及退出后是否保留数据和应用进程</span>
           <div class="info-view-item">
             <span>ROOT授权：</span>
             <span v-if="!switchPopShow">{{appInfo.isRoot === 0 ? '关' : '开'}}</span>
@@ -85,8 +85,8 @@
             </el-select>
           </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="info" v-if="!switchPopShow" @click="switchPop()">设置</el-button>
-            <el-button size="small" type="info" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo)">保存</el-button>
+            <el-button size="small" type="primary" v-if="!switchPopShow" @click="switchPop()">设置</el-button>
+            <el-button size="small" type="primary" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo)">保存</el-button>
             <el-button size="small" type="info" v-if="switchPopShow" @click="switchPopShow = false">取消</el-button>
           </div>
         </div>
@@ -94,26 +94,24 @@
       <div class="info-view" @keyup.enter="whiteAddSave()">
         <div class="info-view-title">白名单设置</div>
         <div class="info-view-main">
-          <span class="info-view-item" style="font-size: 14px">设置应用推流时可以同步启动的其他apk包名，推流时未在白名单内的包名启动时会退出推流</span>
+          <span class="info-view-item" style="font-size: 12px">设置应用推流时可以同步启动的其他apk包名，推流时未在白名单内的包名启动时会退出推流</span>
           <div class="info-view-item" style="align-items: flex-start;height: auto">
-            <span>当前白名单：</span>
+            <span style="height: 30px;line-height: 30px">当前白名单：</span>
             <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
-              <div v-for="(white, index) in whiteList" :key="white" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+              <div v-for="(white, index) in whiteList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
                 <span v-if="!whitePopShow">{{white}}</span>
                 <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                  <el-input size="mini" v-model="whiteList[index]" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteWhite(index)">&#xe630;</i>
+                  <el-input size="mini" v-model="whiteList[index]" style="width: 150px"></el-input>
+                  <i v-if="(index + 1) === whiteList.length" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="whiteAdd()">&#xe631;</i>
+                  <i v-if="whiteList.length !== 1" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteWhite(index)">&#xe630;</i>
                 </div>
               </div>
-              <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
-                <div v-if="whitePopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                  <el-input size="mini" v-model="whiteAddValue" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="whiteAdd()">&#xe631;</i>
-                </div>
-              </div>
+
             </div>
           </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="info" v-if="!whitePopShow" @click="whitePop()">设置</el-button>
-            <el-button size="small" type="info" v-if="whitePopShow" @click="whiteAddSave()">保存</el-button>
+            <el-button size="small" type="primary" v-if="!whitePopShow" @click="whitePop()">设置</el-button>
+            <el-button size="small" type="primary" v-if="whitePopShow" @click="whiteAddSave()">保存</el-button>
             <el-button size="small" type="info" v-if="whitePopShow" @click="cancelWhitePop()">取消</el-button>
           </div>
         </div>
@@ -270,14 +268,15 @@
       /* 白名单新增 */
       whiteAdd () {
         let that = this
-        if (!/^[a-zA-Z0-9.]{1,150}$/.test(that.whiteAddValue)) {
-          that.$message.warning("包名只允许字母数字和小数点")
-          return
-        }
-        that.whiteList.push(that.whiteAddValue)
-        that.whiteAddValue = ''
+        that.whiteList.push('')
       },
       whiteAddSave() {
+        for(let i = 0; i < this.whiteList.length; i++) {
+          if (!/^[a-zA-Z0-9.]{1,150}$/.test(this.whiteList[i])) {
+            this.$message.warning("包名只允许字母数字和小数点")
+            return
+          }
+        }
         this.whitePopInfo.whiteList = this.whiteList.join(";")
         this.saveAppInfo(this.whitePopInfo)
       },
@@ -311,7 +310,7 @@
 <style lang="less" scoped>
 
   .detail-table {
-    padding-bottom: 40px;
+    padding-bottom: 80px;
     .detail-table-header {
       padding-left: 12px;
       background: #f5f6fa;

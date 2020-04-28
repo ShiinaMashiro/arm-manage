@@ -4,11 +4,11 @@
       <div class="search-btn">
         <el-button size="small" type="primary" @click="addUserPop" v-if="$store.getters.checkChangeAuth()">添加用户组
         </el-button>
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark"
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark"
                 style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index" label="ID"></el-table-column>
@@ -47,7 +47,7 @@
             </el-form-item>
             <el-form-item label="用户组类型">
               <span style="font-size: 14px">管理用户权限为管理设备池、设备和系统，业务用户权限仅为对分组内的设备进行操作</span>
-              <el-radio-group v-model="addUserInfo.groupType">
+              <el-radio-group v-model="addUserInfo.groupType" style="display: block">
                 <el-radio-button label="1">管理员</el-radio-button>
                 <el-radio-button label="2">业务用户</el-radio-button>
               </el-radio-group>
@@ -495,7 +495,7 @@
           list = Array.from(new Set(list))
           this.addUserInfo.authority = list.join(',')
         } else {
-          this.addUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_'
+          this.addUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,2-0,2-1,3-0,3-1,5-0,5-1,6-0,6-1'
         }
         console.log(this.addUserInfo.authority)
         let that = this
@@ -557,7 +557,7 @@
           list = Array.from(new Set(list))
           this.changeUserInfo.authority = list.join(',')
         } else {
-          this.changeUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_'
+          this.changeUserInfo.authority = '_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,2-0,2-1,3-0,3-1,5-0,5-1,6-0,6-1'
         }
         let that = this
         that.$post(that.$uri.user.groupInfoSave, that.changeUserInfo).then(res => {

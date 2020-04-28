@@ -2,10 +2,29 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addUserPopShow = true" v-if="$store.getters.checkChangeAuth()">添加用户</el-button>
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <div style="display: flex;flex-direction: row;">
+          <el-button size="small" type="primary" @click="addUserPopShow = true" v-if="$store.getters.checkChangeAuth()">添加用户</el-button>
+          <div class="search-main-item" style="margin-left: 10px">
+            <div class="item-input">
+              <el-select v-model="searchInfo.groupId" size="small" placeholder="用户组">
+                <el-option
+                        v-for="item in searchOptions.userGroupOption"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+              </el-select>
+            </div>
+          </div>
+        </div>
+        <div @keyup.enter="getUserList">
+          <el-input size="small" placeholder="输入用户名 搜索" v-model="searchInfo.username" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+          </el-input>
+        </div>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
-      <div class="search-advanced">
+      <!--<div class="search-advanced">
         <div class="search-main">
           <div class="search-main-item">
             <span>用户名:</span>
@@ -30,10 +49,10 @@
         <div class="search-btn">
           <el-button type="primary" size="mini" @click="getUserList">搜索</el-button>
         </div>
-      </div>
+      </div>-->
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index" label="ID"></el-table-column>
         <el-table-column prop="username" label="用户名"></el-table-column>

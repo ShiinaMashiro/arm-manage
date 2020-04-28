@@ -2,7 +2,21 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <el-date-picker
+                v-model="dateValue"
+                type="datetimerange"
+                size="small"
+                :picker-options="pickerOptions"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                align="right">
+        </el-date-picker>
+        <div @keyup.enter="getLogList">
+          <el-input size="small" placeholder="输入用户名/用户操作 搜索" v-model="searchInfo.queryParam" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="getLogList"></el-button>
+          </el-input>
+        </div>
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -39,7 +53,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="username" label="用户名" min-width="80px"></el-table-column>
@@ -125,12 +139,13 @@
           }]
         },
         dateValue: [new Date(new Date() - 3600 * 1000 * 24), new Date()],
-        advancedShow: true,
+        advancedShow: false,
         searchInfo: {
           usernameLike: "",
           remarkLike: "",
           updateTimeFrom: "",
-          updateTimeTo: ""
+          updateTimeTo: "",
+          queryParam: ""
         }
       }
     },
@@ -215,7 +230,7 @@
       .search-btn {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: space-between;
       }
       .search-advanced {
         display: flex;
@@ -247,7 +262,7 @@
           padding: 0 10px;
           display: flex;
           flex-direction: row;
-          justify-content: flex-end;
+          justify-content: space-between;
           align-items: center;
         }
       }

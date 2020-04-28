@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" stripe size="mini" @row-click="goGroupDev" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="index" label="ID"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
         <el-table-column label="组内设备数量">
@@ -22,14 +22,14 @@
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>
         <el-table-column label="操作" min-width="200px">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="manage(scope.row)">添加设备</el-button>
-            <el-button type="text" size="small" @click="goGroupDev(scope.row)">组内设备</el-button>
-            <el-button type="text" size="small" @click="goAppManage(scope.row)">应用管理</el-button>
-            <el-button type="text" size="small" @click="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="manage(scope.row)">添加设备</el-button>
+            <el-button type="text" size="small" @click.stop="goGroupDev(scope.row)">组内设备</el-button>
+            <el-button type="text" size="small" @click.stop="goAppManage(scope.row)">应用管理</el-button>
+            <el-button type="text" size="small" @click.stop="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
             <!--<el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>-->
-            <el-button type="text" size="small" @click="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
-            <el-button type="text" size="small" @click="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
-            <el-button type="text" size="small" @click="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+            <el-button type="text" size="small" @click.stop="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>
+            <el-button type="text" size="small" @click.stop="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
+            <el-button type="text" size="small" @click.stop="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

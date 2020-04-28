@@ -6,8 +6,9 @@
           <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.getters.checkChangeAuth()">手动添加</el-button>
           <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
           <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+          <el-button type="primary" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>
         </div>
-        <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -89,8 +90,8 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+        <el-table-column align="center" header-align="center" type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
             {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
@@ -100,7 +101,7 @@
         <el-table-column prop="slotNo" label="槽位号"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
         <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-        <el-table-column prop="version" label="设备版本"></el-table-column>
+        <el-table-column prop="version" label="设备版本" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
@@ -531,6 +532,7 @@
     .search-advanced {
       display: flex;
       flex-direction: column;
+      border: 1px solid #efefef;
       .search-main {
         margin-top: 10px;
         display: flex;

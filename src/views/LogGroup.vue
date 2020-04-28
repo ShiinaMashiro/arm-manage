@@ -2,7 +2,37 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <div style="display: flex;flex-direction: row">
+          <div class="search-main-item">
+            <!--<span>选择日期:</span>-->
+            <el-date-picker
+                    v-model="dateValue"
+                    type="datetimerange"
+                    size="small"
+                    :picker-options="pickerOptions"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    align="right">
+            </el-date-picker>
+          </div>
+          <div class="search-main-item" style="margin-left: 20px">
+            <!--<span>分组名称:</span>-->
+            <el-select size="small" v-model="searchInfo.groupNameLike" placeholder="选择分组">
+              <el-option
+                      v-for="item in options"
+                      :key="item.value"
+                      :label="item.label"
+                      :value="item.label">
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+        <div @keyup.enter="getLogList">
+          <el-input size="small" placeholder="输入设备IP/操作内容 搜索" v-model="searchInfo.queryParam" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="getLogList"></el-button>
+          </el-input>
+        </div>
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -21,7 +51,7 @@
           </div>
           <div class="search-main-item">
             <span>分组名称:</span>
-            <el-select v-model="searchInfo.groupNameLike" placeholder="请选择">
+            <el-select size="mini" v-model="searchInfo.groupNameLike" placeholder="请选择">
               <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -50,7 +80,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="terminal" label="终端信息" min-width="80px"></el-table-column>
@@ -140,13 +170,14 @@
           }]
         },
         dateValue: [new Date(new Date() - 3600 * 1000 * 24), new Date()],
-        advancedShow: true,
+        advancedShow: false,
         searchInfo: {
           groupNameLike: "",
           deviceIpLike: "",
           operationLike: "",
           updateTimeFrom: "",
-          updateTimeTo: ""
+          updateTimeTo: "",
+          queryParam: ""
         },
         options: []
       }
@@ -251,7 +282,7 @@
       .search-btn {
         display: flex;
         flex-direction: row;
-        justify-content: flex-end;
+        justify-content: space-between;
       }
       .search-advanced {
         display: flex;

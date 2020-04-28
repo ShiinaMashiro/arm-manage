@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex;flex-direction: row;">
     <el-form ref="form" :model="info" label-width="130px" label-position="left" style="width: 500px;">
-      <el-button type="primary" @click="save()" style="margin-left: -400px;margin-bottom: 20px"  v-if="$store.state.isAdmin">保存修改</el-button>
+      <el-button type="primary" size="small" @click="save()" style="margin-left: -400px;margin-bottom: 20px"  v-if="$store.state.isAdmin">保存修改</el-button>
       <el-form-item label="安装应用">
         <div class="test">
           <el-switch

@@ -3,7 +3,8 @@
     <div class="dev-list-search">
       <div class="search-btn">
         <el-button size="small" type="primary" @click="allDelete" v-if="$store.getters.checkChangeAuth()">全部删除</el-button>
-        <el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>
+        <el-button size="small" type="primary" :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+        <el-button type="primary" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -61,7 +62,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column label="分发类别">
           <template slot-scope="scope">
@@ -91,7 +92,7 @@
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"
@@ -283,11 +284,12 @@
       .search-btn {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
       .search-advanced {
         display: flex;
         flex-direction: column;
+        border: 1px solid #efefef;
         .search-main {
           margin-top: 10px;
           display: flex;

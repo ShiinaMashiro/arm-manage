@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" @row-click="checkRow" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRow" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
@@ -18,7 +18,7 @@
         <el-table-column prop="slotNo" label="槽位号"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
         <el-table-column prop="deviceNo" label="设备编号"></el-table-column>
-        <el-table-column prop="version" label="设备版本"></el-table-column>
+        <el-table-column prop="version" label="设备版本" :show-overflow-tooltip="true"></el-table-column>
         <el-table-column prop="softinstalled" label="应用安装数量"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">

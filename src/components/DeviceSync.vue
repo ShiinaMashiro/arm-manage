@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 20px;display: flex;flex-direction: row;" v-if="(devList.length >= 2) && syncSuccess ">
     <div style="padding-right: 20px;">
-      <DeviceWindow :id="devList[0].id" :deviceId="devList[0].deviceNo"></DeviceWindow>
+      <DeviceWindow :id="syncData.deviceIdMain" :ip="syncData.deviceIpMain" :port="syncData.devicePortMain" @openRecent="openRecent()" :deviceId="devList[0].deviceNo"></DeviceWindow>
     </div>
     <div style="flex-grow: 1;display: flex;flex-direction: column">
       <div style="padding-top: 20px;border-bottom: 1px solid #ddd;padding-bottom: 5px">
@@ -9,29 +9,8 @@
       </div>
       <div style="flex-grow: 1;">
         <div class="preview-main">
-          <template v-for="(item, index) in syncList">
-            <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: '1px solid #DDD'}">
-              <el-tooltip class="item" effect="dark" :content="item.deviceIp" placement="top-start">
-                <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
-                  <div style="flex-grow: 1">
-                    <span>{{item.id}}</span>
-                  </div>
-                  <span :style="item | statusClassFilter" style="padding-right: 5px;font-size: 12px">
-            {{deviceStatusStr[item.deviceIp]}}
-          </span>
-                </div>
-              </el-tooltip>
-              <div class="snapshot-main-img" style="position: relative;">
-                <el-image v-loading="!successList[index]"
-                          element-loading-text="拼命加载中"
-                          element-loading-spinner="el-icon-loading"
-                          element-loading-background="rgba(0, 0, 0, 0.8)"
-                          style="width: 144px;"
-                          :src="statusImg(item.deviceStatus) || imgList[index]"
-                          fit="cover"></el-image>
-                <!--<img @click="h5Test(item.deviceNo)" style="width: 200px" :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"/>-->
-              </div>
-            </div>
+          <template v-for="(item, index) in syncData.devices">
+            <DeviceWindowImg style="padding: 5px 20px 20px 0" :ref="'sync' + item.deviceNo" :target="'sync' + item.deviceNo"  :id="item.deviceId" :ip="item.deviceIp" :port="item.devicePort" :key="item.deviceNo"></DeviceWindowImg>
           </template>
         </div>
       </div>
@@ -41,10 +20,11 @@
 
 <script>
   import DeviceWindow from '@/components/DeviceWindow2'
+  import DeviceWindowImg from '@/components/DeviceWindow3'
   let that
   export default {
     name: "DeviceSync",
-    components: {DeviceWindow},
+    components: {DeviceWindow, DeviceWindowImg},
     props: {
       devList: {
         type: Array,
@@ -63,7 +43,8 @@
         snapError: require('../assets/snaperror.png'),
         snapRestart: require('../assets/snaprestart.png'),
         imgList: [],
-        successList: []
+        successList: [],
+        syncData: null
       }
     },
     computed: {
@@ -99,6 +80,7 @@
           deviceIps: ips.join(',')
         }).then(res => {
           if (res.success) {
+            this.syncData = res.data
             that.syncSuccess = true
             that.snapshotOne()
           } else {
@@ -110,6 +92,11 @@
       statusImg(status) {
         return status === 1 ? this.snapNotUpdate :
           (status === 3 ? this.snapError : null)
+      },
+      openRecent() {
+        this.syncData.devices.forEach(dev => {
+          that.$refs['sync' + dev.deviceNo][0].recentClick()
+        })
       },
       snapshotOne() {
         for (let i = 0; i < that.syncList.length; i++) {

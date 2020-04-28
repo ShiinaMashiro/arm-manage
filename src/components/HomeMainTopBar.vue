@@ -2,12 +2,12 @@
   <div class="home-main-all">
     <el-breadcrumb separator="/" class="home-main-breadcrumb">
       <el-breadcrumb-item v-if="$store.state.sideInfo.item">{{$store.state.sideInfo.item.name || '帮助中心'}}</el-breadcrumb-item>
-      <el-breadcrumb-item v-if="$store.state.sideInfo.child">{{$store.state.sideInfo.child.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item v-if="$store.state.sideInfo.child">{{appName || groupName || $store.state.sideInfo.child.name}}</el-breadcrumb-item>
       <el-breadcrumb-item v-if="$store.state.sideInfo.scene">{{$store.state.sideInfo.scene.name}}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="home-main-top-bar-t">
       <div class="home-main-top-bar">
-        <span>{{$route.meta.fun ? $store.state.fun.title + "功能介绍" : $route.name}}</span>
+        <span>{{appName || groupName || ($route.meta.fun ? $store.state.fun.title + "功能介绍" : $route.name)}}</span>
       </div>
     </div>
   </div>
@@ -15,7 +15,21 @@
 
 <script>
 export default {
-  name: "HomeMainTopBar"
+  name: "HomeMainTopBar",
+  computed: {
+    groupName() {
+      if (this.$route.path.startsWith('/home/group/') && this.$route.path !== '/home/group/list') {
+        return this.$store.state.groupInfo.groupName
+      }
+      return ''
+    },
+    appName() {
+      if (this.$route.path === '/home/app/detail' || this.$route.path === '/home/app/group') {
+        return this.$store.state.appInfo.appName
+      }
+      return ''
+    }
+  }
 };
 </script>
 

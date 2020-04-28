@@ -1,7 +1,7 @@
 <template>
   <div class="dev-list">
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection"></el-table-column>
         <el-table-column prop="groupName" label="分组名称"></el-table-column>
         <el-table-column label="组内设备数量">

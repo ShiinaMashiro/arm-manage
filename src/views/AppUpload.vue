@@ -28,7 +28,7 @@
     <div class="info-view">
       <div class="info-view-title">功能开关</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">设置应用在推流时拥有的设备功能及退出后是否保留数据和应用有进程</span>
+        <span class="info-view-item" style="font-size: 12px">设置应用在推流时拥有的设备功能及退出后是否保留数据和应用有进程</span>
         <div class="info-view-item">
           <span class="flex-grew-1">是否授权：</span>
           <el-switch v-model="addAppExtraInfo.isRoot"
@@ -80,7 +80,7 @@
       <div class="info-view-title">关联分组</div>
       <div class="info-view-main">
         <div style="border: thin solid #ddd; min-width: 400px;width: 40%">
-          <el-table ref="multipleTable" :data="list" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+          <el-table ref="multipleTable" :data="list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="groupName" label="分组名称"></el-table-column>
             <el-table-column label="组内设备数量">

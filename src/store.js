@@ -73,13 +73,13 @@ let sideItems = [
             author: "_0201_",
             queryAuthor: "3_2-1",
             updateAuthor: "3_3-0",
-          }, {
+          }/*, {
             name: "权限控制",
             path: "/home/group/auth",
             author: "_0201_",
             queryAuthor: "3_3-1",
             updateAuthor: "3_3-0",
-          }, {
+          }*/, {
             name: "应用管理",
             path: "/home/group/app/manage",
             author: "_0201_",
@@ -243,6 +243,7 @@ const state = {
   userInfo: {
     id: 0,
     username: '',
+    save: false,
     token: '',
     authority: '_0000_,_0001_,_0100_,_0101_,_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,_0500_,_0501_'
   },
@@ -287,7 +288,8 @@ const state = {
   deviceWindowMode: {
     show: false,
     id: 0,
-    deviceNo: 0
+    deviceNo: 0,
+    ip: ''
   },
   sideInfo: {
     item: null,
@@ -302,7 +304,8 @@ const state = {
   },
   latelyPages: [],
   normalPageInfo: {},
-  helpIndex: 0
+  helpIndex: 0,
+  groupName: ''
 }
 
 let admin = {
@@ -480,6 +483,7 @@ export default new Vuex.Store({
       if (mode.id && mode.deviceNo) {
         state.deviceWindowMode.id = mode.id;
         state.deviceWindowMode.deviceNo = mode.deviceNo;
+        state.deviceWindowMode.ip = mode.ip;
       }
     },
     /* 设置设备控制窗口状态 */
@@ -547,11 +551,11 @@ export default new Vuex.Store({
     [action.LOGIN] ({commit, state}, loginInfo) {
       let that = vm
       that.$post(that.$uri.login.login, loginInfo).then(res => {
+        res.data.save = loginInfo.save
         commit(mutation.LOGIN_INFO, res.data)
-        if (res.data.isFirstLogin == 1){
-        // if (true){
+        /*if (res.data.isFirstLogin == 1){
           commit(mutation.GUIDE, 1)
-        }
+        }*/
 
         commit(mutation.IS_ADMIN, res.data.groupId === 1)
 

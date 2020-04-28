@@ -2,18 +2,23 @@
   <div class="info-view" @keyup.enter="savePre">
     <div class="info-view-title">{{title}}</div>
     <div class="info-view-main">
-      <span class="info-view-item" style="font-size: 14px">{{msg}}</span>
+      <span class="info-view-item" style="font-size: 12px" v-if="msg">{{msg}}</span>
       <template v-for="(item, index) in itemList">
         <div :key="index" class="info-view-item">
           <span style="color: red;" v-if="isEdit && item.notNull">*</span>
           <span>{{item.name}}：</span>
-          <span v-if="!isEdit || !item.edit">{{editInfo[item.key]}}</span>
-          <el-input v-else size="mini" v-model="item.value" style="width: 150px"></el-input>
+          <span v-if="!isEdit || !item.edit">{{item.show ? item.show(editInfo[item.key]) : editInfo[item.key]}}</span>
+          <template v-else>
+            <el-input v-if="!item.type" size="mini" v-model="item.value" style="width: 150px"></el-input>
+            <el-switch v-else v-model="item.value"
+                       :active-value="item.active"
+                       :inactive-value="item.inactive"></el-switch>
+          </template>
         </div>
       </template>
       <div class="info-view-item-btn">
-        <el-button size="small" type="info" v-if="!isEdit" @click="edit">{{editBtnName || '设置'}}</el-button>
-        <el-button size="small" type="info" :disabled="!canSave" v-if="isEdit" @click="savePre">保存</el-button>
+        <el-button size="small" type="primary" v-if="!isEdit" @click="edit">{{editBtnName || '设置'}}</el-button>
+        <el-button size="small" type="primary" :disabled="!canSave" v-if="isEdit" @click="savePre">保存</el-button>
         <el-button size="small" type="info" v-if="isEdit" @click="cancel">取消</el-button>
       </div>
     </div>

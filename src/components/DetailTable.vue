@@ -8,6 +8,25 @@
         </template>-->
         <InfoView ref="v1" refName="v1" title="设备池名称" msg="" :list="nameList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="修改备注"></InfoView>
         <InfoView ref="v2" refName="v2" title="网络设置" msg="设备池的网络，NTP服务器地址等相关内容" :list="netList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="设置"></InfoView>
+        <!--<div class="info-view">
+          <div class="info-view-title">网络设置</div>
+          <div class="info-view-main">
+            <span class="info-view-item" style="font-size: 12px">设备池的网络，NTP服务器地址等相关内容</span>
+            <template v-for="(item, index) in netList">
+              <div class="info-view-item" :key="index">
+                <span style="color: red;" v-if="enginePopShow && item.notNull">*</span>
+                <span>{{item.name}}：</span>
+                <span v-if="!enginePopShow || !item.edit">{{caseInfo[item.key]}}</span>
+                <el-input v-else size="mini" v-model="item.value" style="width: 150px"></el-input>
+              </div>
+            </template>
+            <div class="info-view-item-btn">
+              <el-button size="small" type="info" v-if="!enginePopShow" @click="enginePopShow = true">设置</el-button>
+              <el-button size="small" type="info" :disabled="!canSave" v-if="enginePopShow" @click="saveCaseInfoNew(caseInfo)">保存</el-button>
+              <el-button size="small" type="info" v-if="enginePopShow" @click="enginePopShow = false">取消</el-button>
+            </div>
+          </div>
+        </div>-->
         <InfoView ref="v3" refName="v3" title="分层设置" msg="设备池的分层处理器IP，用于管理应用分发等" :list="cenList" :info="caseInfo" :save="saveCaseInfoNew" editBtnName="设置"></InfoView>
         <InfoView ref="v4" refName="v4" title="IP设置" msg="设备池内设备的起始IP，设置后设备池内的设备IP会根据起始IP自动递增" :list="ipList" :info="ipSetInfo" :save="ipSet" editBtnName="设置"></InfoView>
       </div>
@@ -145,6 +164,7 @@
   },
   data () {
     return {
+      enginePopShow: false,
       networkPopShow: false,
       nodePopShow: false,
       ipPopShow: false,
@@ -218,32 +238,44 @@
           name: 'NTP地址',
           key: 'ntpAddress',
           edit: true,
-          notNull: true,
+          // notNull: true,
           value: ''
         },{
           name: '初始端口',
           key: 'initialPort',
           edit: true,
-          notNull: true,
+          // notNull: true,
           value: ''
         },{
           name: 'ADB端口',
           key: 'adbPort',
           edit: true,
-          notNull: true,
+          // notNull: true,
           value: ''
         },{
           name: '是否有状态',
           key: 'isStatus',
           edit: true,
           notNull: true,
-          value: ''
+          value: '',
+          type: 'switch',
+          active: '1',
+          inactive: '0',
+          show: (status) => {
+            return status == 1 ? '是' : '否'
+          }
         },{
           name: '是否锁定',
           key: 'isLock',
           edit: true,
           notNull: true,
-          value: ''
+          value: '',
+          type: 'switch',
+          active: '2',
+          inactive: '1',
+          show: (status) => {
+            return status == 2 ? '是' : '否'
+          }
         }
       ],
       cenList: [
@@ -291,6 +323,14 @@
     }
   },
   computed: {
+    canSave() {
+      for (let item of this.netList) {
+        if (item.notNull && !item.value) {
+          return false
+        }
+      }
+      return true
+    },
     ipSetInfo() {
       return {
         caseId: this.caseInfo.id,
@@ -472,5 +512,41 @@
 .dialog-footer {
   text-align: center;
   margin-top: 20px;
+}
+.info-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 10px;
+  border-bottom: 1px solid #E1E6EB;
+  .info-view-title {
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 10px;
+  }
+  .info-view-main {
+    padding: 10px 10px 10px 120px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: flex-start;
+    .info-view-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 2px 0;
+      height: 30px;
+    }
+    .info-view-item-btn {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 5px 0;
+    }
+  }
 }
 </style>

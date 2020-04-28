@@ -15,6 +15,13 @@
 body {
   margin: 0;
 }
+
+.header-row-oreki {
+  background: #efefef;
+}
+.el-input-group__append {
+  border-radius: 0!important;
+}
 .setting-list {
   display: flex;
   flex-direction: column;
@@ -36,16 +43,18 @@ body {
   width: 80px;
 }
 .border-all {
-  border: 1px solid #E1E6EB;
+  /*border: 1px solid #E1E6EB;*/
 }
 @import "assets/font/iconfont.css";
 .iconfont {
   color: white;
 }
-span {
-  outline: invert none medium;
+span:focus {
+  outline-style: none;
 }
-div::-webkit-scrollbar {display:none}
+
+.home-main::-webkit-scrollbar {display:none}
+
 .el-input__inner {
   border-radius: 0!important;
 }

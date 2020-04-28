@@ -5,7 +5,7 @@
     </div>
 
     <div v-if="info.success" class="device-case border-all">
-      <el-table ref="multipleTable" :data="info.list" stripe @row-click="goCaseDev" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" stripe @row-click="goCaseDev" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column prop="caseNo" label="设备池编号"></el-table-column>
         <el-table-column prop="deviceNum" label="设备数量"></el-table-column>
         <el-table-column prop="deviceNumIsDistributed" label="受控设备数量"></el-table-column>

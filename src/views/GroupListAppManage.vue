@@ -3,9 +3,14 @@
     <div class="dev-list-search">
       <div class="search-btn">
         <el-button size="small" type="primary" @click="confirmSaveDev">保存修改</el-button>
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <div @keyup.enter="init">
+          <el-input size="small" placeholder="输入应用名称/APPID 搜索" v-model="searchInfo.queryParam" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="init"></el-button>
+          </el-input>
+        </div>
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
-      <div class="search-advanced">
+      <!--<div class="search-advanced">
         <div class="search-main">
           <div class="search-main-item">
             <span>应用名称:</span>
@@ -22,14 +27,14 @@
         </div>
         <div class="search-btn">
           <el-button type="primary" size="mini" @click="init">搜索</el-button>
-          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
+          &lt;!&ndash;<el-button size="mini" @click="advancedShow = false">取消</el-button>&ndash;&gt;
         </div>
-      </div>
+      </div>-->
     </div>
     <div class="device-case-dev border-all">
       <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="未分配应用" name="first">
-          <el-table ref="multipleTableFirst" :data="infoFirst.list" @row-click="checkRowFirst" max-height="400px" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeFirst">
+          <el-table ref="multipleTableFirst" :data="infoFirst.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRowFirst" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeFirst">
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="appName" label="应用名称"></el-table-column>
             <el-table-column prop="packageName" label="包名"></el-table-column>
@@ -38,7 +43,7 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="分组内应用" name="second">
-          <el-table ref="multipleTableSecond" :data="infoSecond.list" @row-click="checkRowSecond" max-height="400px" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeSecond">
+          <el-table ref="multipleTableSecond" :data="infoSecond.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRowSecond" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeSecond">
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="appName" label="应用名称"></el-table-column>
             <el-table-column prop="packageName" label="包名"></el-table-column>
@@ -70,9 +75,10 @@
         multipleSelectionFirst: [], // 选中的对象列表
         multipleSelectionSecond: [], // 选中的对象列表
         searchInfo: {
-          appNameLike: "",
-          appId: "",
-          apkStatus: 1
+          // appNameLike: "",
+          // appId: "",
+          apkStatus: 1,
+          queryParam: ""
         },
         searchOptions: {
           version: []

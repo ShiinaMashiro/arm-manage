@@ -3,47 +3,50 @@
     <div class="info-view">
       <div class="info-view-title">设备引擎升级</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">检查当前版本并对设备引擎进行升级</span>
+        <span class="info-view-item" style="font-size: 12px">检查当前版本并对设备引擎进行升级</span>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" @click="engineUpdatePopShow = true">引擎升级</el-button>
-          <el-button size="small" type="info" @click="checkVersion()">版本检查</el-button>
+          <el-button size="small" type="primary" @click="engineUpdatePopShow = true">引擎升级</el-button>
+          <el-button size="small" type="primary" @click="checkVersion()">版本检查</el-button>
         </div>
       </div>
     </div>
     <div class="info-view">
       <div class="info-view-title">设备引擎版本管理</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">设备引擎版本对应的引擎版本</span>
+        <span class="info-view-item" style="font-size: 12px">设备引擎版本对应的引擎版本</span>
         <div class="info-view-item" style="align-items: flex-start;height: auto">
-          <span>当前白名单：</span>
+          <span style="height: 30px;line-height: 30px">当前引擎版本：</span>
           <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
             <div v-for="(version, index) in engineVersionList" :key="version.code" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!enginePopShow">{{'引擎编码：' + version.code + '   引擎版本：' + version.content}}</span>
               <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
                 引擎编码：<el-input size="mini" v-model="engineVersionList[index].code" style="width: 80px;margin-right: 10px"></el-input>
                 引擎版本：<el-input size="mini" v-model="engineVersionList[index].content" style="width: 80px"></el-input>
-                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteVersion(index)">&#xe630;</i>
+                <i v-if="engineVersionAddList.length === 0 && (index + 1) === engineVersionList.length" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAddList()">&#xe631;</i>
+                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionDelList(index)">&#xe630;</i>
               </div>
             </div>
-            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
-              <div v-if="enginePopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                 引擎编码：<el-input size="mini" v-model="versionAddInfo.code" style="width: 80px;margin-right: 10px"></el-input>
-                 引擎版本：<el-input size="mini" v-model="versionAddInfo.content" style="width: 80px;"></el-input>
-                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAdd()">&#xe631;</i>
+            <div v-for="(version, index) in engineVersionAddList" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+              <div style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
+                 引擎编码：<el-input size="mini" v-model="version.code" style="width: 80px;margin-right: 10px"></el-input>
+                 引擎版本：<el-input size="mini" v-model="version.content" style="width: 80px;"></el-input>
+                <i v-if="engineVersionAddList.length === (index + 1)" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAddList()">&#xe631;</i>
+                <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAddDelList(index)">&#xe630;</i>
               </div>
             </div>
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!enginePopShow" @click="enginePopShow = true">设置</el-button>
-          <el-button size="small" type="info" v-if="enginePopShow" @click="enginePopShow = false">完成</el-button>
+          <el-button size="small" type="primary" v-if="!enginePopShow" @click="enginePopShow = true">设置</el-button>
+          <el-button size="small" type="primary" v-if="enginePopShow" @click="versionAdd()">完成</el-button>
+          <el-button size="small" type="info" v-if="enginePopShow" @click="versionAddCancel()">取消</el-button>
         </div>
       </div>
     </div>
     <div class="info-view">
       <div class="info-view-title">管理系统升级</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">检查当前版本并对管理系统进行升级</span>
+        <span class="info-view-item" style="font-size: 12px">检查当前版本并对管理系统进行升级</span>
         <div class="info-view-item">
           <span>前端版本：</span>
           <span>2.0.0</span>
@@ -53,14 +56,14 @@
           <span>{{systemVersion}}</span>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" @click="systemUpdatePopShow = true">升级</el-button>
+          <el-button size="small" type="primary" @click="systemUpdatePopShow = true">升级</el-button>
         </div>
       </div>
     </div>
     <div v-if="sysInfo" class="info-view" @keyup.enter="saveSysInfo(changePopInfo)">
       <div class="info-view-title">系统网络设置</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">配置管理中心网络及远程相机服务网络</span>
+        <span class="info-view-item" style="font-size: 12px">配置管理中心网络及远程相机服务网络</span>
         <div class="info-view-item">
           <span>管理中心网络IP：</span>
           <span v-if="!changePopShow">{{sysInfo.webIp}}</span>
@@ -97,8 +100,8 @@
           <el-input v-else size="mini" v-model="changePopInfo.mediaServerLan" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!changePopShow" @click="changePop()">设置</el-button>
-          <el-button size="small" type="info" v-if="changePopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
+          <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="changePopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
           <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
         </div>
       </div>
@@ -106,10 +109,10 @@
     <div v-if="sysInfo" class="info-view" @keyup.enter="saveSysInfo(changePopInfo)">
       <div class="info-view-title">默认推流参数</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">配置应用默认推流参数</span>
+        <span class="info-view-item" style="font-size: 12px">配置应用默认推流参数</span>
         <div class="info-view-item">
           <span>推流最大码率：</span>
-          <span v-if="!streamPopShow">{{sysInfo.encodeRateMax}}</span>
+          <span v-if="!streamPopShow">{{sysInfo.encodeRateMax}} kb/s</span>
           <el-input v-else size="mini" v-model="changePopInfo.encodeRateMax" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item">
@@ -118,8 +121,8 @@
           <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!streamPopShow" @click="streamPop()">设置</el-button>
-          <el-button size="small" type="info" v-if="streamPopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
+          <el-button size="small" type="primary" v-if="!streamPopShow" @click="streamPop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="streamPopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
           <el-button size="small" type="info" v-if="streamPopShow" @click="streamPopShow = false">取消</el-button>
         </div>
       </div>
@@ -127,47 +130,51 @@
     <div v-if="sysInfo" class="info-view">
       <div class="info-view-title">运维信息</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">配置运维邮箱和电话，接受预警信息</span>
+        <span class="info-view-item" style="font-size: 12px">配置运维邮箱和电话，接受预警信息</span>
         <div class="info-view-item" style="align-items: flex-start;height: auto">
-          <span>运维邮箱：</span>
+          <span style="height: 30px;line-height: 30px">运维邮箱：</span>
           <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
-            <div v-for="(email, index) in emailList" :key="email" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+            <div v-for="(email, index) in emailList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!emailPopShow">{{email}}</span>
               <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                <el-input size="mini" v-model="emailList[index]" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteEmail(index)">&#xe630;</i>
+                <el-input size="mini" v-model="emailList[index]" style="width: 150px"></el-input>
+                <i v-if="(index + 1) === emailList.length" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="emailAdd()">&#xe631;</i>
+                <i v-if="emailList.length !== 1" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deleteEmail(index)">&#xe630;</i>
               </div>
             </div>
-            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+            <!--<div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <div v-if="emailPopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
                 <el-input size="mini" v-model="emailAddValue" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="emailAdd()">&#xe631;</i>
               </div>
-            </div>
+            </div>-->
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!emailPopShow" @click="emailPop()">设置</el-button>
-          <el-button size="small" type="info" v-if="emailPopShow" @click="emailAddSave()">保存</el-button>
+          <el-button size="small" type="primary" v-if="!emailPopShow" @click="emailPop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="emailPopShow" @click="emailAddSave()">保存</el-button>
           <el-button size="small" type="info" v-if="emailPopShow" @click="emailPopShow = false">取消</el-button>
         </div>
         <div class="info-view-item" style="align-items: flex-start;height: auto">
-          <span>运维电话：</span>
+          <span style="height: 30px;line-height: 30px">运维电话：</span>
           <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
-            <div v-for="(phone, index) in phoneList" :key="phone" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+            <div v-for="(phone, index) in phoneList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!phonePopShow">{{phone}}</span>
               <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                <el-input size="mini" v-model="phoneList[index]" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deletePhone(index)">&#xe630;</i>
+                <el-input size="mini" v-model="phoneList[index]" style="width: 150px"></el-input>
+                <i v-if="(index + 1) === phoneList.length" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="phoneAdd()">&#xe631;</i>
+                <i v-if="phoneList.length !== 1" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="deletePhone(index)">&#xe630;</i>
               </div>
             </div>
-            <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+            <!--<div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <div v-if="phonePopShow" style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
                 <el-input size="mini" v-model="phoneAddValue" style="width: 150px"></el-input><i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="phoneAdd()">&#xe631;</i>
               </div>
-            </div>
+            </div>-->
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" v-if="!phonePopShow" @click="phonePop()">设置</el-button>
-          <el-button size="small" type="info" v-if="phonePopShow" @click="phoneAddSave()">保存</el-button>
+          <el-button size="small" type="primary" v-if="!phonePopShow" @click="phonePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="phonePopShow" @click="phoneAddSave()">保存</el-button>
           <el-button size="small" type="info" v-if="phonePopShow" @click="phonePopShow = false">取消</el-button>
         </div>
       </div>
@@ -175,7 +182,7 @@
     <div v-if="licenseInfo" class="info-view">
       <div class="info-view-title">License信息</div>
       <div class="info-view-main">
-        <span class="info-view-item" style="font-size: 14px">查看和管理您的license凭证</span>
+        <span class="info-view-item" style="font-size: 12px">查看和管理您的license凭证</span>
         <div class="info-view-item">
           <span>license码：</span>
           <span>{{licenseInfo.code}}</span>
@@ -189,7 +196,7 @@
           <span>{{licenseInfo.deviceNum}}</span>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="info" @click="license()">升级</el-button>
+          <el-button size="small" type="primary" @click="license()">升级</el-button>
         </div>
       </div>
     </div>
@@ -317,6 +324,8 @@
         licenseInfo: null,
         systemVersion: '',
         engineVersionList: [],
+        engineVersionDelList: [],
+        engineVersionAddList: [],
         enginePopShow: false,
         versionAddInfo: {
           code: '',
@@ -501,7 +510,7 @@
           iconClass: 'el-icon-c-yellow',
           cancelButtonText: '取消'
         }).then(() => {
-          that.$post(that.$uri.system.engineCodeDelete, {code: that.engineVersionList[index.code]}).then(res => {
+          that.$post(that.$uri.system.engineCodeDelete, {code: that.engineVersionList[index].code}).then(res => {
             if (res.success) {
               that.$message.success("删除成功")
               that.engineVersionList.splice(index, 1)
@@ -511,27 +520,56 @@
           })
         }).catch(() => {})
       },
+      versionAddList() {
+        this.engineVersionAddList.push({
+          code: '',
+          content: ''
+        })
+      },
+      versionDelList(index) {
+        this.engineVersionDelList.push(this.engineVersionList[index])
+        this.engineVersionList.splice(index, 1)
+      },
+      versionAddDelList(index) {
+        this.engineVersionAddList.splice(index, 1)
+      },
       versionAdd () {
         let that = this
-        if (!/^[0-9]{1,4}$/.test(that.versionAddInfo.code) || !/^[0-9a-zA-Z_]{1,20}$/.test(that.versionAddInfo.content)) {
-          that.$message.error("请按正确的格式输入参数")
-          return
-        }
-        that.$post(that.$uri.system.engineCodeAdd, that.versionAddInfo).then(res => {
-          if (res.success) {
-            that.$message.success("添加引擎版本成功")
-            that.versionAddInfo = {code:'', content: ''}
-            that.$post(that.$uri.system.engineCodeList).then(res => {
-              if (res.success) {
-                that.engineVersionList = res.list
-              } else {
-                that.$message.error("获取信息失败，" + res.message)
-              }
-            })
-          } else {
-            that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
+        for (let i = 0; i < this.engineVersionAddList.length; i++) {
+          if (!/^[0-9]{1,4}$/.test(this.engineVersionAddList[i].code) || !/^[0-9a-zA-Z_]{1,20}$/.test(this.engineVersionAddList[i].content)) {
+            that.$message.error("请按正确的格式输入参数")
+            return
           }
+        }
+
+        this.engineVersionAddList.forEach(version => {
+          that.$post(that.$uri.system.engineCodeAdd, version).then(res => {
+            if (res.success) {
+              this.getEngineVersionList()
+            } else {
+              // that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
+            }
+          })
+          this.engineVersionAddList = []
         })
+
+        this.engineVersionDelList.forEach(version => {
+          that.$post(that.$uri.system.engineCodeDelete, version).then(res => {
+            if (res.success) {
+              this.getEngineVersionList()
+            } else {
+              // that.$message.error("删除失败，错误信息：" + res.message + "，错误码： " + res.code)
+            }
+          })
+          this.engineVersionDelList = []
+        })
+        this.enginePopShow = false
+      },
+      versionAddCancel() {
+        this.enginePopShow = false
+        this.getEngineList()
+        this.engineVersionAddList = []
+        this.engineVersionDelList = []
       },
       getEngineVersionList() {
         that.$post(that.$uri.system.engineCodeList).then(res => {
@@ -559,12 +597,8 @@
             })
             that.sysInfo = paramInf
             that.idInfo = idInf
-            if (that.sysInfo.email) {
-              that.emailList = that.sysInfo.email.split(',')
-            }
-            if (that.sysInfo.phone) {
-              that.phoneList = that.sysInfo.phone.split(',')
-            }
+            that.emailList = that.sysInfo.email.split(',')
+            that.phoneList = that.sysInfo.phone.split(',')
           }
         })
       },
@@ -605,16 +639,23 @@
         that.phoneList.splice(index, 1)
       },
       emailPop() {
-        if (that.sysInfo.email) {
-          that.emailList = that.sysInfo.email.split(',')
-        }
+        that.emailList = that.sysInfo.email.split(',')
         that.emailPopShow = true
       },
       emailAdd() {
-        that.emailList.push(that.emailAddValue)
-        that.emailAddValue = ''
+        that.emailList.push('')
       },
       emailAddSave() {
+        let check = false
+        that.emailList.forEach(phone => {
+          if (!phone) {
+            check = true
+          }
+        })
+        if (check) {
+          that.$message.warning("邮箱不能为空")
+          return
+        }
         let temp = {
           id: that.idInfo.email,
           paramName: 'email',
@@ -623,6 +664,7 @@
         that.$post(that.$uri.system.paramSave, temp).then(res => {
           if (res.success) {
             that.$message.success("修改成功")
+            that.getSysInfo()
             that.emailPopShow = false
           } else {
             that.$message.error("修改失败")
@@ -630,16 +672,23 @@
         })
       },
       phonePop() {
-        if (that.sysInfo.phone) {
-          that.phoneList = that.sysInfo.phone.split(',')
-        }
+        that.phoneList = that.sysInfo.phone.split(',')
         that.phonePopShow = true
       },
       phoneAdd() {
-        that.phoneList.push(that.phoneAddValue)
-        that.phoneAddValue = ''
+        that.phoneList.push('')
       },
       phoneAddSave() {
+        let check = false
+        that.phoneList.forEach(phone => {
+          if (!phone) {
+            check = true
+          }
+        })
+        if (check) {
+          that.$message.warning("电话不能为空")
+          return
+        }
         let temp = {
           id: that.idInfo.phone,
           paramName: 'phone',
@@ -648,6 +697,7 @@
         that.$post(that.$uri.system.paramSave, temp).then(res => {
           if (res.success) {
             that.$message.success("修改成功")
+            that.getSysInfo()
             that.phonePopShow = false
           } else {
             that.$message.error("修改失败")

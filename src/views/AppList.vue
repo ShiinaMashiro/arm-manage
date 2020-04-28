@@ -8,7 +8,7 @@
             <el-button slot="append" icon="el-icon-search" @click="getAppList"></el-button>
           </el-input>
         </div>
-        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级搜索</el-button>-->
+        <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->
       </div>
       <div class="search-advanced" v-show="advancedShow">
         <div class="search-main">
@@ -38,16 +38,16 @@
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="goDetail" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column prop="appName" label="应用名称"></el-table-column>
         <el-table-column prop="packageName" label="包名"></el-table-column>
         <el-table-column prop="versionName" label="版本"></el-table-column>
         <el-table-column prop="appId" label="APPID"></el-table-column>
         <el-table-column min-width="120px" label="操作">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="goDetail(scope.row)">编辑</el-button>
-            <el-button type="text" size="small" @click="goGroup(scope.row)">分组</el-button>
-            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" @click="apkOffBatch(scope.row)">下架</el-button>
+            <el-button type="text" size="small" @click.stop="goDetail(scope.row)">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="goGroup(scope.row)">分组</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" @click.stop="apkOffBatch(scope.row)">下架</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -185,7 +185,7 @@
         let that = this
         that.searchInfo.apkNameLike = that.searchInfo.appNameLike
         that.searchInfo.appid = that.searchInfo.appNameLike
-        that.$post(that.$uri.apk.apkList, {...that.page, queryParam: that.searchInfo.appNameLike}).then(res => {
+        that.$post(that.$uri.apk.apkList, {...that.page, apkStatus: 1, queryParam: that.searchInfo.appNameLike}).then(res => {
           that.info = res
         })
       },
