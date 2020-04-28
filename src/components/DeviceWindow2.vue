@@ -80,7 +80,7 @@ export default {
     this.player.open({
       // appkey: this.appkey,
       // appid: this.appid,
-      ip: this.ip,
+      ip: this.port === 0 ? this.ip : shinoIp,
       port: this.port === 0 ? 20000 : this.port,
       ljyip: shinoIp,
       deviceId: this.deviceId,
