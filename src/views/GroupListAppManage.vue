@@ -34,7 +34,8 @@
     <div class="device-case-dev border-all">
       <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="未分配应用" name="first">
-          <el-table ref="multipleTableFirst" :data="infoFirst.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRowFirst" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeFirst">
+          <el-table ref="multipleTableFirst" :data="infoFirst.list" :header-cell-style="{backgroundColor: '#efefef'}"
+                    @row-click="checkRowFirst" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeFirst">
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="appName" label="应用名称"></el-table-column>
             <el-table-column prop="packageName" label="包名"></el-table-column>
@@ -43,7 +44,8 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="分组内应用" name="second">
-          <el-table ref="multipleTableSecond" :data="infoSecond.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRowSecond" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeSecond">
+          <el-table ref="multipleTableSecond" :data="infoSecond.list" :header-cell-style="{backgroundColor: '#efefef'}"
+                    @row-click="checkRowSecond" max-height="400px" tooltip-effect="dark" style="width: 100%;" @selection-change="handleSelectionChangeSecond">
             <el-table-column type="selection"></el-table-column>
             <el-table-column prop="appName" label="应用名称"></el-table-column>
             <el-table-column prop="packageName" label="包名"></el-table-column>

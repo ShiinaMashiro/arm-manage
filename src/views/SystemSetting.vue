@@ -546,6 +546,7 @@
           that.$post(that.$uri.system.engineCodeAdd, version).then(res => {
             if (res.success) {
               this.getEngineVersionList()
+              this.getEngineList()
             } else {
               // that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
             }
@@ -557,6 +558,7 @@
           that.$post(that.$uri.system.engineCodeDelete, version).then(res => {
             if (res.success) {
               this.getEngineVersionList()
+              this.getEngineList()
             } else {
               // that.$message.error("删除失败，错误信息：" + res.message + "，错误码： " + res.code)
             }
