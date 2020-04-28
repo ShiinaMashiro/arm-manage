@@ -20,7 +20,7 @@
             <div v-for="(version, index) in engineVersionList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!enginePopShow">{{'引擎编码：' + version.code + '   引擎版本：' + version.content}}</span>
               <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
-                引擎编码：<el-input size="mini" v-model="engineVersionList[index].code" style="width: 80px;margin-right: 10px"></el-input>
+                引擎编码：<el-input :disabled="true" size="mini" v-model="engineVersionList[index].code" style="width: 80px;margin-right: 10px"></el-input>
                 引擎版本：<el-input size="mini" v-model="engineVersionList[index].content" style="width: 80px"></el-input>
                 <i v-if="engineVersionAddList.length === 0 && (index + 1) === engineVersionList.length" class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionAddList()">&#xe631;</i>
                 <i class="iconfont" style="color: gray;margin-left: 3px;font-size: 18px" @click="versionDelList(index)">&#xe630;</i>
@@ -152,7 +152,7 @@
         <div class="info-view-item-btn">
           <el-button size="small" type="primary" v-if="!emailPopShow" @click="emailPop()">设置</el-button>
           <el-button size="small" type="primary" v-if="emailPopShow" @click="emailAddSave()">保存</el-button>
-          <el-button size="small" type="info" v-if="emailPopShow" @click="emailPopShow = false">取消</el-button>
+          <el-button size="small" type="info" v-if="emailPopShow" @click="emailCancel()">取消</el-button>
         </div>
         <div class="info-view-item" style="align-items: flex-start;height: auto">
           <span style="height: 30px;line-height: 30px">运维电话：</span>
@@ -175,7 +175,7 @@
         <div class="info-view-item-btn">
           <el-button size="small" type="primary" v-if="!phonePopShow" @click="phonePop()">设置</el-button>
           <el-button size="small" type="primary" v-if="phonePopShow" @click="phoneAddSave()">保存</el-button>
-          <el-button size="small" type="info" v-if="phonePopShow" @click="phonePopShow = false">取消</el-button>
+          <el-button size="small" type="info" v-if="phonePopShow" @click="phoneCancel()">取消</el-button>
         </div>
       </div>
     </div>
@@ -542,6 +542,17 @@
           }
         }
 
+        this.engineVersionList.forEach(version => {
+          that.$post(that.$uri.system.engineCodeChange, version).then(res => {
+            if (res.success) {
+              this.getEngineVersionList()
+              this.getEngineList()
+            } else {
+              // that.$message.error("添加失败，错误信息：" + res.message + "，错误码： " + res.code)
+            }
+          })
+        })
+
         this.engineVersionAddList.forEach(version => {
           that.$post(that.$uri.system.engineCodeAdd, version).then(res => {
             if (res.success) {
@@ -565,6 +576,7 @@
           })
           this.engineVersionDelList = []
         })
+        this.$message.success("修改完成")
         this.enginePopShow = false
       },
       versionAddCancel() {
@@ -679,6 +691,14 @@
       },
       phoneAdd() {
         that.phoneList.push('')
+      },
+      phoneCancel() {
+        that.getSysInfo()
+        that.phonePopShow = false
+      },
+      emailCancel() {
+        that.getSysInfo()
+        that.emailPopShow = false
       },
       phoneAddSave() {
         let check = false
