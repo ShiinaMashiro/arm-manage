@@ -17,7 +17,7 @@
         <div class="info-view-item" style="align-items: flex-start;height: auto">
           <span style="height: 30px;line-height: 30px">当前引擎版本：</span>
           <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
-            <div v-for="(version, index) in engineVersionList" :key="version.code" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
+            <div v-for="(version, index) in engineVersionList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!enginePopShow">{{'引擎编码：' + version.code + '   引擎版本：' + version.content}}</span>
               <div v-else style="display: flex;flex-direction: row;justify-content: center;align-items: center;">
                 引擎编码：<el-input size="mini" v-model="engineVersionList[index].code" style="width: 80px;margin-right: 10px"></el-input>
@@ -569,7 +569,7 @@
       },
       versionAddCancel() {
         this.enginePopShow = false
-        this.getEngineList()
+        this.getEngineVersionList()
         this.engineVersionAddList = []
         this.engineVersionDelList = []
       },
