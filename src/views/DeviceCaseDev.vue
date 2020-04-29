@@ -9,7 +9,7 @@
     </div>
     <div class="device-case-dev border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRow" size="mini" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
+        <el-table-column type="selection" align="center" header-align="center" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
             {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
@@ -279,7 +279,7 @@ export default {
   },
   filters: {
     statusStr (row) {
-      if (row.isFlow === 1) return "推流中"
+      if (row.isFlow === 1 && row.deviceStatus === 0) return "推流中"
       switch (row.deviceStatus) {
         case 0: return "正常";
         case 1: return "未更新";
@@ -292,7 +292,7 @@ export default {
       }
     },
     statusClassFilter (row) {
-      if (row.isFlow === 1) return {color: "green"}
+      if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
       switch (row.deviceStatus) {
         case 0: return {color: "#333"};
         case 3: return {color: "red"};

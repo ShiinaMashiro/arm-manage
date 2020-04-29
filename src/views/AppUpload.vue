@@ -81,7 +81,7 @@
       <div class="info-view-main">
         <div style="border: thin solid #ddd; min-width: 400px;width: 40%">
           <el-table ref="multipleTable" :data="list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-            <el-table-column type="selection"></el-table-column>
+            <el-table-column type="selection" align="center" header-align="center"></el-table-column>
             <el-table-column prop="groupName" label="分组名称"></el-table-column>
             <el-table-column label="组内设备数量">
               <template slot-scope="scope">

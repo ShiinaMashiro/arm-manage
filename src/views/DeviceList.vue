@@ -487,7 +487,7 @@
     },
     filters: {
       statusStr (row) {
-        if (row.isFlow === 1) return "推流中"
+        if (row.isFlow === 1 && row.deviceStatus === 0) return "推流中"
         switch (row.deviceStatus) {
           case 0: return "正常";
           case 1: return "未更新";
@@ -500,7 +500,7 @@
         }
       },
       statusClassFilter (row) {
-        if (row.isFlow === 1) return {color: "green"}
+        if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
         switch (row.deviceStatus) {
           case 0: return {color: "#333"};
           case 3: return {color: "red"};

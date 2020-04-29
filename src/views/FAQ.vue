@@ -6,7 +6,7 @@
 
     <div v-if="info.success" class="device-case border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+        <el-table-column type="selection" align="center" header-align="center"></el-table-column>
         <el-table-column prop="id" label="ID"></el-table-column>
         <el-table-column prop="title" label="提问"></el-table-column>
         <el-table-column prop="content" label="回答"></el-table-column>

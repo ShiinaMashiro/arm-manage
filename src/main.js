@@ -14,6 +14,9 @@ import 'mavon-editor/dist/css/index.css'
 import axios from 'axios'
 import VueDraggableResizable from 'vue-draggable-resizable'
 
+console.log(process.env)
+console.log(process.argv)
+
 Vue.use(mavonEditor)
 Vue.use(ElementUI)
 Vue.config.productionTip = false

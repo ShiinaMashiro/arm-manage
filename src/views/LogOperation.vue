@@ -54,7 +54,7 @@
     </div>
     <div class="device-case-dev border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+        <el-table-column type="selection" align="center" header-align="center"></el-table-column>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="username" label="用户名" min-width="80px"></el-table-column>
         <el-table-column prop="remark" label="操作内容" min-width="150px"></el-table-column>

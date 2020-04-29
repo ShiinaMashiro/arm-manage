@@ -63,7 +63,7 @@
     </div>
     <div class="device-case-dev border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection"></el-table-column>
+        <el-table-column type="selection" align="center" header-align="center"></el-table-column>
         <el-table-column label="分发类别">
           <template slot-scope="scope">
             <span>{{scope.row | modeStr}}</span>

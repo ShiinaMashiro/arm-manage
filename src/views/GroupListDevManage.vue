@@ -41,7 +41,7 @@
           <el-table ref="multipleTableFirst" :data="infoFirst.list" max-height="400px" :header-cell-style="{backgroundColor: '#efefef'}"
                     @row-click="checkRowFirst"
                     tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeFirst">
-            <el-table-column type="selection"></el-table-column>
+            <el-table-column type="selection" align="center" header-align="center"></el-table-column>
             <el-table-column prop="id" label="ID" min-width="50px">
               <template slot-scope="scope">
                 {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
@@ -71,7 +71,7 @@
           <el-table ref="multipleTableSecond" :data="infoSecond.list" max-height="400px" :header-cell-style="{backgroundColor: '#efefef'}"
                     @row-click="checkRowSecond"
                     tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChangeSecond">
-            <el-table-column type="selection"></el-table-column>
+            <el-table-column type="selection" align="center" header-align="center"></el-table-column>
             <el-table-column prop="id" label="ID" min-width="50px">
               <template slot-scope="scope">
                 {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
@@ -246,7 +246,7 @@ export default {
         case 7: return "应用结束中";
       }
     },statusClassFilter (row) {
-      if (row.isFlow === 1) return {color: "green"}
+      if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
       switch (row.deviceStatus) {
         case 0: return {color: "#333"};
         case 3: return {color: "red"};

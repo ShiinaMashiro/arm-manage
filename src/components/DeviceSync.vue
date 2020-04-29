@@ -61,7 +61,7 @@
     },
     filters: {
       statusClassFilter (row) {
-        if (row.isFlow === 1) return {color: "green"}
+        if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
         switch (row.deviceStatus) {
           case 0: return {color: "#333"};
           case 3: return {color: "red"};

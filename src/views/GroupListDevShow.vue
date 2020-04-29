@@ -1,7 +1,7 @@
 <template>
   <div class="dev-list">
     <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 60px;border-bottom: 1px solid #efefef">
-      <div class="preview-bar-operate" v-if="!viewMode">
+      <div class="preview-bar-operate">
         <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
           <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
         </div>
@@ -16,7 +16,7 @@
             <el-dropdown-item :disabled="!hasSelect" command="reboot">重启设备</el-dropdown-item>
             <el-dropdown-item :disabled="!hasSelect" command="home">一键HOME</el-dropdown-item>
             <el-dropdown-item :disabled="!hasSelect" command="recover">恢复出厂设置</el-dropdown-item>
-            <el-dropdown-item :disabled="!hasSelect || !snapshotComplete" command="snapshot">刷新截图</el-dropdown-item>
+            <el-dropdown-item v-if="!viewMode" :disabled="!hasSelect || !snapshotComplete" command="snapshot">刷新截图</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-button type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
@@ -24,7 +24,7 @@
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>-->
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>-->
       </div>
-      <div class="preview-bar-operate" v-else>
+      <div class="preview-bar-operate" v-if="false">
         <div style="padding: 0 10px 0 0; margin-right: 10px">
           <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
         </div>
@@ -38,7 +38,7 @@
     </div>
     <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 70px">
       <el-table ref="multipleTable" :data="info.list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" :row-key="rowKey" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" :selectable="isCommonCard"></el-table-column>
+        <el-table-column type="selection" align="center" header-align="center" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
           <template slot-scope="scope">
             {{scope.row.cardType === 1 ? scope.row.id : "分层"}}
@@ -340,21 +340,31 @@ export default {
       ]
     },
     hasSelect() {
-      for(let i = 0; i < this.test.length; i++) {
-        if (this.test[i] === true) {
-          return true
+      if (this.viewMode) {
+        return this.multipleSelection.length > 0
+      } else {
+        for (let i = 0; i < this.test.length; i++) {
+          if (this.test[i] === true) {
+            return true
+          }
         }
+        return false
       }
-      return false
     },
     imgUrl() {
       return this.snapshotSuccess ? '.jpg?temp=' + new Date().getTime() : ''
     },
     selectIps() {
       let ips = []
-      for(let i = 0; i < this.info.list.length; i++) {
-        if (this.test[i] === true) {
-          ips.push(this.info.list[i].deviceIp)
+      if (this.viewMode) {
+        this.multipleSelection.forEach(dev => {
+          ips.push(dev.deviceIp)
+        })
+      } else {
+        for (let i = 0; i < this.info.list.length; i++) {
+          if (this.test[i] === true) {
+            ips.push(this.info.list[i].deviceIp)
+          }
         }
       }
       return ips
@@ -382,9 +392,13 @@ export default {
     },
     devSync() {
       let devs = []
-      for(let i = 0; i < this.info.list.length; i++) {
-        if (this.test[i] === true) {
-          devs.push(this.info.list[i])
+      if (this.viewMode) {
+        devs = this.multipleSelection
+      } else {
+        for (let i = 0; i < this.info.list.length; i++) {
+          if (this.test[i] === true) {
+            devs.push(this.info.list[i])
+          }
         }
       }
       if (devs.length < 2) {
@@ -569,9 +583,12 @@ export default {
       if (!this.viewMode) {
         this.allChecked = false
         this.oldLimit = this.page.limit
-        this.page.limit = 1000
+        let p = {
+          limit: 1000,
+          startPage: 1
+        }
         let that = this
-        that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
+        that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id}).then(res => {
           that.info = res
           that.test = []
           that.info.list.forEach(v => {
@@ -598,13 +615,17 @@ export default {
           })
         })
       } else {
-        this.page.limit = this.oldLimit
+        // this.page.limit = this.oldLimit
         this.getDeviceList()
       }
     },
     allCheckedChange(checked) {
-      for(let i = 0; i < this.test.length; i++) {
-        this.test.splice(i, 1, checked)
+      if (!this.viewMode) {
+        for (let i = 0; i < this.test.length; i++) {
+          this.test.splice(i, 1, checked)
+        }
+      } else {
+        this.$refs.multipleTable.toggleAllSelection()
       }
     },
     /* 表单击行事件 */
@@ -630,7 +651,14 @@ export default {
     /* 获取设备列表 */
     getDeviceList2Refresh () {
       let that = this
-      that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
+      let p = this.page
+      if (!this.viewMode) {
+        p = {
+          limit: 1000,
+          startPage: 1
+        }
+      }
+      that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id}).then(res => {
         that.info.list.forEach(v => {
           res.list.forEach(i => {
             if (v.id === i.id) {
@@ -852,7 +880,7 @@ export default {
   },
   filters: {
     statusStr (row) {
-      if (row.isFlow === 1) return "推流中"
+      if (row.isFlow === 1 && row.deviceStatus === 0) return "推流中"
       switch (row.deviceStatus) {
         case 0: return "正常";
         case 1: return "未更新";
@@ -865,7 +893,7 @@ export default {
       }
     },
     statusStrPre (row) {
-      if (row.isFlow === 1) return "推流中"
+      if (row.isFlow === 1 && row.deviceStatus === 0) return "推流中"
       switch (row.deviceStatus) {
         case 0: return "";
         case 1: return "未更新";
@@ -878,7 +906,7 @@ export default {
       }
     },
     statusClassFilter (row) {
-      if (row.isFlow === 1) return {color: "green"}
+      if (row.isFlow === 1 && row.deviceStatus === 0) return {color: "green"}
       switch (row.deviceStatus) {
         case 0: return {color: "#333"};
         case 3: return {color: "red"};
