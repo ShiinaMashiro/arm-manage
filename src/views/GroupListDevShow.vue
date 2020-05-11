@@ -20,6 +20,8 @@
           </el-dropdown-menu>
         </el-dropdown>
         <el-button type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
+        <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipStartPop()">切换IP</el-button>
+        <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>-->
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>-->
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>-->
@@ -132,7 +134,7 @@
     <div class="preview-main" v-else  style="margin-top: 70px;">
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
-          <el-tooltip class="item" effect="dark" :content="item.deviceIp + ' adb端口：' + adbPortFilter(item)" placement="top-start">
+          <el-tooltip class="item" effect="dark" :content="$isEnable($enableKey.adb) ? (item.deviceIp + ' adb端口：' + adbPortFilter(item)) : item.deviceIp" placement="top-start">
           <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
             <el-checkbox v-model="test[index]" @change="itemCheckedChange" style="flex-grow: 1">
                 <span>{{item.id}}</span>
@@ -148,8 +150,8 @@
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="rebootOneOne(item.deviceIp)">重启云机</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="downloadSnapshot(index)">下载截图</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
-              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 1)">打开ADB</el-button></div>
-              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
+              <div v-if="$isEnable($enableKey.adb)" style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 1)">打开ADB</el-button></div>
+              <div v-if="$isEnable($enableKey.adb)" style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
             </div>
             <el-image @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
                       v-loading="snapshotImgLoading[item.deviceIp]"
@@ -194,6 +196,34 @@
             </el-table-column>
           </el-table>
         </el-form>
+      </div>
+    </Drawer>
+
+    <!-- 切换IP弹窗 -->
+    <Drawer title="切换IP" :visible.sync="ipStartPopShow" @handClick="ipStart">
+      <div style="font-size: 12px;">
+        <div style="font-size: 14px;font-weight: 600">已选云机：</div>
+        <div style="width: 100%;word-wrap: break-word;">{{ipStartInfo.msg}}</div>
+        <br/>
+        <div style="font-size: 14px;font-weight: 600">选择IP：</div>
+        <div>切换方式：
+          <el-radio-group v-model="ipStartInfo.method" size="mini">
+            <el-radio-button :label="1">随机</el-radio-button>
+            <el-radio-button :label="2">指定IP</el-radio-button>
+          </el-radio-group>
+        </div>
+        <div v-if="ipStartInfo.method === 2">
+          <el-table
+                  :data="ipList"
+                  size="mini"
+                  highlight-current-row
+                  @current-change="handleCurrentChangeIp"
+                  style="width: 100%">
+            <el-table-column prop="name" label="名称" ></el-table-column>
+            <el-table-column prop="ip" label="IP" ></el-table-column>
+            <el-table-column prop="connectionLast" label="剩余连接数" ></el-table-column>
+          </el-table>
+        </div>
       </div>
     </Drawer>
 
@@ -327,7 +357,17 @@ export default {
         ],
         version: []
       },
-      timeoutId: 0
+      timeoutId: 0,
+      // ip
+      ipStartInfo: {
+        ips: [],
+        proxyId: null,
+        msg: '',
+        method: 1,
+        last: 0
+      },
+      ipList: [],
+      ipStartPopShow: false
     }
   },
   computed: {
@@ -381,6 +421,10 @@ export default {
     handleCurrentChange(row) {
       this.startStopAppid = row.appId
     },
+    handleCurrentChangeIp(row) {
+      this.ipStartInfo.proxyId = row.id
+      // this.ipStartInfo.last = row.connectionLast
+    },
     handleSyncClose(done) {
       let that = this
       this.$confirm('退出同步？')
@@ -407,6 +451,93 @@ export default {
       }
       this.devSyncList = devs
       this.devSyncShow = true
+
+    },
+    ipStartPop() {
+      let devs = []
+      if (this.viewMode) {
+        devs = this.multipleSelection
+      } else {
+        for (let i = 0; i < this.info.list.length; i++) {
+          if (this.test[i] === true) {
+            devs.push(this.info.list[i])
+          }
+        }
+      }
+
+      let ips = []
+      let msgs = []
+      devs.forEach(dev => {
+        ips.push(dev.deviceIp)
+        msgs.push(dev.deviceNo + '(' + dev.deviceIp + ')')
+      })
+      this.ipStartInfo.ips = ips
+      this.ipStartInfo.msg = msgs.join(',')
+      let that = this
+      that.$post(that.$uri.ipProxy.list).then(res => {
+        if (res.success) {
+          that.ipList = res.list
+        }
+      })
+      this.ipStartPopShow = true
+    },
+    ipStart() {
+      console.log(this.ipStartInfo)
+      if (this.ipStartInfo.ips.length > this.ipStartInfo.last) {
+        this.$confirm("当前剩余连接数不足以分配所选云机，请增加ip最大连接数，或者减少选择云机。", "剩余连接数不足", {
+          confirmButtonText: '关闭',
+          confirmButtonClass: 'confirm-btn-red',
+          iconClass: 'el-icon-c-red',
+          cancelButtonText: '取消',
+          showClose: false
+        }).then( () => {
+
+        }).catch( () => {})
+        return
+      }
+
+      if(this.ipStartInfo.method === 1) {
+        this.ipStartInfo.proxyId = this.ipStartInfo.ips[Math.floor((Math.random() * this.ipStartInfo.ips.length))].id
+      }
+
+      let that = this
+      this.ipStartInfo.ips.forEach(ip => {
+        that.$post(that.$uri.device.stopProxy, {deviceIp: ip, proxyId: this.ipStartInfo.proxyId}).then(res => {
+          if (!res.success){
+            that.$message.error(res.msg)
+          }
+        })
+      })
+      this.$message.success("开始切换IP...")
+      this.ipStartPopShow = false
+    },
+    ipClose() {
+      this.$confirm("确定关闭IP代理？", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消',
+      }).then( () => {
+        let devs = []
+        if (this.viewMode) {
+          devs = this.multipleSelection
+        } else {
+          for (let i = 0; i < this.info.list.length; i++) {
+            if (this.test[i] === true) {
+              devs.push(this.info.list[i])
+            }
+          }
+        }
+
+        let that = this
+        devs.forEach(dev => {
+          that.$post(that.$uri.device.stopProxy, {deviceIp: dev.deviceIp}).then(res => {
+            if (!res.success){
+              that.$message.error(res.msg)
+            }
+          })
+        })
+      }).catch( () => {})
 
     },
     getGroupAppList() {

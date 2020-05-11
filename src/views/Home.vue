@@ -177,6 +177,18 @@ export default {
   },
   mounted () {
     let that = this
+    if(this.$isEnable(this.$enableKey.ipProxy)) {
+      this.$store.commit(this.$mutation.ENABLE_IP_PROXY)
+    }
+
+    if(this.$isEnable(this.$enableKey.cmdForward)) {
+      this.$store.commit(this.$mutation.ENABLE_CMD_FORWARD)
+    }
+
+    if(this.$isEnable(this.$enableKey.devMaster)) {
+      this.$store.commit(this.$mutation.ENABLE_DEV_MASTER)
+    }
+
     that.$post(that.$uri.system.paramGet, {paramName: "extranetIp"}).then(res => {
       that.$store.commit(that.$mutation.OREKI_IP, res.data.paramValue)
     })

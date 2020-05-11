@@ -214,154 +214,8 @@
         ],
         groupList: [],
         groupSelectList: [],
-        optData: [{
-          id: '_0200_',
-          query: '_0201_',
-          label: '设备管理',
-          children: [{
-            id: '_0200_,1-0',
-            query: '_0201_,1-1',
-            label: '设备池',
-          }, {
-            id: '_0200_,2-0',
-            query: '_0201_,2-1',
-            label: '设备列表',
-          }, {
-            id: '_0200_,_0400_,3-0',
-            query: '_0201_,_0401_,3-1',
-            label: '分组列表',
-          }, {
-            id: '_0200_,4-0',
-            query: '_0201_,4-1',
-            label: '文件分发',
-          }]
-        }, {
-          id: '_0300_',
-          query: '_0301_',
-          label: '应用管理',
-          children: [{
-            id: '_0300_,5-0',
-            query: '_0301_,5-1',
-            label: '应用列表'
-          }, {
-            id: '_0300_,6-0',
-            query: '_0301_,6-1',
-            label: '应用恢复'
-          }, {
-            id: '_0300_,7-0',
-            query: '_0301_,7-1',
-            label: '应用监控'
-          }]
-        }, {
-          id: '_0500_',
-          query: '_0501_',
-          label: '日志管理',
-          children: [{
-            id: '_0500_,8-0',
-            query: '_0501_,8-1',
-            label: '操作日志'
-          }, {
-            id: '_0500_,9-0',
-            query: '_0501_,9-1',
-            label: '调度日志'
-          }, {
-            id: '_0500_,10-0',
-            query: '_0501_,10-1',
-            label: '分组日志'
-          }]
-        }, {
-          id: '_0100_',
-          query: '_0101_',
-          label: '用户管理',
-          children: [{
-            id: '_0100_,11-0',
-            query: '_0101_,11-1',
-            label: '用户列表'
-          }, {
-            id: '_0100_,12-0',
-            query: '_0101_,12-1',
-            label: '用户组列表'
-          }]
-        }, {
-          id: '_0000_',
-          query: '_0001_',
-          label: '系统管理',
-          children: [{
-            id: '_0000_,13-0',
-            query: '_0001_,13-1',
-            label: '系统信息'
-          }, {
-            id: '_0000_,14-0',
-            query: '_0001_,14-1',
-            label: '日志服务器配置'
-          }]
-        }],
-        viewData: [{
-          id: '_0901_',
-          label: '预览',
-        },{
-          id: '_0201_',
-          label: '设备管理',
-          children: [{
-            id: '_0201_,1-1',
-            label: '设备池',
-          }, {
-            id: '_0201_,2-1',
-            label: '设备列表',
-          }, {
-            id: '_0201_,_0401_,3-1',
-            label: '分组列表',
-          }, {
-            id: '_0201_,4-1',
-            label: '文件分发',
-          }]
-        }, {
-          id: '_0301_',
-          label: '应用管理',
-          children: [{
-            id: '_0301_,5-1',
-            label: '应用列表'
-          }, {
-            id: '_0301_,6-1',
-            label: '应用恢复'
-          }, {
-            id: '_0301_,7-1',
-            label: '应用监控'
-          }]
-        }, {
-          id: '_0501_',
-          label: '日志管理',
-          children: [{
-            id: '_0501_,8-1',
-            label: '操作日志'
-          }, {
-            id: '_0501_,9-1',
-            label: '调度日志'
-          }, {
-            id: '_0501_,10-1',
-            label: '分组日志'
-          }]
-        }, {
-          id: '_0101_',
-          label: '用户管理',
-          children: [{
-            id: '_0101_,11-1',
-            label: '用户列表'
-          }, {
-            id: '_0101_,12-1',
-            label: '用户组列表'
-          }]
-        }, {
-          id: '_0001_',
-          label: '系统管理',
-          children: [{
-            id: '_0001_,13-1',
-            label: '系统信息'
-          }, {
-            id: '_0001_,14-1',
-            label: '日志服务器配置'
-          }]
-        }],
+        optData: [],
+        viewData: [],
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -584,6 +438,9 @@
       }
     },
     mounted() {
+      console.log(this.$store.getters.groupAuthList)
+      this.optData = this.$store.getters.groupAuthList.optData
+      this.viewData = this.$store.getters.groupAuthList.viewData
       this.getUserList()
       if (this.$store.state.isAdmin) {
         this.getGroupList()

@@ -64,6 +64,8 @@ export const uri = {
         startApp: '/device/startApp/', // 开关ADB
         stopApp: '/device/stopApp/', // 开关ADB
         sync: '/device/sync/', // 开关ADB
+        startProxy: '/device/startProxy/', // 开关ADB
+        stopProxy: '/device/stopProxy/', // 开关ADB
     },
     apk: { // 应用模块管理
         apkList: '/apk/list', // 应用信息列表
@@ -120,5 +122,31 @@ export const uri = {
         fileAdd: '/fileIssue/saveAdd/', //文件新增
         fileDel: '/fileIssue/delete/', //文件删除
         fileIssue: '/fileIssue/issue/', //文件分发
+    },
+    ipProxy: {
+        list: '/proxy/list/', //代理信息列表
+        edit: '/proxy/edit/', //代理信息
+        add: '/proxy/saveAdd/', //代理新增
+        save: '/proxy/saveEdit/', //代理修改
+        del: '/proxy/delete/', //代理删除
+    },
+    cmd: {
+      list: '/commandForwarding/list/', //消息信息列表
+      edit: '/commandForwarding/edit/', //
+      forward: '/commandForwarding/forwarding/', //
+      add: '/commandForwarding/saveAdd/', //
+      save: '/commandForwarding/saveEdit/', //
+      del: '/commandForwarding/delete/', //
+      record: '/commandForwarding/record/', //
+      recordDel: '/commandForwarding/record/delete/', //
+      recordDetail: '/commandForwarding/record/detail/', //
+    },
+    devMaster: {
+      list: '/deviceMasterLongene/list/', //
+      record: '/deviceMasterLongene/record/', //
+      backup: '/deviceMasterLongene/backup/', //
+      restore: '/deviceMasterLongene/restore/', //
+      upload: '/deviceMasterLongene/upload/', //
+      del: '/deviceMasterLongene/delete/', //
     }
 }

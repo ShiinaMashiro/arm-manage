@@ -251,7 +251,7 @@
           key: 'adbPort',
           edit: true,
           // notNull: true,
-          value: ''
+          value: '',
         },{
           name: '是否有状态',
           key: 'isStatus',
@@ -454,6 +454,9 @@
     }
   },
   created () {
+    if(!this.$isEnable(this.$enableKey.adb)) {
+      this.netList.splice(5, 1)
+    }
     this.caseInfo = this.$store.state.caseInfo
     this.caseInfo.isStatus += ""
     this.caseInfo.isLock += ""

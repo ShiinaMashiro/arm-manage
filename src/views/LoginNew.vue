@@ -8,10 +8,11 @@
       <el-button type="primary" @click="login">登陆</el-button>
     </div>-->
     <el-image
-            style="width: 432px;"
+            style="width: 432px;border-radius: 15px 0 0 15px;"
             :src="url"
             fit="fill"></el-image>
-    <div style="background-color: white;width: 253px;height: 460px;padding: 20px 55px 0 60px;border-radius: 0 15px 15px 0;display: flex;flex-direction: column;align-items: stretch">
+    <div style="background-color: white;width: 253px;height: 460px;padding: 20px 55px 0 60px;border-radius: 0 15px 15px 0;
+    display: flex;flex-direction: column;align-items: stretch">
       <div style="color: #555;font-size: 20px;text-align: left;padding: 60px 0">龙境安卓云系统管理软件</div>
       <div class="item">
         <el-image

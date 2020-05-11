@@ -37,6 +37,11 @@ import FileAdd from "./views/FileAdd.vue";
 import FileIssue from "./views/FileIssue.vue";
 import AppUpload from "./views/AppUpload.vue";
 import Overview from "./views/Overview.vue";
+import IpPorxy from "./views/IpPorxy.vue";
+import ForwardCmd from "./views/ForwardCmd.vue";
+import ForwardRecord from "./views/ForwardRecord.vue";
+import AppDevMaster from "./views/AppDevMaster.vue";
+import DevMasterNew from "./views/DevMasterNew.vue";
 
 Vue.use(Router);
 
@@ -95,6 +100,23 @@ export default new Router({
             refresh: true
           }
         }, {
+          path: "cmdForward",
+          name: "命令转发",
+          component: ForwardCmd,
+          meta: {
+            changeAuth: "_0200_",
+            refresh: true
+          }
+        }, {
+          path: "forwardRecord",
+          name: "转发记录",
+          component: ForwardRecord,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_",
+            refresh: true
+          }
+        }, {
           path: "app/list",
           name: "应用列表",
           component: AppList,
@@ -113,6 +135,21 @@ export default new Router({
           name: "应用监控",
           component: AppMonitor,
           meta: {
+            changeAuth: "_0300_"
+          }
+        }, {
+          path: "app/devMaster",
+          name: "设备大师",
+          component: AppDevMaster,
+          meta: {
+            changeAuth: "_0300_"
+          }
+        }, {
+          path: "app/devMaster/new",
+          name: "新建备份",
+          component: DevMasterNew,
+          meta: {
+            c2c: true,
             changeAuth: "_0300_"
           }
         }, {
@@ -248,6 +285,13 @@ export default new Router({
           path: "system/log",
           name: "日志服务器管理",
           component: LogSetting,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "system/ipproxy",
+          name: "IP代理",
+          component: IpPorxy,
           meta: {
             changeAuth: "_0000_"
           }

@@ -1,8 +1,8 @@
 'use strict'
 
 process.argv.forEach(arg => {
-  if (arg.startsWith('--enable')) {
-    process.env.VUE_APP_OREKI = arg.substr(8)
+  if (arg.startsWith('--e')) {
+    process.env.VUE_APP_OREKI = arg.substr(3)
   }
 })
 

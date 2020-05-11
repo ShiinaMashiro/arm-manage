@@ -14,9 +14,6 @@ import 'mavon-editor/dist/css/index.css'
 import axios from 'axios'
 import VueDraggableResizable from 'vue-draggable-resizable'
 
-console.log(process.env)
-console.log(process.argv)
-
 Vue.use(mavonEditor)
 Vue.use(ElementUI)
 Vue.config.productionTip = false
@@ -39,6 +36,20 @@ Vue.prototype.$util = myUtil
 Vue.filter("formatDateTime", function(time) {
   return myUtil.formatDate(new Date(time))
 })
+
+Vue.prototype.$enableKey = {
+  ipProxy: 'i',
+  devMaster: 'd',
+  adb: 'a',
+  cmdForward: 'c'
+}
+Vue.prototype.$isEnable = (key) => {
+  if (key && process.env.VUE_APP_OREKI) {
+    let oreki = process.env.VUE_APP_OREKI.toLowerCase()
+    return oreki.indexOf(key) >= 0
+  }
+  return false
+}
 
 Vue.component('vue-draggable-resizable', VueDraggableResizable)
 

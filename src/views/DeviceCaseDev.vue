@@ -2,7 +2,7 @@
   <div>
     <div class="search-btn">
       <div class="search-btn-pre">
-        <el-button size="small" type="primary" @click="scanCaseNode"  v-if="$store.getters.checkChangeAuth()">扫描分层处理器</el-button>
+        <!--<el-button size="small" type="primary" @click="scanCaseNode"  v-if="$store.getters.checkChangeAuth()">扫描分层处理器</el-button>-->
         <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
         <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
       </div>

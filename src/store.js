@@ -14,7 +14,6 @@ let sideItems = [
     name: "预览",
     authorCode: "_09",
     queryAuthor: "_0901_",
-    updateAuthor: "_0900_",
     path: '/home/overview'
   },{
     src: "dev",
@@ -545,6 +544,55 @@ export default new Vuex.Store({
       sessionStorage.setItem('latelyPages', JSON.stringify(state.latelyPages))
       sessionStorage.setItem('normalPageInfo', JSON.stringify(state.normalPageInfo))
     },
+    /*  */
+    [mutation.ENABLE_IP_PROXY] (state) {
+      state.sideItems[5].children.push({
+        name: "IP代理",
+        path: '/home/system/ipproxy',
+        author: '_0001_',
+        queryAuthor: "31-1",
+        updateAuthor: "31-0",
+      })
+      // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
+    [mutation.ENABLE_CMD_FORWARD] (state) {
+      state.sideItems[1].children.push({
+        name: "命令转发",
+        path: '/home/cmdForward',
+        author: '_0002_',
+        queryAuthor: "32-1",
+        updateAuthor: "32-0",
+        sceneList: [
+          {
+            name: "转发记录",
+            path: "/home/forwardRecord",
+            author: "_0201_",
+            queryAuthor: "32_1-1",
+            updateAuthor: "32_1-0",
+          }
+        ]
+      })
+      // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
+    [mutation.ENABLE_DEV_MASTER] (state) {
+      state.sideItems[2].children.push({
+        name: "设备大师",
+        path: '/home/app/devMaster',
+        author: '_0003_',
+        queryAuthor: "33-1",
+        updateAuthor: "33-0",
+        sceneList: [
+          {
+            name: "新建备份",
+            path: "/home/app/devMaster/new",
+            author: "_0201_",
+            queryAuthor: "33_1-1",
+            updateAuthor: "33_1-0",
+          }
+        ]
+      })
+      // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
   },
   actions: {
     /* 登陆 */
@@ -613,6 +661,51 @@ export default new Vuex.Store({
         shinoIp = shinoIp.substr(0,shinoIp.indexOf(":"))
       }
       return shinoIp;
+    },
+    groupAuthList (state) {
+      let optList = []
+      let viewList = []
+      state.sideItems.forEach(side => {
+        let opt = {
+          id: side.updateAuthor,
+          query: side.queryAuthor,
+          label: side.name,
+        }
+        let view = {
+          id: side.queryAuthor,
+          label: side.name,
+        }
+
+        if (side.children) {
+          opt.children = []
+          view.children = []
+
+          side.children.forEach(child => {
+            opt.children.push({
+              id: side.updateAuthor + ',' + child.updateAuthor,
+              query: side.queryAuthor + ',' + child.queryAuthor,
+              label: child.name
+            })
+
+            view.children.push({
+              id: side.queryAuthor + ',' + child.queryAuthor,
+              label: child.name
+            })
+          })
+        }
+
+        if(side.name) {
+          if(side.updateAuthor) {
+            optList.push(opt)
+          }
+          viewList.push(view)
+        }
+      })
+
+      return {
+        optData: optList,
+        viewData: viewList
+      }
     },
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
