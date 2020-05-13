@@ -3,6 +3,7 @@
           :title="title"
           :visible.sync="drawer"
           :append-to-body="true"
+          size="400px"
           direction="rtl">
     <div style="height: 100%;display: flex;flex-direction: column;border-top: thin solid #ddd;">
       <div style="flex-grow: 1;padding: 20px;overflow: auto;height: 600px;padding-bottom: 100px;">

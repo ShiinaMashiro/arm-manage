@@ -35,35 +35,35 @@
       <el-dialog title="网络设置" :append-to-body="true" :visible.sync="networkPopShow" width="500px" top="15vh">
         <div>
           <el-form ref="form" :model="caseInfo" label-width="130px" label-position="left">
-            <el-form-item label="网关">
+            <el-form-item size="mini" label="网关">
               <el-input v-model="caseInfo.route"></el-input>
             </el-form-item>
-            <el-form-item label="子网掩码">
+            <el-form-item size="mini" label="子网掩码">
               <el-input v-model="caseInfo.netmask"></el-input>
             </el-form-item>
-            <el-form-item label="DNS">
+            <el-form-item size="mini" label="DNS">
               <el-input v-model="caseInfo.dns"></el-input>
             </el-form-item>
-            <el-form-item label="NTP地址">
+            <el-form-item size="mini" label="NTP地址">
               <el-input v-model="caseInfo.ntpAddress"></el-input>
             </el-form-item>
-            <el-form-item label="初始端口">
+            <el-form-item size="mini" label="初始端口">
               <el-input v-model="caseInfo.initialPort"></el-input>
             </el-form-item>
-            <el-form-item label="ADB端口">
+            <el-form-item size="mini" label="ADB端口">
               <el-input v-model="caseInfo.adbPort"></el-input>
             </el-form-item>
-            <el-form-item label="是否有状态">
+            <el-form-item size="mini" label="是否有状态">
               <el-switch v-model="caseInfo.isStatus"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="IP是否锁定">
+            <el-form-item size="mini" label="IP是否锁定">
               <el-switch v-model="caseInfo.isLock"
                          active-value="2"
                          inactive-value="1"></el-switch>
             </el-form-item>
-            <el-form-item>
+            <el-form-item size="mini">
               <el-button type="primary" @click="networkSet">确定</el-button>
               <el-button @click="networkPopShow = false">取消</el-button>
             </el-form-item>
@@ -74,13 +74,13 @@
       <el-dialog title="分层设置" :append-to-body="true" :visible.sync="nodePopShow" width="500px" top="15vh">
         <div>
           <el-form ref="form" :model="caseInfo" label-width="150px" label-position="left">
-            <el-form-item label="分层处理器IP">
+            <el-form-item size="mini" label="分层处理器IP">
               <el-input v-model="caseInfo.nodeIp"></el-input>
             </el-form-item>
-            <el-form-item label="备用分层处理器IP">
+            <el-form-item size="mini" label="备用分层处理器IP">
               <el-input v-model="caseInfo.nodeIpBak"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item size="mini">
               <el-button type="primary" @click="nodeSet">确定</el-button>
               <el-button @click="nodePopShow = false">取消</el-button>
             </el-form-item>
@@ -91,19 +91,19 @@
       <el-dialog title="修改设备IP" :append-to-body="true" :visible.sync="ipPopShow" width="500px" top="15vh">
         <div>
           <el-form ref="form" :model="ipChangeInfo" label-width="130px" label-position="left">
-            <el-form-item label="设备起始IP">
+            <el-form-item size="mini" label="设备起始IP">
               <el-input v-model="ipChangeInfo.initialIp"></el-input>
             </el-form-item>
-            <el-form-item label="网关">
+            <el-form-item size="mini" label="网关">
               <el-input v-model="ipChangeInfo.route"></el-input>
             </el-form-item>
-            <el-form-item label="子网掩码">
+            <el-form-item size="mini" label="子网掩码">
               <el-input v-model="ipChangeInfo.netmask"></el-input>
             </el-form-item>
-            <el-form-item label="网管IP">
+            <el-form-item size="mini" label="网管IP">
               <el-input v-model="ipChangeInfo.webIp"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item size="mini">
               <el-button type="primary" @click="ipSet">确定</el-button>
               <el-button @click="ipPopShow = false">取消</el-button>
             </el-form-item>
@@ -132,10 +132,10 @@
       <el-dialog title="修改备注" :append-to-body="true" :visible.sync="remarkPopShow" width="500px" top="15vh">
         <div>
           <el-form ref="form" :model="caseInfo" label-width="130px" label-position="left">
-            <el-form-item label="备注">
+            <el-form-item size="mini" label="备注">
               <el-input v-model="caseInfo.remark"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item size="mini">
               <el-button type="primary" @click="remarkChange">确定</el-button>
               <el-button @click="remarkPopShow = false">取消</el-button>
             </el-form-item>

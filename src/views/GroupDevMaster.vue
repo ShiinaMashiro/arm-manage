@@ -2,7 +2,7 @@
   <div>
     <div class="search-btn">
       <div style="display: flex;flex-direction: row">
-        <el-button size="small" type="primary" @click="$router.push('/home/app/devMaster/new')"  v-if="$store.getters.checkChangeAuth()">新建备份</el-button>
+        <el-button size="small" type="primary" @click="$router.push('/home/group/devMaster/new')"  v-if="$store.getters.checkChangeAuth()">新建备份</el-button>
         <div>
           <span style="font-size: 12px;padding: 0 10px">FTP服务器：{{ftpHost.paramValue}}:{{ftpPort.paramValue}}</span>
           <el-button size="small" type="text" @click="ftpPopShow = true"  v-if="$store.getters.checkChangeAuth()">修改</el-button>
@@ -105,13 +105,14 @@
           <div style="width: 100%;border-bottom: 1px solid #ddd"></div>
           <el-table :data="restoreList" style="width: 100%">
             <el-table-column prop="createTime" label="日期">
-              <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
+              <template slot-scope="scope">{{scope.row.createTime | formateDateTime}}</template>
             </el-table-column>
             <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
             <el-table-column prop="operationStatus" label="状态">
               <template slot-scope="scope">{{scope.row.operationStatus | recordStatusFilter}}</template>
             </el-table-column>
           </el-table>
+
         </el-form>
       </div>
     </Drawer>
@@ -121,7 +122,7 @@
 <script>
   import Drawer from '@/components/Drawer'
   export default {
-    name: "AppDevMaster",
+    name: "GroupDevMaster",
     components: {
       Drawer
     },
@@ -161,7 +162,8 @@
           paramValue: ''
         },
         searchInfo: {
-          queryParam: ''
+          queryParam: '',
+          groupId: 0
         },
         ftpPopShow: false,
         props: {
@@ -250,7 +252,7 @@
         let that = this
         that.$post(that.$uri.devMaster.list, {...that.page, ...that.searchInfo}).then(res => {
           that.info = res
-          if (that.$route.path === '/home/app/devMaster') {
+          if (that.$route.path === '/home/group/devMaster') {
             setTimeout(() => {that.getIpList()}, 5000)
           }
         })
@@ -365,20 +367,12 @@
         })
         that.$message.success("修改成功")
         that.ftpPopShow = false
-      },
-      getMyGroupList() {
-        let that = this
-        that.$post(that.$uri.group.list, {}).then(res => {
-          if(res.success) {
-            that.groupList = res.list
-          }
-        })
-      },
+      }
     },
     mounted () {
+      this.searchInfo.groupId = this.$store.state.groupInfo.id
       this.getIpList()
       this.getFtpInfo()
-      this.getMyGroupList()
     }
   };
 </script>

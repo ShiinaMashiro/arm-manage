@@ -41,7 +41,8 @@ Vue.prototype.$enableKey = {
   ipProxy: 'i',
   devMaster: 'd',
   adb: 'a',
-  cmdForward: 'c'
+  cmdForward: 'c',
+  sync: 's'
 }
 Vue.prototype.$isEnable = (key) => {
   if (key && process.env.VUE_APP_OREKI) {
@@ -53,8 +54,22 @@ Vue.prototype.$isEnable = (key) => {
 
 Vue.component('vue-draggable-resizable', VueDraggableResizable)
 
+
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  beforeCreate() {
+    if(this.$isEnable(this.$enableKey.ipProxy)) {
+      this.$store.commit(this.$mutation.ENABLE_IP_PROXY)
+    }
+
+    if(this.$isEnable(this.$enableKey.cmdForward)) {
+      this.$store.commit(this.$mutation.ENABLE_CMD_FORWARD)
+    }
+
+    if(this.$isEnable(this.$enableKey.devMaster)) {
+      this.$store.commit(this.$mutation.ENABLE_DEV_MASTER)
+    }
+  }
 }).$mount("#app");

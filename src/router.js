@@ -42,6 +42,8 @@ import ForwardCmd from "./views/ForwardCmd.vue";
 import ForwardRecord from "./views/ForwardRecord.vue";
 import AppDevMaster from "./views/AppDevMaster.vue";
 import DevMasterNew from "./views/DevMasterNew.vue";
+import GroupDevMaster from "./views/GroupDevMaster.vue";
+import DevMasterNewGroup from "./views/DevMasterNewGroup.vue";
 
 Vue.use(Router);
 
@@ -139,7 +141,7 @@ export default new Router({
           }
         }, {
           path: "app/devMaster",
-          name: "设备大师",
+          name: "备份管理",
           component: AppDevMaster,
           meta: {
             changeAuth: "_0300_"
@@ -208,6 +210,22 @@ export default new Router({
           path: "group/auth",
           name: "权限控制",
           component: GroupListAuth,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "group/devMaster",
+          name: "备份管理",
+          component: GroupDevMaster,
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
+          }
+        }, {
+          path: "group/devMaster/new",
+          name: "新建备份",
+          component: DevMasterNewGroup,
           meta: {
             c2c: true,
             changeAuth: "_0200_"

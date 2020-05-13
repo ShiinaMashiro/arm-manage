@@ -2,7 +2,7 @@
   <div style="display: flex;flex-direction: row;">
     <el-form ref="form" :model="info" label-width="130px" label-position="left" style="width: 500px;">
       <el-button type="primary" size="small" @click="save()" style="margin-left: -400px;margin-bottom: 20px"  v-if="$store.state.isAdmin">保存修改</el-button>
-      <el-form-item label="安装应用">
+      <el-form-item size="mini" label="安装应用">
         <div class="test">
           <el-switch
                   v-model="info.isInstallApp"
@@ -14,7 +14,7 @@
           </el-tooltip>
         </div>
       </el-form-item>
-      <el-form-item label="卸载应用">
+      <el-form-item size="mini" label="卸载应用">
         <div class="test">
           <el-switch
                   v-model="info.isUninstallApp"
@@ -26,7 +26,7 @@
           </el-tooltip>
         </div>
       </el-form-item>
-      <el-form-item label="返回桌面">
+      <el-form-item size="mini" label="返回桌面">
         <div class="test">
           <el-switch
                   v-model="info.isHome"
@@ -38,7 +38,7 @@
           </el-tooltip>
         </div>
       </el-form-item>
-      <!--<el-form-item label="网络限制">
+      <!--<el-form-item size="mini" label="网络限制">
         <div class="test">
           <el-switch
                   v-model="info.isNetLimit"
@@ -75,7 +75,7 @@
                 v-model="info.netList">
         </el-input>
       </div>
-      <el-form-item label="推流时间限制">
+      <el-form-item size="mini" label="推流时间限制">
         <div class="test">
           <el-switch
                   v-model="info.isFlowTimeLimit"
@@ -88,7 +88,7 @@
         </div>
       </el-form-item>
       <div v-show="info.isFlowTimeLimit == 1">
-        <el-form-item label="每日可推流时间段">
+        <el-form-item size="mini" label="每日可推流时间段">
           <el-time-picker
                   is-range
                   v-model="range"
@@ -98,7 +98,7 @@
                   placeholder="选择时间范围">
           </el-time-picker>
         </el-form-item>
-        <el-form-item label="单次可推流时长">
+        <el-form-item size="mini" label="单次可推流时长">
           <el-time-picker
                   v-model="info.flowTimeOnce"
                   placeholder="时长">

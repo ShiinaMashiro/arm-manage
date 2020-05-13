@@ -19,7 +19,7 @@
             <el-dropdown-item v-if="!viewMode" :disabled="!hasSelect || !snapshotComplete" command="snapshot">刷新截图</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
+        <el-button v-if="$isEnable($enableKey.sync)" type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipStartPop()">切换IP</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
         <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>-->
@@ -110,7 +110,7 @@
       <!--<el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addDevInfo" label-width="130px" label-position="left">
-            <el-form-item label="分层处理器IP">
+            <el-form-item size="mini" label="分层处理器IP">
               <el-select v-model="addDevInfo.caseId" placeholder="请选择">
                 <el-option
                         v-for="item in addDevOptions"
@@ -120,7 +120,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="备用处理器IP">
+            <el-form-item size="mini" label="备用处理器IP">
               <el-input v-model="addDevInfo.deviceIp"></el-input>
             </el-form-item>
             <!--<el-form-item>
@@ -133,7 +133,7 @@
     </div>
     <div class="preview-main" v-else  style="margin-top: 70px;">
       <template v-for="(item, index) in info.list">
-        <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #DDD'}">
+        <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #f6f6f6'}">
           <el-tooltip class="item" effect="dark" :content="$isEnable($enableKey.adb) ? (item.deviceIp + ' adb端口：' + adbPortFilter(item)) : item.deviceIp" placement="top-start">
           <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
             <el-checkbox v-model="test[index]" @change="itemCheckedChange" style="flex-grow: 1">
@@ -161,7 +161,8 @@
                     style="width: 144px;"
                     :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"
                     fit="cover"></el-image>
-            <!--<img @click="h5Test(item.deviceNo)" style="width: 200px" :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"/>-->
+            <div v-if="$isEnable($enableKey.ipProxy)" style="font-size: 12px;text-align: left;padding: 0 5px;margin-top: -5px;
+            height: 18px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">IP：{{item.proxyIp || '无'}}</div>
           </div>
         </div>
       </template>
@@ -170,7 +171,7 @@
     <Drawer :title="isApkStart ? '启动应用' : '停止应用'" :visible.sync="apkStartStopShow" @handClick="startStopApk()">
       <div>
         <el-form ref="form" size="mini" label-width="130px" label-position="left">
-          <el-form-item label="分组应用列表：">
+          <el-form-item size="mini" label="分组应用列表：">
             <!--<el-select v-model="startStopAppid" placeholder="请选择">
               <el-option
                       v-for="item in groupAppList"
@@ -275,6 +276,7 @@ export default {
       apkStartStopShow: false,
       isApkStart: false,
       startStopAppid: null,
+      startStopApp: null,
       groupAppList: [],
       adbPort:{},
       snapFail: require('../assets/snapfail.png'),
@@ -420,10 +422,11 @@ export default {
   methods: {
     handleCurrentChange(row) {
       this.startStopAppid = row.appId
+      this.startStopApp = row
     },
     handleCurrentChangeIp(row) {
       this.ipStartInfo.proxyId = row.id
-      // this.ipStartInfo.last = row.connectionLast
+      this.ipStartInfo.last = row.connectionLast
     },
     handleSyncClose(done) {
       let that = this
@@ -483,29 +486,63 @@ export default {
     },
     ipStart() {
       console.log(this.ipStartInfo)
-      if (this.ipStartInfo.ips.length > this.ipStartInfo.last) {
+      if (this.ipStartInfo.method === 2 && this.ipStartInfo.ips.length > this.ipStartInfo.last) {
         this.$confirm("当前剩余连接数不足以分配所选云机，请增加ip最大连接数，或者减少选择云机。", "剩余连接数不足", {
           confirmButtonText: '关闭',
           confirmButtonClass: 'confirm-btn-red',
           iconClass: 'el-icon-c-red',
           cancelButtonText: '取消',
-          showClose: false
+          showCancelButton: false
         }).then( () => {
 
         }).catch( () => {})
         return
       }
 
+      let allLast = 0
+      if (this.ipStartInfo.method === 1) {
+        this.ipList.forEach(ip => {
+          allLast += ip.connectionLast
+        })
+      }
+
+      if (this.ipStartInfo.method === 1 && this.ipStartInfo.ips.length > allLast) {
+        this.$confirm("当前剩余连接数不足以分配所选云机，请增加ip最大连接数，或者减少选择云机。", "剩余连接数不足", {
+          confirmButtonText: '关闭',
+          confirmButtonClass: 'confirm-btn-red',
+          iconClass: 'el-icon-c-red',
+          cancelButtonText: '取消',
+          showCancelButton: false
+        }).then( () => {
+
+        }).catch( () => {})
+        return
+      }
+
+      let proxyIdList = []
       if(this.ipStartInfo.method === 1) {
-        this.ipStartInfo.proxyId = this.ipStartInfo.ips[Math.floor((Math.random() * this.ipStartInfo.ips.length))].id
+        this.ipList.forEach(ip => {
+          for (let i = 0; i< ip.connectionLast; i++) {
+            proxyIdList.push(ip.id)
+          }
+        })
+        console.log('xxxxxxxx')
+        console.log(proxyIdList)
       }
 
       let that = this
+      let proxyId = this.ipStartInfo.proxyId
       this.ipStartInfo.ips.forEach(ip => {
-        that.$post(that.$uri.device.stopProxy, {deviceIp: ip, proxyId: this.ipStartInfo.proxyId}).then(res => {
-          if (!res.success){
+        if (this.ipStartInfo.method === 1) {
+          let index = Math.floor((Math.random() * proxyIdList.length))
+          proxyId = proxyIdList[index]
+          proxyIdList.splice(index, 1)
+          console.log(proxyId)
+        }
+        that.$post(that.$uri.device.startProxy, {deviceIp: ip, proxyId}).then(res => {
+          /*if (!res.success){
             that.$message.error(res.msg)
-          }
+          }*/
         })
       })
       this.$message.success("开始切换IP...")
@@ -537,6 +574,7 @@ export default {
             }
           })
         })
+        that.$message.success("开始关闭IP代理...")
       }).catch( () => {})
 
     },
@@ -554,6 +592,20 @@ export default {
         this.$message.warning('请选择应用')
         return
       }
+
+      if (!this.startStopApp.activity) {
+        this.$confirm("您选择的应用（" + this.startStopApp.appName + "）在上传后无法识别类名，无法一键启动，需要补充类名后进行？", "提示", {
+          confirmButtonText: '去补充',
+          confirmButtonClass: 'confirm-btn-blue',
+          iconClass: 'el-icon-c-blue',
+          cancelButtonText: '取消',
+        }).then( () => {
+          this.$store.commit(this.$mutation.APP_DETAIL, this.startStopApp)
+          this.$router.push("/home/app/detail")
+        })
+        return
+      }
+
       let uri = this.isApkStart ? this.$uri.device.startApp  : this.$uri.device.stopApp
       let that = this
       that.$post(uri, {
@@ -795,6 +847,7 @@ export default {
             if (v.id === i.id) {
               v.deviceStatus = i.deviceStatus
               v.isFlow = i.isFlow
+              v.proxyIp = i.proxyIp
             }
             if (v.id === i.id && v.deviceStatus === 1 && i.deviceStatus !== 1) {
               setTimeout(() => {
@@ -1081,8 +1134,10 @@ export default {
       /*justify-content: space-between;*/
       flex-wrap: wrap;
       .snapshot-main {
-        border: 1px solid #DDD;
-        border-radius: 6px;
+        /*border: 1px solid #f6f6f6;*/
+        background-color: #f6f6f6;
+
+        border-radius: 0px;
         .snapshot-main-head {
           padding: 0 5px;
           width: 100%;

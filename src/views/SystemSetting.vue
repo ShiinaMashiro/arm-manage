@@ -208,14 +208,14 @@
                :visible.sync="engineUpdatePopShow" width="500px">-->
       <div>
         <el-form ref="form" :model="engineUpdateExtraInfo" label-width="130px" label-position="left">
-          <el-form-item label="系统当前版本">
+          <!--<el-form-item size="mini" label="系统当前版本">
             <div style="display: flex;flex-direction: column;justify-content: flex-start">
               <template v-for="(item, index) in engineList">
                 <span style="line-height: normal" :key="index">{{item.engineTypeName}}: {{item.versionName}}-{{item.versionCode}}</span>
               </template>
             </div>
-          </el-form-item>
-          <el-form-item label="类型">
+          </el-form-item>-->
+          <el-form-item size="mini" label="类型">
             <div class="item-input">
               <el-select v-model="engineUpdateExtraInfo.engineType" size="samll" placeholder="引擎版本">
                 <el-option
@@ -227,22 +227,18 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="版本号">
-            <el-input v-model="engineUpdateExtraInfo.versionName"></el-input>
-          </el-form-item>
-          <el-form-item label="版本序号">
-            <el-input v-model="engineUpdateExtraInfo.versionCode"></el-input>
-          </el-form-item>
-          <el-form-item label="升级文件">
+          <el-form-item size="mini" label="升级文件">
             <el-upload
                     class="upload-demo"
                     ref="upload"
                     :headers="$store.getters.getHeaders"
                     :action="$uri.system.engineUpdate"
                     :data="engineUpdateExtraInfo"
+                    :file-list="fileList"
                     accept="apk"
                     :limit="1"
                     :multiple="false"
+                    :on-change="handleChange"
                     :on-success="handleSuccess"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
@@ -252,7 +248,13 @@
               <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             </el-upload>
           </el-form-item>
-          <el-form-item label="MD5">
+          <el-form-item size="mini" label="版本号" v-if="fileList.length">
+            <el-input v-model="engineUpdateExtraInfo.versionName"></el-input>
+          </el-form-item>
+          <el-form-item size="mini" label="版本序号" v-if="fileList.length">
+            <el-input v-model="engineUpdateExtraInfo.versionCode"></el-input>
+          </el-form-item>
+          <el-form-item size="mini" label="MD5" v-if="fileList.length">
             <el-input v-model="engineUpdateExtraInfo.md5"></el-input>
           </el-form-item>
           <!--<el-form-item>
@@ -270,10 +272,10 @@
                :visible.sync="systemUpdatePopShow" width="500px">-->
       <div>
         <el-form ref="form" label-width="130px" label-position="left">
-          <el-form-item label="系统当前版本">
+          <el-form-item size="mini" label="系统当前版本">
             <span>{{systemVersion}}</span>
           </el-form-item>
-          <el-form-item label="升级文件">
+          <el-form-item size="mini" label="升级文件">
             <el-upload
                     class="upload-demo"
                     ref="systemUpdate"
@@ -341,7 +343,7 @@
           md5: ""
         },
         systemUpdatePopShow: false,
-
+        fileList: []
       }
     },
     computed: {
@@ -353,8 +355,21 @@
             value: v.engineType
           })
         })
+        console.log("dddsdfadf")
         return list
       },
+    },
+    watch: {
+      fileList() {
+        if (this.fileList.length) {
+          let name = this.fileList[0].name
+          let s = name.indexOf('__')
+          let e = name.indexOf('.')
+          let version = name.substr(s + 2, e - s - 2)
+          this.engineUpdateExtraInfo.versionCode = version
+          this.engineUpdateExtraInfo.versionName = version
+        }
+      }
     },
     filters: {
       secondsFilter (s) {
@@ -458,6 +473,9 @@
           this.$refs.upload.abort(file)
           this.$refs.upload.clearFiles()
         }
+      },
+      handleChange(file, fileList) {
+        this.fileList = fileList
       },
       handleSuccess(response, file, fileList) {
         if (response.success) {

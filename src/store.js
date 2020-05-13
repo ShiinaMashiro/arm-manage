@@ -304,7 +304,12 @@ const state = {
   latelyPages: [],
   normalPageInfo: {},
   helpIndex: 0,
-  groupName: ''
+  groupName: '',
+  devInfo: {
+    deviceNum: 0,
+    badNum: 0,
+    streamNum: 0
+  }
 }
 
 let admin = {
@@ -576,7 +581,7 @@ export default new Vuex.Store({
     },
     [mutation.ENABLE_DEV_MASTER] (state) {
       state.sideItems[2].children.push({
-        name: "设备大师",
+        name: "备份管理",
         path: '/home/app/devMaster',
         author: '_0003_',
         queryAuthor: "33-1",
@@ -585,13 +590,29 @@ export default new Vuex.Store({
           {
             name: "新建备份",
             path: "/home/app/devMaster/new",
-            author: "_0201_",
+            author: "_0301_",
             queryAuthor: "33_1-1",
             updateAuthor: "33_1-0",
           }
         ]
       })
+
+      state.sideItems[1].children[2].sceneList.push({
+        name: "备份管理",
+        path: '/home/group/devMaster',
+        author: '_0201_',
+      })
+      state.sideItems[1].children[2].sceneList.push({
+        name: "新建备份",
+        path: '/home/group/devMaster/new',
+        author: '_0201_',
+      })
+      console.log(state.sideItems)
       // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
+    },
+    [mutation.DEV_INFO] (state, info) {
+      state.devInfo = info
+      sessionStorage.setItem('devInfo', JSON.stringify(info))
     },
   },
   actions: {
@@ -633,6 +654,26 @@ export default new Vuex.Store({
       commit(mutation.SIDE_CHECK, 0)
       // commit(mutation.SCENE_CHECK, 0)
       router.push("/home/deviceCaseDev")
+    },
+    /* 跳转帮助文档 */
+    [action.GO_FUN] ({commit}, funTitle) {
+      let that = vm
+      that.$post(that.$uri.help.funList, {}).then(r => {
+        if (r.success) {
+          commit(mutation.FUN, r.list)
+          let index = -1
+          for(let i = 0; i < r.list.length; i++) {
+            if (r.list[i].title === funTitle) {
+              index = i
+              break
+            }
+          }
+          if (index !== -1) {
+            commit(mutation.HELP_INDEX, index)
+            router.push("/home/help/fun/show?index=" + index)
+          }
+        }
+      })
     }
   },
   getters: {

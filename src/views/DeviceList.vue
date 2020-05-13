@@ -161,7 +161,7 @@
       <!--<el-dialog title="手动添加" :append-to-body="true" :visible.sync="addDevicePopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addDevInfo" label-width="150px" label-position="left">
-            <el-form-item label="分层处理器选择">
+            <el-form-item size="mini" label="分层处理器选择">
               <el-select v-model="addDevInfo.caseId" placeholder="请选择">
                 <el-option
                         v-for="item in addDevOptions"
@@ -171,7 +171,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="IP">
+            <el-form-item size="mini" label="IP">
               <el-input v-model="addDevInfo.deviceIp"></el-input>
             </el-form-item>
             <!--<el-form-item>

@@ -38,13 +38,13 @@
                :visible.sync="addPopShow" width="500px">
       <div>
         <el-form ref="form" :model="addInfo" :rules="rules" label-width="130px" label-position="left">
-          <el-form-item label="提问" prop="title">
+          <el-form-item size="mini" label="提问" prop="title">
             <el-input v-model="addInfo.title"></el-input>
           </el-form-item>
-          <el-form-item label="回答" prop="content">
+          <el-form-item size="mini" label="回答" prop="content">
             <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 8}" v-model="addInfo.content"></el-input>
           </el-form-item>
-          <el-form-item label="排序" prop="sort">
+          <el-form-item size="mini" label="排序" prop="sort">
             <el-input v-model="addInfo.sort"></el-input>
           </el-form-item>
           <el-form-item>
@@ -60,13 +60,13 @@
                :visible.sync="changePopShow" width="500px">
       <div>
         <el-form ref="changeForm" :model="changeInfo" :rules="rules" label-width="130px" label-position="left">
-          <el-form-item label="提问" prop="title">
+          <el-form-item size="mini" label="提问" prop="title">
             <el-input v-model="changeInfo.title"></el-input>
           </el-form-item>
-          <el-form-item label="回答" prop="content">
+          <el-form-item size="mini" label="回答" prop="content">
             <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 8}" v-model="changeInfo.content"></el-input>
           </el-form-item>
-          <el-form-item label="排序" prop="sort">
+          <el-form-item size="mini" label="排序" prop="sort">
             <el-input v-model="changeInfo.sort"></el-input>
           </el-form-item>
           <el-form-item>

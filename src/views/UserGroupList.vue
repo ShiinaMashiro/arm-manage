@@ -42,17 +42,17 @@
         <!--<el-dialog title="添加用户组" :append-to-body="true" :visible.sync="addUserPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
-            <el-form-item label="用户组名称">
+            <el-form-item size="mini" label="用户组名称">
               <el-input size="mini" v-model="addUserInfo.groupName"></el-input>
             </el-form-item>
-            <el-form-item label="用户组类型">
+            <el-form-item size="mini" label="用户组类型">
               <span style="font-size: 14px">管理用户权限为管理设备池、设备和系统，业务用户权限仅为对分组内的设备进行操作</span>
               <el-radio-group v-model="addUserInfo.groupType" style="display: block">
                 <el-radio-button label="1">管理员</el-radio-button>
                 <el-radio-button label="2">业务用户</el-radio-button>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="操作权限" v-if="addUserInfo.groupType == 1">
+            <el-form-item size="mini" label="操作权限" v-if="addUserInfo.groupType == 1">
               <span style="font-size: 14px">可对模块进行操作，勾选后自动享有查看权限</span>
               <el-tree
                       ref="optTree"
@@ -63,8 +63,8 @@
                       :props="defaultProps">
               </el-tree>
             </el-form-item>
-            <el-form-item label="查看权限"  v-if="addUserInfo.groupType == 1">
-              <span style="font-size: 14px">可对模块进行操作，勾选后自动享有查看权限</span>
+            <el-form-item size="mini" label="查看权限"  v-if="addUserInfo.groupType == 1">
+              <span style="font-size: 14px">可对模块享有查看权限</span>
               <el-tree
                       ref="viewTree"
                       :data="viewData"
@@ -93,17 +93,17 @@
       <Drawer title="修改用户组" :visible.sync="changeUserPopShow" @handClick="changeUser">
         <div>
           <el-form ref="form" :model="changeUserInfo" label-width="130px" label-position="left">
-            <el-form-item label="用户组名称">
+            <el-form-item size="mini" label="用户组名称">
               <el-input size="mini" v-model="changeUserInfo.groupName"></el-input>
             </el-form-item>
-            <el-form-item label="用户组类型">
+            <el-form-item size="mini" label="用户组类型">
               <span style="font-size: 14px">管理用户权限为管理设备池、设备和系统，业务用户权限仅为对分组内的设备进行操作</span>
-              <el-radio-group v-model="changeUserInfo.groupType">
+              <el-radio-group v-model="changeUserInfo.groupType" style="display: block">
                 <el-radio-button label="1">管理员</el-radio-button>
                 <el-radio-button label="2">业务用户</el-radio-button>
               </el-radio-group>
             </el-form-item>
-            <el-form-item label="操作权限" v-if="changeUserInfo.groupType == 1">
+            <el-form-item size="mini" label="操作权限" v-if="changeUserInfo.groupType == 1">
               <span style="font-size: 14px">可对模块进行操作，勾选后自动享有查看权限</span>
               <el-tree
                       ref="optChangeTree"
@@ -114,8 +114,8 @@
                       :props="defaultProps">
               </el-tree>
             </el-form-item>
-            <el-form-item label="查看权限"  v-if="changeUserInfo.groupType == 1">
-              <span style="font-size: 14px">可对模块进行操作，勾选后自动享有查看权限</span>
+            <el-form-item size="mini" label="查看权限"  v-if="changeUserInfo.groupType == 1">
+              <span style="font-size: 14px">可对模块享有查看权限</span>
               <el-tree
                       ref="viewChangeTree"
                       :data="viewData"
@@ -172,7 +172,8 @@
         changeUserInfo: {
           id: "",
           groupName: "",
-          authority: ""
+          authority: "",
+          groupType: "1"
         },
         authority: [
           {
@@ -314,6 +315,7 @@
         let that = this
         that.$post(that.$uri.user.groupList, {...that.page}).then(res => {
           that.info = res
+          console.log(res)
         })
       },
       /* 当前页改变 */
@@ -373,17 +375,7 @@
         this.changeUserInfo.id = row.id
         this.changeUserInfo.groupName = row.groupName
         this.changeUserInfo.groupType = row.groupType + ''
-        let a = row.authority
-        this.authority.forEach(v => {
-          let list = []
-          if (a.indexOf(v.query) !== -1) {
-            list.push(v.query)
-          }
-          if (a.indexOf(v.change) !== -1) {
-            list.push(v.change)
-          }
-          v.value = list
-        })
+
         let that = this
         that.$post(that.$uri.group.list, {userGroupId: row.id}).then(res => {
           if (res.success) {
@@ -395,6 +387,48 @@
           }
         })
         this.changeUserPopShow = true
+        let aList = row.authority.split(',')
+        this.$nextTick().then(() => {
+          aList.forEach(a => {
+            if (a.indexOf('-') !== -1){
+              for(let i = 0; i < this.optData.length; i++) {
+                let sign = false
+                if (!this.optData[i].children) {
+                  continue
+                }
+                for(let j = 0; j < this.optData[i].children.length; j++) {
+                  if (this.optData[i].children[j].id.indexOf(a) !== -1) {
+                    this.$refs.optChangeTree.setChecked(this.optData[i].children[j].id, true)
+                    sign = true
+                    break
+                  }
+                }
+                if (sign) {
+                  break
+                }
+              }
+
+              for(let i = 0; i < this.viewData.length; i++) {
+                let sign = false
+                if (!this.viewData[i].children) {
+                  continue
+                }
+                for(let j = 0; j < this.viewData[i].children.length; j++) {
+                  if (this.viewData[i].children[j].id.indexOf(a) !== -1) {
+                    this.$refs.viewChangeTree.setChecked(this.viewData[i].children[j].id, true)
+                    sign = true
+                    break
+                  }
+                }
+                if (sign) {
+                  break
+                }
+              }
+            }
+          })
+        })
+
+
       },
       /* 修改用户 */
       changeUser() {

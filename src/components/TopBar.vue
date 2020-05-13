@@ -2,10 +2,10 @@
   <div class="home-head">
     <div class="arm-logo">
       <div class="arm-logo-wrapper">
-        <TopBarItem2 class="arm-icon" :jump="true">
+        <TopBarItem2 class="arm-icon" :jump="false">
           <img class="img" src="../assets/lj.png" />
         </TopBarItem2>
-        <TopBarItem2 class="sys-link" :jump="true">
+        <TopBarItem2 class="sys-link" :jump="false">
           <span>龙境安卓云系统管理软件</span>
         </TopBarItem2>
       </div>

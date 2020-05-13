@@ -33,13 +33,13 @@
                :visible.sync="addPopShow" width="500px">
       <div>
         <el-form ref="form" :model="addInfo" :rules="rules" label-width="130px" label-position="left">
-          <el-form-item label="标题" prop="name">
+          <el-form-item size="mini" label="标题" prop="name">
             <el-input v-model="addInfo.name"></el-input>
           </el-form-item>
-          <el-form-item label="排序" prop="sort">
+          <el-form-item size="mini" label="排序" prop="sort">
             <el-input v-model="addInfo.sort"></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item size="mini">
             <el-button type="primary" @click="addFaq">确定</el-button>
             <el-button @click="addPopShow = false">取消</el-button>
           </el-form-item>
@@ -52,13 +52,13 @@
                :visible.sync="changePopShow" width="500px">
       <div>
         <el-form ref="changeForm" :model="changeInfo" :rules="rules" label-width="130px" label-position="left">
-          <el-form-item label="标题" prop="name">
+          <el-form-item size="mini" label="标题" prop="name">
             <el-input v-model="changeInfo.name"></el-input>
           </el-form-item>
-          <el-form-item label="排序" prop="sort">
+          <el-form-item size="mini" label="排序" prop="sort">
             <el-input v-model="changeInfo.sort"></el-input>
           </el-form-item>
-          <el-form-item>
+          <el-form-item size="mini">
             <el-button type="primary" @click="changeFaq">确定</el-button>
             <el-button @click="changePopShow = false">取消</el-button>
           </el-form-item>

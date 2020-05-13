@@ -87,16 +87,16 @@
       <!--<el-dialog title="添加用户" :append-to-body="true" :visible.sync="addUserPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
-            <el-form-item label="用户名">
+            <el-form-item size="mini" label="用户名">
               <el-input v-model="addUserInfo.username"></el-input>
             </el-form-item>
-            <el-form-item label="密码">
+            <el-form-item size="mini" label="密码">
               <el-input v-model="addUserInfo.password" type="password"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码">
+            <el-form-item size="mini" label="确认密码">
               <el-input v-model="addUserInfo.password2" type="password"></el-input>
             </el-form-item>
-            <el-form-item label="用户组">
+            <el-form-item size="mini" label="用户组">
               <el-select v-model="addUserInfo.groupId" placeholder="请选择">
                 <el-option
                         v-for="item in searchOptions.userGroupOption"
@@ -118,10 +118,10 @@
       <!--<el-dialog title="修改用户" :append-to-body="true" :visible.sync="changeUserPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addUserInfo" label-width="130px" label-position="left">
-            <el-form-item label="用户名">
+            <el-form-item size="mini" label="用户名">
               <span>{{changeUserInfo.username}}</span>
             </el-form-item>
-            <el-form-item label="用户组">
+            <el-form-item size="mini" label="用户组">
               <el-select v-model="changeUserInfo.groupId" placeholder="请选择">
                 <el-option
                         v-for="item in searchOptions.userGroupOption"

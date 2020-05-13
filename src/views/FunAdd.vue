@@ -1,13 +1,13 @@
 <template>
   <div>
     <el-form ref="form" :rules="rules" :inline="true" :model="info" class="demo-form-inline">
-      <el-form-item label="标题" prop="title">
+      <el-form-item size="mini" label="标题" prop="title">
         <el-input v-model="info.title"></el-input>
       </el-form-item>
-      <el-form-item label="排序" prop="sort">
+      <el-form-item size="mini" label="排序" prop="sort">
         <el-input v-model="info.sort"></el-input>
       </el-form-item>
-      <el-form-item label="大类">
+      <el-form-item size="mini" label="大类">
         <el-select v-model="info.categoryId" placeholder="大类">
           <template v-for="clazz in classList">
             <el-option :key="clazz.id" :label="clazz.name" :value="clazz.id"></el-option>

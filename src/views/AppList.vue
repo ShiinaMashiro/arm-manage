@@ -70,37 +70,37 @@
                  :visible.sync="addAppPopShow" width="500px">
         <div>
           <el-form ref="form" :model="addAppExtraInfo" label-width="180px" label-position="left">
-            <el-form-item label="是否授权">
+            <el-form-item size="mini" label="是否授权">
               <el-switch v-model="addAppExtraInfo.isRoot"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="是否预启动">
+            <el-form-item size="mini" label="是否预启动">
               <el-switch v-model="addAppExtraInfo.isPrestart"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="是否上传定位信息">
+            <el-form-item size="mini" label="是否上传定位信息">
               <el-switch v-model="addAppExtraInfo.isUploadLocationInfo"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="是否开启传感器">
+            <el-form-item size="mini" label="是否开启传感器">
               <el-switch v-model="addAppExtraInfo.isSensor"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="退出是否清理用户数据">
+            <el-form-item size="mini" label="退出是否清理用户数据">
               <el-switch v-model="addAppExtraInfo.isClean"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="退出后是否重启设备">
+            <el-form-item size="mini" label="退出后是否重启设备">
               <el-switch v-model="addAppExtraInfo.isReboot"
                          active-value="1"
                          inactive-value="0"></el-switch>
             </el-form-item>
-            <el-form-item label="退出后是否关闭应用">
+            <el-form-item size="mini" label="退出后是否关闭应用">
               <el-select v-model="addAppExtraInfo.isStopApp" placeholder="请选择" size="small">
                 <el-option label="关闭应用" value="0"></el-option>
                 <el-option label="不关闭并放入后台" value="1"></el-option>

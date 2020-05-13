@@ -4,6 +4,10 @@
   </div>
 </template>
 
+<script>
+
+</script>
+
 <style lang="less">
 #app {
   font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
@@ -14,6 +18,10 @@
 }
 body {
   margin: 0;
+}
+
+.el-textarea__inner {
+  border-radius: 0!important;
 }
 
 .header-row-oreki {
@@ -54,7 +62,7 @@ span:focus {
 }
 
 .home-main::-webkit-scrollbar {display:none}
-
+textarea::-webkit-scrollbar {display:none}
 .el-input__inner {
   border-radius: 0!important;
 }

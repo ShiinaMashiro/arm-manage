@@ -15,14 +15,14 @@
     <div v-if="info.success" class="device-case border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" stripe size="mini"
                 tooltip-effect="dark" style="width: 100%">
-        <el-table-column prop="id" label="ID"></el-table-column>
+        <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column prop="remark" label="备注"></el-table-column>
-        <el-table-column label="创建时间">
+        <el-table-column label="创建时间" width="200">
           <template slot-scope="scope">
             {{scope.row.createTime | formatDateTime}}
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
             <el-button type="text" size="small" @click.stop="edit(scope.row)">编辑</el-button>
@@ -47,30 +47,33 @@
 
     <!-- 录入IP弹窗 -->
     <Drawer title="新增消息" :visible.sync="addIpPopShow" @handClick="addIp">
-      <div style="font-size: 12px">
+      <div style="font-size: 12px" v-if="addIpPopShow">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="消息内容">
-            <el-input
+          <el-form-item size="mini" label="消息内容">
+            <!--<el-input
+                    id="msg1"
                     type="textarea"
                     placeholder="请输入内容"
                     v-model="addIpInfo.command"
                     maxlength="3000"
                     :rows="10"
                     show-word-limit
-            ></el-input>
+            ></el-input>-->
+            <Textarea4Row v-model="addIpInfo.command"></Textarea4Row>
           </el-form-item>
-          <el-form-item label="消息备注">
+          <el-form-item size="mini" label="消息备注">
             <el-input
+                    id="msg2"
                     type="textarea"
                     placeholder="请输入消息备注，最多200字"
                     v-model="addIpInfo.remark"
                     maxlength="200"
-                    :rows="4"
+                    :rows="8"
                     show-word-limit
             ></el-input>
           </el-form-item>
           <div style="font-size: 14px;margin-bottom: 5px">当前仅支持TCP协议转发</div>
-          <el-form-item label="消息转发端口">
+          <el-form-item size="mini" label="消息转发端口">
             <el-input-number size="mini" v-model="addIpInfo.devicePort" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
 
@@ -79,30 +82,33 @@
     </Drawer>
     <!-- 修改IP弹窗 -->
     <Drawer title="编辑消息" :visible.sync="changeIpPopShow" @handClick="changeIp">
-      <div style="font-size: 12px" v-if="changeIpInfo">
+      <div style="font-size: 12px" v-if="changeIpInfo && changeIpPopShow">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="消息内容">
-            <el-input
+          <el-form-item size="mini" label="消息内容">
+            <!--<el-input
+                    id="msg3"
                     type="textarea"
                     placeholder="请输入内容"
                     v-model="changeIpInfo.command"
                     maxlength="3000"
                     :rows="10"
                     show-word-limit
-            ></el-input>
+            ></el-input>-->
+            <Textarea4Row v-model="changeIpInfo.command"></Textarea4Row>
           </el-form-item>
-          <el-form-item label="消息备注">
+          <el-form-item size="mini" label="消息备注">
             <el-input
+                    id="msg4"
                     type="textarea"
                     placeholder="请输入消息备注，最多200字"
                     v-model="changeIpInfo.remark"
                     maxlength="200"
-                    :rows="4"
+                    :rows="8"
                     show-word-limit
             ></el-input>
           </el-form-item>
           <div style="font-size: 14px;margin-bottom: 5px">当前仅支持TCP协议转发</div>
-          <el-form-item label="消息转发端口">
+          <el-form-item size="mini" label="消息转发端口">
             <el-input-number size="mini" v-model="changeIpInfo.devicePort" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
         </el-form>
@@ -114,10 +120,11 @@
       <div style="font-size: 12px" v-if="forwardInfo">
         <el-form ref="form" :model="forwardInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
           <div style="font-size: 16px;margin-bottom: 5px">消息内容</div>
-          <el-form-item label="消息ID">{{forwardInfo.id}}</el-form-item>
-          <el-form-item label="消息备注">{{forwardInfo.remark}}</el-form-item>
-          <el-form-item label="消息内容">
+          <el-form-item size="mini" label="消息ID">{{forwardInfo.id}}</el-form-item>
+          <el-form-item size="mini" label="消息备注">{{forwardInfo.remark}}</el-form-item>
+          <el-form-item size="mini" label="消息内容">
             <el-input
+                    id="msg5"
                     type="textarea"
                     v-model="forwardInfo.command"
                     :rows="10"
@@ -125,7 +132,7 @@
             ></el-input>
           </el-form-item>
           <div style="width: 100%;border-bottom: 1px solid #ddd"></div>
-          <el-form-item label="选择云机">
+          <el-form-item size="mini" label="选择云机">
             <el-tree
                     :props="props"
                     :load="loadNode"
@@ -143,10 +150,12 @@
 
 <script>
   import Drawer from '@/components/Drawer'
+  import Textarea4Row from '@/components/Textarea4Row'
   export default {
     name: "CmdForward",
     components: {
-      Drawer
+      Drawer,
+      Textarea4Row
     },
     data () {
       return {
@@ -271,7 +280,12 @@
         }).catch( () => {})
       },
       edit(row) {
-        this.changeIpInfo = row
+        this.changeIpInfo = {
+          id: row.id,
+          remark: row.remark,
+          command: row.command,
+          devicePort: row.devicePort,
+        }
         this.changeIpPopShow = true
       },
       forward(row) {
@@ -281,6 +295,10 @@
       },
       forwardMsg() {
         let that = this
+        if(!that.forwardVo.deviceIps) {
+          that.$message.warning('请选择云机')
+          return
+        }
         that.$post(that.$uri.cmd.forward, that.forwardVo).then(res => {
           if (res.success) {
             that.$message.success("转发成功")
@@ -310,6 +328,13 @@
       },
       changeIp() {
         let that = this
+        console.log(that.changeIpInfo)
+        for (let key in that.changeIpInfo) {
+          if (!that.changeIpInfo[key]) {
+            that.$message.warning('参数不能为空')
+            return
+          }
+        }
         that.$post(that.$uri.cmd.save, that.changeIpInfo).then(res => {
           if (res.success) {
             that.$message.success("修改成功")
@@ -329,6 +354,7 @@
 </script>
 
 <style lang="less" scoped>
+  textarea::-webkit-scrollbar {display:none}
   .search-btn {
     display: flex;
     flex-direction: row;

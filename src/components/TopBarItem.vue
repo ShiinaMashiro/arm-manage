@@ -9,13 +9,13 @@
     <!--<Drawer title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px" top="15vh">-->
       <div>
         <el-form ref="form" :model="changeInfo" label-width="130px" label-position="left">
-          <el-form-item label="原密码">
+          <el-form-item size="mini" label="原密码">
             <el-input v-model="changeInfo.oldPassword" type="password"></el-input>
           </el-form-item>
-          <el-form-item label="新密码">
+          <el-form-item size="mini" label="新密码">
             <el-input v-model="changeInfo.newPassword" type="password"></el-input>
           </el-form-item>
-          <el-form-item label="重复新密码">
+          <el-form-item size="mini" label="重复新密码">
             <el-input v-model="changeInfo.newPassword2" type="password"></el-input>
           </el-form-item>
           <!--<el-form-item>

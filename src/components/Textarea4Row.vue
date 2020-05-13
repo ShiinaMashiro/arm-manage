@@ -1,35 +1,43 @@
 <template>
-  <div>
+  <div style="width: 100%">
     <div id="mian">
       <div id="leftBox"><textarea wrap="off" cols="2" id="leftNum" disabled></textarea></div>
-      <textarea id="test" name="content" @keydown="keyUp()" @scroll="left.scrollTop = test.scrollTop;">
+      <textarea id="test" name="content" v-model="content" @scroll="left.scrollTop = test.scrollTop;">
     </textarea>
     </div>
   </div>
 </template>
 
 <script>
-
-
-
-
   export default {
     name: "Forward",
+    props: {
+      value: String
+    },
     data() {
       return {
-       num : "",
-      btn : null,
-      test : null,
-      left: null,
-    }
+        num: "",
+        btn: null,
+        test: null,
+        left: null,
+        content: ''
+      }
+    },
+    watch: {
+      content(v) {
+        this.$emit('input', v)
+        this.keyUp()
+      },
     },
     methods: {
       keyUp() {
-        var str = this.test.value;
+        var str = this.content;
+        console.log(str)
         str = str.replace(/\r/gi, "");
         str = str.split("\n");
         let n = str.length;
         this.line(n);
+        console.log(n)
       },
       line(n) {
         var lineobj = this.getId("leftNum");
@@ -48,49 +56,42 @@
       }
     },
     mounted() {
+      this.content = this.value
       this.num = "";
       this.btn = this.getId('btn');
       this.test = this.getId('test');
       this.left = this.getId('leftNum');
-        this.keyUp();
+      this.keyUp();
     }
   };
 </script>
 
 <style scoped>
-  * {
-    margin: 0;
-    padding: 0;
-  }
-
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    font: 12px/1.5 tahoma, arial, 'hiragino sans gb', 'microsoft yahei', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
   #mian {
-    width: 640px;
-    height: 100%;
+    width: 100%;
+    height: 180px;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #DCDFE6;
   }
 
   #leftBox {
     background: #ecf0f5;
-    width: 35px;
+    width: 25px;
     height: 100%;
     text-align: left;
     float: left;
   }
 
   #test {
-    border: 1px solid #eaeaea;
+    flex-grow: 1;
+    border: 0 solid #eaeaea;
+    border-left: 1px solid #eaeaea;
     outline: none;
-    width: 600px;
     height: 100%;
     resize: none;
-    background: rgb(250, 250, 250);
+    background-color: white;
+    /*background: rgb(250, 250, 250);*/
     line-height: 24px;
     font-size: 14px;
     float: left;

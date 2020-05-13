@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="search-btn">
-      <el-button size="small" type="primary" @click="addIpPopShow = true"  v-if="$store.getters.checkChangeAuth()">录入IP</el-button>
+      <div>
+        <el-button size="small" type="primary" @click="addIpPopShow = true"  v-if="$store.getters.checkChangeAuth()">录入IP</el-button>
+        <el-button size="small" type="primary" @click="uploadFilePop"  v-if="$store.getters.checkChangeAuth()">CA证书分发</el-button>
+        <el-button size="small" type="text" @click="goFun"  v-if="$store.getters.checkChangeAuth()">OpenVPN搭建教程</el-button>
+      </div>
     </div>
 
     <div v-if="info.success" class="device-case border-all">
@@ -41,28 +45,28 @@
     <Drawer title="录入IP" :visible.sync="addIpPopShow" @handClick="addIp">
       <div style="font-size: 12px">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="IP名称">
+          <el-form-item size="mini" label="IP名称">
             <el-input size="mini" v-model="addIpInfo.name"></el-input>
           </el-form-item>
-          <el-form-item label="IP地址">
+          <el-form-item size="mini" label="IP地址">
               <el-input size="mini" v-model="addIpInfo.ip"></el-input>
           </el-form-item>
-          <el-form-item label="DNS">
+          <el-form-item size="mini" label="DNS">
               <el-input size="mini" v-model="addIpInfo.dns"></el-input>
           </el-form-item>
-          <el-form-item label="网关">
+          <el-form-item size="mini" label="网关">
             <el-input size="mini" v-model="addIpInfo.gateway"></el-input>
           </el-form-item>
-          <el-form-item label="端口">
+          <el-form-item size="mini" label="端口">
             <el-input-number size="mini" v-model="addIpInfo.port" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
-          <el-form-item label="用户名">
+          <el-form-item size="mini" label="用户名">
             <el-input size="mini" v-model="addIpInfo.username"></el-input>
           </el-form-item>
-          <el-form-item label="密码">
+          <el-form-item size="mini" label="密码">
             <el-input size="mini" v-model="addIpInfo.password"></el-input>
           </el-form-item>
-          <el-form-item label="最大连接数">
+          <el-form-item size="mini" label="最大连接数">
             <el-input-number size="mini" v-model="addIpInfo.connectionMax" :min="0" :max="100"></el-input-number>
           </el-form-item>
         </el-form>
@@ -72,29 +76,57 @@
     <Drawer title="修改IP" :visible.sync="changeIpPopShow" @handClick="changeIp">
       <div style="font-size: 12px" v-if="changeIpInfo">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="IP名称">
+          <el-form-item size="mini" label="IP名称">
             <el-input size="mini" v-model="changeIpInfo.name"></el-input>
           </el-form-item>
-          <el-form-item label="IP地址">
+          <el-form-item size="mini" label="IP地址">
             <el-input size="mini" v-model="changeIpInfo.ip"></el-input>
           </el-form-item>
-          <el-form-item label="DNS">
+          <el-form-item size="mini" label="DNS">
             <el-input size="mini" v-model="changeIpInfo.dns"></el-input>
           </el-form-item>
-          <el-form-item label="网关">
+          <el-form-item size="mini" label="网关">
             <el-input size="mini" v-model="changeIpInfo.gateway"></el-input>
           </el-form-item>
-          <el-form-item label="端口">
+          <el-form-item size="mini" label="端口">
             <el-input-number size="mini" v-model="changeIpInfo.port" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
-          <el-form-item label="用户名">
+          <el-form-item size="mini" label="用户名">
             <el-input size="mini" v-model="changeIpInfo.username"></el-input>
           </el-form-item>
-          <el-form-item label="密码">
+          <el-form-item size="mini" label="密码">
             <el-input size="mini" v-model="changeIpInfo.password"></el-input>
           </el-form-item>
-          <el-form-item label="最大连接数">
+          <el-form-item size="mini" label="最大连接数">
             <el-input-number size="mini" v-model="changeIpInfo.connectionMax" :min="0" :max="100" label="描述文字"></el-input-number>
+          </el-form-item>
+        </el-form>
+      </div>
+    </Drawer>
+
+    <Drawer title="CA证书分发" :visible.sync="uploadFilePopShow" @handClick="submitUpload" :before-close="popClose">
+      <div>
+        <el-form ref="form" label-width="130px" label-position="left">
+          <div style="font-size: 13px;color: #606266;margin-bottom: 30px">当前仅支持所有IP代理节点使用统一的CA证书，选择文件上传后 ，
+          点击确定会在分组管理-文件分发中生成一条CA证书文件分发记录并分发至所有云机，如果需要重新分发，
+          可在此页面重新上传或在文件分发页面重新分发。</div>
+          <el-form-item size="mini" label="CA证书文件：">
+            <el-upload
+                    class="upload-demo"
+                    ref="upload"
+                    :headers="$store.getters.getHeaders"
+                    :action="$uri.file.fileAdd"
+                    :data="uploadFileExtraInfo"
+                    :limit="1"
+                    :multiple="false"
+                    :on-success="handleSuccess"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :before-upload="handleUpload"
+                    :on-progress="handleProgress"
+                    :auto-upload="false">
+              <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
+            </el-upload>
           </el-form-item>
         </el-form>
       </div>
@@ -132,13 +164,88 @@
           connectionMax: 0
         },
         changeIpPopShow: false,
-        changeIpInfo: null
+        changeIpInfo: null,
+        uploadFilePopShow: false,
+        uploadPopCloseTip: false,
+        uploadFileExtraInfo: {
+          issuePath: '/system/bin/',
+          deviceIps: '',
+        },
       }
     },
     computed: {
 
     },
     methods: {
+      goFun() {
+        this.$store.dispatch(this.$action.GO_FUN, 'OpenVpn搭建')
+      },
+      uploadFilePop() {
+        let that = this
+        that.$post(that.$uri.device.deviceList).then(res => {
+          if (res.success) {
+            let ipList = []
+            res.list.forEach(dev => {
+              ipList.push(dev.deviceIp)
+            })
+            this.uploadFileExtraInfo.deviceIps = ipList.join(',')
+            this.uploadFilePopShow = true
+          } else {
+            that.$message.error("系统异常")
+          }
+        })
+      },
+      popClose () {
+        if (this.uploadPopCloseTip) {
+          this.$confirm("文件正在上传中，确定关闭弹窗？", "提示", {
+            confirmButtonText: '确定',
+            confirmButtonClass: 'confirm-btn-blue',
+            iconClass: 'el-icon-c-blue',
+            cancelButtonText: '取消'
+          }).then( () => {
+            this.uploadFilePopShow = false
+            this.uploadPopCloseTip = false
+            this.$refs.upload.clearFiles()
+          }).catch( () => {})
+        } else {
+          this.uploadFilePopShow = false
+          this.uploadPopCloseTip = false
+          this.$refs.upload.clearFiles()
+        }
+      },
+      /* 上传文件 */
+      submitUpload() {
+        this.$refs.upload.submit();
+      },
+      handleSuccess(response, file, fileList) {
+        if (response.success) {
+          this.uploadFilePopShow = false
+          this.uploadFilePopShow = false
+          this.uploadPopCloseTip = false
+          this.$refs.upload.clearFiles()
+          this.$message.success("上传CA证书成功")
+          this.getGroupList()
+        } else {
+          console.log(response)
+          this.$message.error(response.message)
+          this.$refs.upload.clearFiles()
+        }
+      },
+      handleUpload () {
+        this.uploadPopCloseTip = true
+      },
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleProgress (event, file, fileList) {
+        if (!this.uploadFilePopShow) {
+          this.$refs.upload.abort(file)
+          this.$refs.upload.clearFiles()
+        }
+      },
       /* 获取ip列表 */
       getIpList () {
         let that = this

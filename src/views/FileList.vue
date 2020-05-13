@@ -53,19 +53,19 @@
       <!--<el-dialog title="重新分发" :append-to-body="true" :visible.sync="changeGroupPopShow" width="500px" top="15vh">-->
         <div>
           <el-form ref="form" :model="addGroupInfo" label-width="130px" label-position="left">
-            <el-form-item label="文件名">
+            <el-form-item size="mini" label="文件名">
               {{changeFile.fileName}}
             </el-form-item>
-            <el-form-item label="文件存放路径">
+            <el-form-item size="mini" label="文件存放路径">
               {{changeFile.downPath}}
             </el-form-item>
-            <el-form-item label="设备分发路径">
+            <el-form-item size="mini" label="设备分发路径">
               {{changeFile.issuePath}}
             </el-form-item>
-            <el-form-item label="上传时间">
+            <el-form-item size="mini" label="上传时间">
               {{changeFile.updateTime}}
             </el-form-item>
-            <el-form-item label="选择分组">
+            <el-form-item size="mini" label="选择分组">
               <el-tree
                       :props="props"
                       :load="loadNode"
@@ -85,12 +85,9 @@
 
     <!-- 上传文件 -->
     <Drawer title="新增文件" :visible.sync="uploadFilePopShow" @handClick="submitUpload" :before-close="popClose">
-    <!--<el-dialog title="新增文件" :append-to-body="true"
-               :close-on-click-modal="false" :show-close="false" top="15vh"
-               :visible.sync="uploadFilePopShow" width="500px">-->
       <div>
         <el-form ref="form" :model="uploadFileExtraInfo" label-width="130px" label-position="left">
-          <el-form-item label="文件存放路径">
+          <el-form-item size="mini" label="文件存放路径">
             <el-input v-model="uploadFileExtraInfo.issuePath"></el-input>
           </el-form-item>
           <el-form-item>
@@ -110,10 +107,9 @@
                     :on-progress="handleProgress"
                     :auto-upload="false">
               <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-              <!--<div slot="tip" class="el-upload__tip">只能上传apk文件</div>-->
             </el-upload>
           </el-form-item>
-          <el-form-item label="选择分组">
+          <el-form-item size="mini" label="选择分组">
             <el-tree
                     :props="props"
                     :load="loadNode"
@@ -122,10 +118,6 @@
                     @check-change="handleCheckChange">
             </el-tree>
           </el-form-item>
-          <!--<el-form-item>
-            <el-button type="primary" :disabled="uploadPopCloseTip" @click="submitUpload">确定</el-button>
-            <el-button @click="popClose">取消</el-button>
-          </el-form-item>-->
         </el-form>
       </div>
     </Drawer>

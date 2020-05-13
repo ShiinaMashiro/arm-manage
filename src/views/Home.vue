@@ -68,10 +68,28 @@
           <div>设备数量：{{licenseInfo.deviceNum}}</div>
         </div>
         <div style="width: 100%;text-align: center;padding: 15px 0">
-          <el-button type="primary" style="width: 100px" @click="licenseResult = false">开始使用</el-button>
+          <el-button type="primary" @click="systemPop">设置系统参数</el-button>
+          <el-button type="primary" style="width: 100px" @click="startUse">开始使用</el-button>
         </div>
       </div>
     </el-dialog>
+
+    <Drawer title="系统参数设置" :visible.sync="systemParamSetPopShow" @handClick="systemSet()">
+      <div>
+        <el-form ref="form" size="mini" label-width="130px" label-position="left">
+          <div style="font-size: 14px;font-weight: 600">首次激活必填参数</div>
+          <el-form-item v-if="systemInfo[systemKeyList[0]]" label="公网入口：" :required="true"><el-input size="mini" v-model="systemInfo[systemKeyList[0]].paramValue"></el-input>{{systemInfo[systemKeyList[0]].paramName}}</el-form-item>
+          <el-form-item v-if="systemInfo[systemKeyList[1]]" label="管理中心内网IP：" :required="true"><el-input size="mini" v-model="systemInfo[systemKeyList[1]].paramValue"></el-input>{{systemInfo[systemKeyList[1]].paramName}}</el-form-item>
+          <div style="margin-top: 20px;margin-bottom: 20px;border-bottom: 1px solid #ddd"></div>
+
+          <div style="font-size: 14px;font-weight: 600">首次激活选填参数</div>
+          <el-form-item v-if="systemInfo[systemKeyList[2]]" label="设备备份FTP地址："><el-input size="mini" v-model="systemInfo[systemKeyList[2]].paramValue"></el-input>{{systemInfo[systemKeyList[2]].paramName}}</el-form-item>
+          <el-form-item v-if="systemInfo[systemKeyList[3]]" label="NTP服务器地址："><el-input size="mini" v-model="systemInfo[systemKeyList[3]].paramValue"></el-input>{{systemInfo[systemKeyList[3]].paramName}}</el-form-item>
+          <el-form-item v-if="systemInfo[systemKeyList[4]]" label="媒体服务器内网地址："><el-input size="mini" v-model="systemInfo[systemKeyList[4]].paramValue"></el-input>{{systemInfo[systemKeyList[4]].paramName}}</el-form-item>
+          <el-form-item v-if="systemInfo[systemKeyList[5]]" label="媒体服务器外网地址："><el-input size="mini" v-model="systemInfo[systemKeyList[5]].paramValue"></el-input>{{systemInfo[systemKeyList[5]].paramName}}</el-form-item>
+        </el-form>
+      </div>
+    </Drawer>
   </div>
 </template>
 
@@ -83,6 +101,7 @@ import UserInfo from "@/components/UserInfo.vue";
 import HomeMainTopBar from "@/components/HomeMainTopBar.vue";
 import DeviceWindow from "@/components/DeviceWindow.vue";
 import MainScene from "@/components/MainScene.vue";
+import Drawer from "@/components/Drawer.vue";
 
 export default {
   name: "home",
@@ -92,7 +111,8 @@ export default {
     SideBar,
     UserInfo,
     DeviceWindow,
-    MainScene
+    MainScene,
+    Drawer
   },
   data() {
     return {
@@ -101,6 +121,16 @@ export default {
       licenseInfo: {
         seconds: -1,
         deviceNum: 0
+      },
+      systemParamSetPopShow: false,
+      systemKeyList: ['extranetIp', 'webIp', 'ftpHost', 'ntpAddress', 'mediaServerLan', 'mediaServerWan'],
+      systemInfo: {
+        extranetIp: {},
+        webIp: {},
+        ftpHost: {},
+        ntpAddress: {},
+        mediaServerLan: {},
+        mediaServerWan: {},
       }
     }
   },
@@ -121,9 +151,22 @@ export default {
         time += hour + '小时'
       }
       return time
+    },
+    isSytemPop() {
+      let a = 0
+      if (this.systemInfo) {
+        for (let key in this.systemInfo) {
+          a++
+        }
+      }
+      return a === 6
     }
   },
   methods: {
+    startUse() {
+      this.licenseResult = false
+      this.$router.go(0)
+    },
     licenseSystem() {
       let that = this
       that.$post(that.$uri.system.license, {licenseCode: that.license}).then(res => {
@@ -173,21 +216,32 @@ export default {
       this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
         show: false
       })
+    },
+    systemPop() {
+      let that = this
+      that.systemKeyList.forEach(key => {
+        that.$post(that.$uri.system.paramGet, {paramName: key}).then(res => {
+          if (res.success) {
+            that.systemInfo[key] = res.data
+          }
+        })
+      })
+      that.systemParamSetPopShow = true
+      that.licenseResult = false
+    },
+    systemSet() {
+      let that = this
+      that.systemKeyList.forEach(key => {
+        that.$post(that.$uri.system.paramSave, that.systemInfo[key]).then(res => {
+
+        })
+      })
+      that.$message.success("正在设置")
+      that.systemParamSetPopShow = false
     }
   },
   mounted () {
     let that = this
-    if(this.$isEnable(this.$enableKey.ipProxy)) {
-      this.$store.commit(this.$mutation.ENABLE_IP_PROXY)
-    }
-
-    if(this.$isEnable(this.$enableKey.cmdForward)) {
-      this.$store.commit(this.$mutation.ENABLE_CMD_FORWARD)
-    }
-
-    if(this.$isEnable(this.$enableKey.devMaster)) {
-      this.$store.commit(this.$mutation.ENABLE_DEV_MASTER)
-    }
 
     that.$post(that.$uri.system.paramGet, {paramName: "extranetIp"}).then(res => {
       that.$store.commit(that.$mutation.OREKI_IP, res.data.paramValue)
@@ -203,9 +257,9 @@ export default {
     }
   },
   beforeRouteUpdate (to, from, next) {
-    if (!from.path.startsWith('/home/group')) {
+    /*if (!from.path.startsWith('/home/group')) {
       this.$store.commit(this.$mutation.GROUP_DETAIL, {})
-    }
+    }*/
     this.sideInit(to)
     console.log('home update')
     console.log(to.path)

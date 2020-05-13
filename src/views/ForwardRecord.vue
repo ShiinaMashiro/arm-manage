@@ -13,12 +13,16 @@
     <div v-if="info.success" class="device-case border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" stripe size="mini"
                 tooltip-effect="dark" style="width: 100%">
-        <el-table-column prop="id" label="ID"></el-table-column>
-        <el-table-column prop="commandId" label="消息ID"></el-table-column>
-        <el-table-column prop="remark" label="消息备注"></el-table-column>
-        <el-table-column prop="createTime" label="转发时间"></el-table-column>
-        <el-table-column prop="deviceIps" label="转发云机"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="id" label="ID" width="80"></el-table-column>
+        <el-table-column prop="commandId" label="消息ID" width="80"></el-table-column>
+        <el-table-column prop="remark" label="消息备注" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="createTime" label="转发时间" width="200">
+          <template slot-scope="scope">
+            {{scope.row.createTime | formatDateTime}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="deviceIps" label="转发云机" width="200"></el-table-column>
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
             <el-button type="text" size="small" @click.stop="forwardRecord(scope.row)">查看</el-button>
@@ -44,7 +48,7 @@
     <Drawer title="录入IP" :visible.sync="addIpPopShow" @handClick="addIp">
       <div style="font-size: 12px">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="消息内容">
+          <el-form-item size="mini" label="消息内容">
             <el-input
                     type="textarea"
                     placeholder="请输入内容"
@@ -54,7 +58,7 @@
                     show-word-limit
             ></el-input>
           </el-form-item>
-          <el-form-item label="消息备注">
+          <el-form-item size="mini" label="消息备注">
             <el-input
                     type="textarea"
                     placeholder="请输入消息备注，最多200字"
@@ -65,7 +69,7 @@
             ></el-input>
           </el-form-item>
           <div style="font-size: 14px;margin-bottom: 5px">当前仅支持TCP协议转发</div>
-          <el-form-item label="消息转发端口">
+          <el-form-item size="mini" label="消息转发端口">
             <el-input-number size="mini" v-model="addIpInfo.devicePort" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
 
@@ -76,7 +80,7 @@
     <Drawer title="录入IP" :visible.sync="changeIpPopShow" @handClick="changeIp">
       <div style="font-size: 12px" v-if="changeIpInfo">
         <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="消息内容">
+          <el-form-item size="mini" label="消息内容">
             <el-input
                     type="textarea"
                     placeholder="请输入内容"
@@ -86,7 +90,7 @@
                     show-word-limit
             ></el-input>
           </el-form-item>
-          <el-form-item label="消息备注">
+          <el-form-item size="mini" label="消息备注">
             <el-input
                     type="textarea"
                     placeholder="请输入消息备注，最多200字"
@@ -97,7 +101,7 @@
             ></el-input>
           </el-form-item>
           <div style="font-size: 14px;margin-bottom: 5px">当前仅支持TCP协议转发</div>
-          <el-form-item label="消息转发端口">
+          <el-form-item size="mini" label="消息转发端口">
             <el-input-number size="mini" v-model="changeIpInfo.devicePort" :min="0" :max="65000" :controls="false"></el-input-number>
           </el-form-item>
         </el-form>
@@ -107,13 +111,13 @@
     <Drawer title="转发详情" :visible.sync="forwardPopShow">
       <div style="font-size: 12px" v-if="forwardInfo">
         <el-form ref="form" :model="forwardInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="转发ID">{{forwardInfo.id}}</el-form-item>
-          <el-form-item label="转发时间">{{forwardInfo.createTime | formatDateTime}}</el-form-item>
+          <el-form-item size="mini" label="转发ID">{{forwardInfo.id}}</el-form-item>
+          <el-form-item size="mini" label="转发时间">{{forwardInfo.createTime | formatDateTime}}</el-form-item>
           <div style="width: 100%;border-bottom: 1px solid #ddd"></div>
           <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">消息信息</div>
-          <el-form-item label="消息ID">{{forwardInfo.commandId}}</el-form-item>
-          <el-form-item label="消息备注">{{forwardInfo.remark}}</el-form-item>
-          <el-form-item label="消息内容">
+          <el-form-item size="mini" label="消息ID">{{forwardInfo.commandId}}</el-form-item>
+          <el-form-item size="mini" label="消息备注">{{forwardInfo.remark}}</el-form-item>
+          <el-form-item size="mini" label="消息内容">
             <el-input
                     type="textarea"
                     v-model="forwardInfo.command"
@@ -124,7 +128,8 @@
           <div style="width: 100%;border-bottom: 1px solid #ddd"></div>
           <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">转发状态</div>
           <template v-for="r in details">
-            <el-form-item :label="r.deviceIp">{{r.isSuccess ? '成功' : r.message}}</el-form-item>
+            <el-form-item :label="r.deviceIp" size="mini"><span v-if="r.isSuccess" style="color: green;">成功</span>
+              <span v-if="!r.isSuccess" style="color: red;">{{r.message}}</span></el-form-item>
           </template>
         </el-form>
       </div>

@@ -50,10 +50,10 @@
       <Drawer title="新增分组" :visible.sync="addGroupPopShow" @handClick="addGroup">
         <div style="font-size: 12px">
           <el-form ref="form" :model="addGroupInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-            <el-form-item label="分组名称">
+            <el-form-item size="mini" label="分组名称">
               <el-input size="mini" v-model="addGroupInfo.groupName"></el-input>
             </el-form-item>
-            <el-form-item label="推流权限控制">
+            <el-form-item size="mini" label="推流权限控制">
               <div class="test">
                 <el-switch
                         v-model="addGroupAuthSelectShow"
@@ -63,7 +63,7 @@
               </div>
             </el-form-item>
             <div style="padding: 0 0 0 15px;flex-grow: 1" v-show="addGroupAuthSelectShow == '1'">
-              <el-form-item label="安装应用">
+              <el-form-item size="mini" label="安装应用">
                 <div class="test">
                   <el-switch
                           v-model="addGroupInfo.isInstallApp"
@@ -75,7 +75,7 @@
                   </el-tooltip>
                 </div>
               </el-form-item>
-              <el-form-item label="卸载应用">
+              <el-form-item size="mini" label="卸载应用">
                 <div class="test">
                   <el-switch
                           v-model="addGroupInfo.isUninstallApp"
@@ -87,7 +87,7 @@
                   </el-tooltip>
                 </div>
               </el-form-item>
-              <el-form-item label="返回桌面">
+              <el-form-item size="mini" label="返回桌面">
                 <div class="test">
                   <el-switch
                           v-model="addGroupInfo.isHome"
@@ -108,7 +108,7 @@
       <Drawer title="修改分组名称" :visible.sync="changeGroupPopShow" @handClick="changeGroupName">
         <div>
           <el-form ref="form" :model="changeGroupInfo" label-width="130px" label-position="left">
-            <el-form-item label="分组名称">
+            <el-form-item size="mini" label="分组名称">
               <el-input v-model="changeGroupInfo.groupName"></el-input>
             </el-form-item>
 

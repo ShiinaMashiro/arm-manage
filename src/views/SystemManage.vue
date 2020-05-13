@@ -152,14 +152,14 @@
                :visible.sync="engineUpdatePopShow" width="500px">
       <div>
         <el-form ref="form" :model="engineUpdateExtraInfo" label-width="130px" label-position="left">
-          <el-form-item label="系统当前版本">
+          <el-form-item size="mini" label="系统当前版本">
             <div style="display: flex;flex-direction: column;justify-content: flex-start">
               <template v-for="(item, index) in engineList">
                 <span style="line-height: normal" :key="index">{{item.engineTypeName}}: {{item.versionName}}-{{item.versionCode}}</span>
               </template>
             </div>
           </el-form-item>
-          <el-form-item label="类型">
+          <el-form-item size="mini" label="类型">
             <div class="item-input">
               <el-select v-model="engineUpdateExtraInfo.engineType" size="samll" placeholder="引擎版本">
                 <el-option
@@ -171,13 +171,13 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="版本号">
+          <el-form-item size="mini" label="版本号">
             <el-input v-model="engineUpdateExtraInfo.versionName"></el-input>
           </el-form-item>
-          <el-form-item label="版本序号">
+          <el-form-item size="mini" label="版本序号">
             <el-input v-model="engineUpdateExtraInfo.versionCode"></el-input>
           </el-form-item>
-          <el-form-item label="升级文件">
+          <el-form-item size="mini" label="升级文件">
             <el-upload
                     class="upload-demo"
                     ref="upload"
@@ -196,7 +196,7 @@
               <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
             </el-upload>
           </el-form-item>
-          <el-form-item label="MD5">
+          <el-form-item size="mini" label="MD5">
             <el-input v-model="engineUpdateExtraInfo.md5"></el-input>
           </el-form-item>
           <el-form-item>
@@ -210,7 +210,7 @@
     <el-dialog title="日志参数设置" :append-to-body="true" :visible.sync="logChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="sysLogChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="日志输出方式" :style="logItemShow('output')">
+          <el-form-item size="mini" label="日志输出方式" :style="logItemShow('output')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.output" size="samll" placeholder="引擎版本">
                 <el-option
@@ -222,7 +222,7 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="日志级别" :style="logItemShow('logLevel')">
+          <el-form-item size="mini" label="日志级别" :style="logItemShow('logLevel')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.logLevel" size="samll" placeholder="日志级别">
                 <el-option
@@ -234,7 +234,7 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="远程日志级别" :style="logItemShow('remoteLevel')">
+          <el-form-item size="mini" label="远程日志级别" :style="logItemShow('remoteLevel')">
             <div class="item-input">
               <el-select v-model="sysLogChangeInfo.remoteLevel" size="samll" placeholder="远程日志级别">
                 <el-option
@@ -246,13 +246,13 @@
               </el-select>
             </div>
           </el-form-item>
-          <el-form-item label="日志文件大小" :style="logItemShow('fileSize')">
+          <el-form-item size="mini" label="日志文件大小" :style="logItemShow('fileSize')">
             <el-input v-model="sysLogChangeInfo.fileSize"></el-input>
           </el-form-item>
-          <el-form-item label="日志服务器地址" :style="logItemShow('udpServer')">
+          <el-form-item size="mini" label="日志服务器地址" :style="logItemShow('udpServer')">
             <el-input v-model="sysLogChangeInfo.udpServer"></el-input>
           </el-form-item>
-          <el-form-item label="日志服务器端口" :style="logItemShow('udpPort')">
+          <el-form-item size="mini" label="日志服务器端口" :style="logItemShow('udpPort')">
             <el-input v-model="sysLogChangeInfo.udpPort"></el-input>
           </el-form-item>
           <el-form-item>
@@ -268,10 +268,10 @@
                :visible.sync="systemUpdatePopShow" width="500px">
       <div>
         <el-form ref="form" :model="sysLogChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="系统当前版本">
+          <el-form-item size="mini" label="系统当前版本">
             <span>{{systemVersion}}</span>
           </el-form-item>
-          <el-form-item label="升级文件">
+          <el-form-item size="mini" label="升级文件">
             <el-upload
                     class="upload-demo"
                     ref="systemUpdate"
@@ -299,7 +299,7 @@
     <el-dialog title="机箱类型修改" :append-to-body="true" :visible.sync="caseTypeChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="caseTypeChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="机箱类型">
+          <el-form-item size="mini" label="机箱类型">
             <div class="item-input">
               <el-select v-model="caseTypeChangeInfo.paramValue" size="samll" placeholder="机箱类型">
                 <el-option
@@ -322,13 +322,13 @@
     <el-dialog title="网络配置" :append-to-body="true" :visible.sync="netChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="netChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="IP">
+          <el-form-item size="mini" label="IP">
             <el-input v-model="netChangeInfo.ip"></el-input>
           </el-form-item>
-          <el-form-item label="端口">
+          <el-form-item size="mini" label="端口">
             <el-input v-model="netChangeInfo.port"></el-input>
           </el-form-item>
-          <el-form-item label="子网掩码">
+          <el-form-item size="mini" label="子网掩码">
             <el-input v-model="netChangeInfo.mask"></el-input>
           </el-form-item>
           <el-form-item>
@@ -342,7 +342,7 @@
     <el-dialog title="NTP配置" :append-to-body="true" :visible.sync="ntpChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="ntpChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="IP/域名">
+          <el-form-item size="mini" label="IP/域名">
             <el-input v-model="ntpChangeInfo.ntpAddress"></el-input>
           </el-form-item>
           <el-form-item>
@@ -356,7 +356,7 @@
     <el-dialog title="公网配置" :append-to-body="true" :visible.sync="netIpChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="netIpChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="IP/域名">
+          <el-form-item size="mini" label="IP/域名">
             <el-input v-model="netIpChangeInfo.extranetIp"></el-input>
           </el-form-item>
           <el-form-item>
@@ -370,7 +370,7 @@
     <el-dialog title="推流配置" :append-to-body="true" :visible.sync="rateChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="rateChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="码率">
+          <el-form-item size="mini" label="码率">
             <div class="test">
               <el-input type="number" v-model="rateChangeInfo.encodeRateMax">
                 <div slot="suffix">kb/s</div>
@@ -391,7 +391,7 @@
     <el-dialog title="推流帧率配置" :append-to-body="true" :visible.sync="frameRateChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="frameRateChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="推流帧率">
+          <el-form-item size="mini" label="推流帧率">
             <div class="test">
               <el-input type="number" v-model="frameRateChangeInfo.framerate">
               </el-input>
@@ -411,7 +411,7 @@
     <el-dialog title="媒体服务器外网地址" :append-to-body="true" :visible.sync="mediaServerWanChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="mediaServerWanChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="IP">
+          <el-form-item size="mini" label="IP">
             <div class="test">
               <el-input v-model="mediaServerWanChangeInfo.mediaServerWan">
               </el-input>
@@ -428,7 +428,7 @@
     <el-dialog title="媒体服务器内网地址" :append-to-body="true" :visible.sync="mediaServerLanChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="mediaServerLanChangeInfo" label-width="130px" label-position="left">
-          <el-form-item label="IP">
+          <el-form-item size="mini" label="IP">
             <div class="test">
               <el-input v-model="mediaServerLanChangeInfo.mediaServerLan">
               </el-input>
@@ -445,7 +445,7 @@
     <el-dialog title="设备自主安装应用配置" :append-to-body="true" :visible.sync="appAllowChangePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="appAllowChangeInfo" label-width="150px" label-position="left">
-          <el-form-item label="设备自主安装应用">
+          <el-form-item size="mini" label="设备自主安装应用">
             <el-switch
                     v-model="appAllowChangeInfo.isAppAllow"
                     active-value="1"
@@ -466,11 +466,11 @@
           <el-button type="primary" size="small" @click="versionAddShow = true" v-if="!versionAddShow">新增版本</el-button>
           <div v-if="versionAddShow" style="padding: 0 0 0 10px;display: flex;">
             <el-form :inline="true" size="small" :model="versionAddInfo">
-              <el-form-item label="引擎编码">
+              <el-form-item size="mini" label="引擎编码">
                 <el-input type="text" style="width: 80px" placeholder="数字" show-word-limit
                           maxlength="4" v-model="versionAddInfo.code"></el-input>
               </el-form-item>
-              <el-form-item label="引擎版本">
+              <el-form-item size="mini" label="引擎版本">
                 <el-input type="text" style="width: 148px" placeholder="数字/字母" show-word-limit
                           maxlength="20" v-model="versionAddInfo.content"></el-input>
               </el-form-item>
@@ -495,10 +495,10 @@
     <el-dialog title="邮箱配置" :append-to-body="true" :visible.sync="emailPopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="emailAddInfo" label-width="130px" label-position="left">
-          <el-form-item label="">
+          <el-form-item size="mini" label="">
             <el-button type="text" @click="emailAddShow = true" v-if="!emailAddShow">新增邮箱</el-button>
           </el-form-item>
-          <el-form-item label="运维邮箱">
+          <el-form-item size="mini" label="运维邮箱">
             <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
               <template v-for="(item, index) in emailList">
                 <div style="display: flex;flex-direction: row;justify-content: space-between">
@@ -508,7 +508,7 @@
               </template>
             </div>
           </el-form-item>
-          <el-form-item label="新增邮箱" v-if="emailAddShow">
+          <el-form-item size="mini" label="新增邮箱" v-if="emailAddShow">
             <el-input v-model="emailAddInfo.email"></el-input>
           </el-form-item>
           <el-form-item  v-if="emailAddShow">
@@ -522,10 +522,10 @@
     <el-dialog title="电话配置" :append-to-body="true" :visible.sync="phonePopShow" width="500px" top="15vh">
       <div>
         <el-form ref="form" :model="phoneAddInfo" label-width="130px" label-position="left">
-          <el-form-item label="">
+          <el-form-item size="mini" label="">
             <el-button type="text" @click="phoneAddShow = true" v-if="!phoneAddShow">新增电话</el-button>
           </el-form-item>
-          <el-form-item label="运维电话">
+          <el-form-item size="mini" label="运维电话">
             <div style="display: flex;flex-direction: column;max-height: 400px;overflow-y: auto">
               <template v-for="(item, index) in phoneList">
                 <div style="display: flex;flex-direction: row;justify-content: space-between">
@@ -535,7 +535,7 @@
               </template>
             </div>
           </el-form-item>
-          <el-form-item label="新增电话" v-if="phoneAddShow">
+          <el-form-item size="mini" label="新增电话" v-if="phoneAddShow">
             <el-input v-model="phoneAddInfo.phone"></el-input>
           </el-form-item>
           <el-form-item  v-if="phoneAddShow">

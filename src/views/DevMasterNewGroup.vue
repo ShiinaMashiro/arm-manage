@@ -1,13 +1,5 @@
 <template>
   <div style="text-align: left">
-    <div>选择分组：<el-select size="small" v-model="group" @change="handleSelectChange" placeholder="选择分组">
-      <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-      </el-option>
-    </el-select></div>
     <div style="display: flex;flex-direction: row;margin-top: 30px">
       <el-card class="box-card" style="width: 300px">
         <div slot="header" class="clearfix">
@@ -31,7 +23,6 @@
       </el-card>
     </div>
     <el-button type="primary" size="small" style="width: 100px;margin-top: 30px" @click="backupPop">备份</el-button>
-
     <Drawer title="备份确认" :visible.sync="backupPopShow" @handClick="backup">
       <div style="font-size: 12px" v-if="remark">
         <el-form ref="form" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
@@ -77,13 +68,6 @@
         backupApps: ''
       }
     },
-    watch: {
-      backupPopShow(v) {
-        if (!v) {
-          this.remark = null
-        }
-      }
-    },
     methods: {
       loadNode(node, resolve) {
         let that = this
@@ -116,7 +100,7 @@
       getDevList() {
         let that = this
         that.backupInfo.deviceIp = ''
-        that.$post(that.$uri.device.deviceList, {groupId: that.group}).then(res => {
+        that.$post(that.$uri.device.deviceList, {groupId: this.$store.state.groupInfo.id}).then(res => {
           if (res.success) {
             that.devList = res.list
             if (res.list.length) {
@@ -128,7 +112,7 @@
       getAppList() {
         let that = this
         that.checkList = []
-        that.$post(that.$uri.apk.apkList, {groupId: that.group}).then(res => {
+        that.$post(that.$uri.apk.apkList, {groupId: this.$store.state.groupInfo.id}).then(res => {
           if (res.success) {
             that.appList = res.list
           }
@@ -168,7 +152,7 @@
             }
           })
           that.$message.success("开始备份")
-          that.$router.push('/home/app/devMaster')
+          that.$router.push('/home/group/devMaster')
         })
       }
     },
@@ -176,6 +160,7 @@
       that = this
     },
     mounted() {
+      this.group = this.$store.state.groupInfo.id
       this.getGroupList()
     }
   };
