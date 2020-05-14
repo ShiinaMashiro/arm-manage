@@ -292,7 +292,7 @@ export default {
     display: flex;
     flex-direction: row;
     .home-list {
-      margin-top: 0px;
+      margin-top: 0;
       flex-grow: 1;
     }
   }

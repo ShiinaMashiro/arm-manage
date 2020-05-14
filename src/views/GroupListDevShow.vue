@@ -3,7 +3,7 @@
     <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 60px;border-bottom: 1px solid #efefef">
       <div class="preview-bar-operate">
         <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
-          <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
+          <el-button type="primary" size="small" v-if="$store.getters.checkChangeAuth()" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
         </div>
         <el-checkbox v-model="allChecked" @change="allCheckedChange" style="margin-right: 10px">全选</el-checkbox>
         <el-dropdown  @command="handleCommand">

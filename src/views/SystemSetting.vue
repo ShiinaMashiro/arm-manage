@@ -5,8 +5,8 @@
       <div class="info-view-main">
         <span class="info-view-item" style="font-size: 12px">检查当前版本并对设备引擎进行升级</span>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" @click="engineUpdatePopShow = true">引擎升级</el-button>
-          <el-button size="small" type="primary" @click="checkVersion()">版本检查</el-button>
+          <el-button size="small" type="primary" @click="engineUpdatePopShow = true" v-if="$store.getters.checkChangeAuth()">引擎升级</el-button>
+          <el-button size="small" type="primary" @click="checkVersion()" v-if="$store.getters.checkChangeAuth()">版本检查</el-button>
         </div>
       </div>
     </div>
@@ -37,7 +37,7 @@
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!enginePopShow" @click="enginePopShow = true">设置</el-button>
+          <el-button size="small" type="primary" v-if="!enginePopShow && $store.getters.checkChangeAuth()" @click="enginePopShow = true">设置</el-button>
           <el-button size="small" type="primary" v-if="enginePopShow" @click="versionAdd()">完成</el-button>
           <el-button size="small" type="info" v-if="enginePopShow" @click="versionAddCancel()">取消</el-button>
         </div>
@@ -56,7 +56,7 @@
           <span>{{systemVersion}}</span>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" @click="systemUpdatePopShow = true">升级</el-button>
+          <el-button size="small" type="primary" @click="systemUpdatePopShow = true" v-if="$store.getters.checkChangeAuth()">升级</el-button>
         </div>
       </div>
     </div>
@@ -100,7 +100,7 @@
           <el-input v-else size="mini" v-model="changePopInfo.mediaServerLan" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="!changePopShow && $store.getters.checkChangeAuth()" @click="changePop()">设置</el-button>
           <el-button size="small" type="primary" v-if="changePopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
           <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
         </div>
@@ -121,7 +121,7 @@
           <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!streamPopShow" @click="streamPop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="!streamPopShow && $store.getters.checkChangeAuth()" @click="streamPop()">设置</el-button>
           <el-button size="small" type="primary" v-if="streamPopShow" @click="saveSysInfo(changePopInfo)">保存</el-button>
           <el-button size="small" type="info" v-if="streamPopShow" @click="streamPopShow = false">取消</el-button>
         </div>
@@ -150,7 +150,7 @@
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!emailPopShow" @click="emailPop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="!emailPopShow && $store.getters.checkChangeAuth()" @click="emailPop()">设置</el-button>
           <el-button size="small" type="primary" v-if="emailPopShow" @click="emailAddSave()">保存</el-button>
           <el-button size="small" type="info" v-if="emailPopShow" @click="emailCancel()">取消</el-button>
         </div>
@@ -173,7 +173,7 @@
           </div>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!phonePopShow" @click="phonePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="!phonePopShow && $store.getters.checkChangeAuth()" @click="phonePop()">设置</el-button>
           <el-button size="small" type="primary" v-if="phonePopShow" @click="phoneAddSave()">保存</el-button>
           <el-button size="small" type="info" v-if="phonePopShow" @click="phoneCancel()">取消</el-button>
         </div>
@@ -196,7 +196,7 @@
           <span>{{licenseInfo.deviceNum}}</span>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" @click="license()">升级</el-button>
+          <el-button size="small" type="primary" v-if="$store.getters.checkChangeAuth()" @click="license()">升级</el-button>
         </div>
       </div>
     </div>

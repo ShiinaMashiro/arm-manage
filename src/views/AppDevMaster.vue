@@ -30,10 +30,10 @@
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
-            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
-            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="edit(scope.row)">恢复记录</el-button>
-            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)">删除</el-button>
+            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
+            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
+            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="edit(scope.row)">操作记录</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" @click.stop="deleteIp(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -139,6 +139,7 @@
         addIpPopShow: false,
         addIpInfo: null,
         changeIpPopShow: false,
+        row: {},
         changeIpInfo: null,
         ftpHost: {
           id: 0,
@@ -202,7 +203,7 @@
           case 5: return '上传中'
           case 6: return '上传完成'
           case 7: return '下载中'
-          case 8: return '下载失败'
+          case 8: return '下载成功'
           default: return '未知'
         }
       }
@@ -287,10 +288,20 @@
       edit(row) {
         this.changeIpInfo = row
         this.changeIpPopShow = true
+        this.row = row
+        this.getRecordList(row)
+      },
+      getRecordList(row) {
         let that = this
+        if(row.id !== this.row.id) {
+          return
+        }
         that.$post(that.$uri.devMaster.record, {operationId: row.operationId}).then(res => {
           if (res.success) {
             that.restoreList = res.list
+            if (that.$route.path === '/home/app/devMaster' && this.changeIpPopShow) {
+              setTimeout(() => {that.getRecordList(row)}, 5000)
+            }
           }
         })
       },

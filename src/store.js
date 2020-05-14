@@ -61,7 +61,7 @@ let sideItems = [
         updateAuthor: "3-0",
         sceneList: [
           {
-            name: "新增设备",
+            name: "增减设备",
             path: "/home/group/dev/manage",
             author: "_0201_",
             queryAuthor: "3_1-1",
@@ -441,7 +441,7 @@ export default new Vuex.Store({
       let sceneList = []
       for (let i in funList) {
         sceneList.push({
-          name: funList[i].title + "功能介绍",
+          name: funList[i].title,
           path: "/home/help/fun/show?index=" + i,
           author: "_0200_"
         })
@@ -679,11 +679,14 @@ export default new Vuex.Store({
   getters: {
     /* 检查是否有当前模块的修改权限 */
     checkChangeAuth: (state) => () => {
-      let route = router.currentRoute
-      if (!route.meta || !route.meta.changeAuth) {
+      if(state.isAdmin) {
         return true
       }
-      return state.userInfo.authority.indexOf(route.meta.changeAuth) !== -1
+      let auth = 'oreki'
+      if (state.sideInfo.child) {
+        auth = state.sideInfo.child.updateAuthor
+      }
+      return state.userInfo.authority.indexOf(auth) !== -1
     },
     /* 获取推流链接 */
     h5TestUrl: (state) => (deviceId) => {

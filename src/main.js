@@ -23,7 +23,8 @@ Vue.prototype.$filePost = () => {
   return axios.create({
     timeout: 1000,
     headers: {
-      "Content-Type": "multiple/form-data",
+      "Content-Type": "multipart/form-data",
+      "Sec-Fetch-Site": "same-origin",
       ...store.state.userInfo,
       userId: store.state.userInfo.id
     }

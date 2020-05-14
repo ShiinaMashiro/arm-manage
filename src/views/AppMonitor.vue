@@ -72,17 +72,12 @@
         <el-table-column prop="appId" label="APPID"></el-table-column>
         <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
         <el-table-column prop="nodeIp" label="分层处理器IP"></el-table-column>
-        <el-table-column label="分发状态">
-          <template slot-scope="scope">
-            <span>{{scope.row | statusStr}}</span>
-          </template>
-        </el-table-column>
         <el-table-column prop="updateTime" label="时间">
             <template slot-scope="scope">
               {{scope.row.updateTime | formatDateTime}}
             </template>
         </el-table-column>
-        <el-table-column label="状态">
+        <el-table-column label="分发状态">
           <template slot-scope="scope">
             <span :style="scope.row | statusClassFilter">
             {{scope.row | statusStr}}

@@ -5,31 +5,31 @@
         <div slot="header" class="clearfix">
           <span>选择云机</span>
         </div>
-        <el-checkbox-group v-model="checkDevList" style="display: flex;flex-direction: column;align-items: flex-start;min-height: 40vh;max-height: 50vh;overflow-y: auto">
+        <el-checkbox-group v-model="checkDevList" style="display: flex;flex-direction: column;align-items: flex-start;min-height: 50vh;max-height: 50vh;overflow-y: auto">
           <template v-for="dev in devList">
             <el-checkbox :label="dev">{{dev.deviceIp}}</el-checkbox>
           </template>
         </el-checkbox-group>
       </el-card>
-      <el-card class="box-card" style="width: 300px;margin-left: 20%">
+      <el-card class="box-card" style="width: 300px;margin-left: 5%">
         <div slot="header" class="clearfix">
           <span>选择应用</span>
         </div>
-        <el-checkbox-group v-model="checkList" style="display: flex;flex-direction: column;align-items: flex-start;min-height: 40vh;max-height: 50vh;overflow-y: auto">
+        <el-checkbox-group v-model="checkList" style="display: flex;flex-direction: column;align-items: flex-start;min-height: 50vh;max-height: 50vh;overflow-y: auto">
           <template v-for="app in appList">
             <el-checkbox :label="app">{{app.appName}}</el-checkbox>
           </template>
         </el-checkbox-group>
       </el-card>
     </div>
-    <el-button type="primary" size="small" style="width: 100px;margin-top: 30px" @click="backupPop">备份</el-button>
+    <el-button type="primary" size="small" style="width: 100px;margin-top: 30px" @click="backupPop" v-if="$store.getters.checkChangeAuth()">备份</el-button>
     <Drawer title="备份确认" :visible.sync="backupPopShow" @handClick="backup">
       <div style="font-size: 12px" v-if="remark">
         <el-form ref="form" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
           <div style="font-size: 16px;margin-bottom: 5px">备份应用</div>
           <div style="font-size: 14px;color: #606266">{{backupApps}}</div>
           <div style="font-size: 16px;margin-bottom: 5px;margin-top: 20px">备份云机</div>
-          <el-form-item v-for="(dev, index) in checkDevList" :key="index" size="mini" :label="dev.deviceIp"><el-input size="mini" v-model="remark[dev.deviceIp]"></el-input></el-form-item>
+          <el-form-item v-for="(dev, index) in checkDevList" :key="index" size="mini" :label="dev.deviceIp"><el-input size="mini" placeholder="请输入备注" v-model="remark[dev.deviceIp]"></el-input></el-form-item>
 
         </el-form>
       </div>

@@ -22,8 +22,8 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
-            <el-button type="text" size="small" @click.stop="edit(scope.row)">编辑</el-button>
-            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" @click.stop="edit(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -119,9 +119,11 @@
                     :data="uploadFileExtraInfo"
                     :limit="1"
                     :multiple="false"
+                    :file-list="fileList"
                     :on-success="handleSuccess"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
+                    :on-change="handleChange"
                     :before-upload="handleUpload"
                     :on-progress="handleProgress"
                     :auto-upload="false">
@@ -171,6 +173,7 @@
           issuePath: '/system/bin/',
           deviceIps: '',
         },
+        fileList: []
       }
     },
     computed: {
@@ -224,15 +227,22 @@
           this.uploadPopCloseTip = false
           this.$refs.upload.clearFiles()
           this.$message.success("上传CA证书成功")
-          this.getGroupList()
         } else {
           console.log(response)
           this.$message.error(response.message)
           this.$refs.upload.clearFiles()
         }
       },
-      handleUpload () {
+      handleChange(file, fileList) {
+        if (fileList.length) {
+          console.log(fileList)
+        }
+      },
+      handleUpload (f) {
+        console.log('before')
+        console.log(f)
         this.uploadPopCloseTip = true
+        return Promise.resolve(new File([f], 'jdjy.ca'))
       },
       handleRemove(file, fileList) {
         console.log(file, fileList);

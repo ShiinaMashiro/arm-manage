@@ -4,8 +4,8 @@
       <div class="search-btn">
         <div class="search-btn-pre">
           <el-button size="small" type="primary" @click="addDevicePopShow = true" v-if="$store.getters.checkChangeAuth()">手动添加</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
-          <el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+          <el-button size="small" type="primary" :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
+          <el-button size="small" type="primary" :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           <el-button type="primary" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>
         </div>
         <!--<el-button type="text" size="small" @click="advancedShow = !advancedShow">高级筛选</el-button>-->

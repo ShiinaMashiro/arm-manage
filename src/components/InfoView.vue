@@ -17,7 +17,7 @@
         </div>
       </template>
       <div class="info-view-item-btn">
-        <el-button size="small" type="primary" v-if="!isEdit" @click="edit">{{editBtnName || '设置'}}</el-button>
+        <el-button size="small" type="primary" v-if="!isEdit && $store.getters.checkChangeAuth()" @click="edit">{{editBtnName || '设置'}}</el-button>
         <el-button size="small" type="primary" :disabled="!canSave" v-if="isEdit" @click="savePre">保存</el-button>
         <el-button size="small" type="info" v-if="isEdit" @click="cancel">取消</el-button>
       </div>

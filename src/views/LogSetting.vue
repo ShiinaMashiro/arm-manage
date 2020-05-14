@@ -57,7 +57,7 @@
           </el-select>
         </div>
         <div class="info-view-item-btn">
-          <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+          <el-button size="small" type="primary" v-if="!changePopShow && $store.getters.checkChangeAuth()" @click="changePop()">设置</el-button>
           <el-button size="small" type="primary" v-if="changePopShow" @click="saveLogInfo()">保存</el-button>
           <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
         </div>

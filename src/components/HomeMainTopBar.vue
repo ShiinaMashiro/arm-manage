@@ -17,6 +17,8 @@
         <span style="font-size: 12px;margin-left: 20px" v-if="$route.path === '/home/system/ipproxy'">自行通过OpenVPN搭建IP代理池，<span style="color: red">管理系统内的IP代理池仅提供板卡切换和管理功能</span></span>
         <span style="font-size: 12px;margin-left: 20px;text-align: left" v-if="$route.path === '/home/app/devMaster'">备份管理可指定设备和应用进行备份，同时将本地的备份上传至设定的FTP服务器（
           <span style="color: red">需用户自建</span>），并可将FTP服务器上的备份恢复至云机。</span>
+        <span style="font-size: 12px;margin-left: 20px;text-align: left" v-if="$route.path === '/home/cmdForward'">命令转发功能需要用户上传自定的辅助程序（
+          <span style="color: red">需用户自行开发</span>）至设备，后台可根据端口将消息发送至指定设备的辅助程序。</span>
         <span v-if="this.$route.path.startsWith('/home/group') && this.$route.path.indexOf('/list') === -1" style="font-size: 12px;margin-left: 20px">{{'设备数量：' + deviceNum + '     推流设备数量：' + streamNum + '      故障设备数量：' + badNum}}</span>
       </div>
     </div>

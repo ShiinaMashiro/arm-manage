@@ -56,7 +56,7 @@
           <div class="title">License信息</div>
           <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: left;padding: 20px 20px 10px 20px;font-size: 14px">
             <div style="text-align: left">有效时间：{{licenseTime}}</div>
-            <div style="text-align: left;margin-top: 10px">设备数量：80</div>
+            <div style="text-align: left;margin-top: 10px">设备数量：{{licenseInfo.deviceNum}}</div>
           </div>
         </div>
       </div>

@@ -30,10 +30,10 @@
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
-            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
-            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="edit(scope.row)">恢复记录</el-button>
-            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)">删除</el-button>
+            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
+            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
+            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="edit(scope.row)">操作记录</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" @click.stop="deleteIp(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -105,7 +105,7 @@
           <div style="width: 100%;border-bottom: 1px solid #ddd"></div>
           <el-table :data="restoreList" style="width: 100%">
             <el-table-column prop="createTime" label="日期">
-              <template slot-scope="scope">{{scope.row.createTime | formateDateTime}}</template>
+              <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
             </el-table-column>
             <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
             <el-table-column prop="operationStatus" label="状态">
@@ -140,6 +140,7 @@
         addIpPopShow: false,
         addIpInfo: null,
         changeIpPopShow: false,
+        row: {},
         changeIpInfo: null,
         ftpHost: {
           id: 0,
@@ -167,8 +168,7 @@
         },
         ftpPopShow: false,
         props: {
-          label: 'name',
-          children: 'children',
+          label: 'deviceIp',
           isLeaf: 'leaf'
         },
         groupList: [],
@@ -204,7 +204,7 @@
           case 5: return '上传中'
           case 6: return '上传完成'
           case 7: return '下载中'
-          case 8: return '下载失败'
+          case 8: return '下载成功'
           default: return '未知'
         }
       }
@@ -214,34 +214,15 @@
         data.checked = checked
         let s = []
         this.groupList.forEach(g => {
-          g.children.forEach(c => {
-            if (g.checked || c.checked) {
-              s.push(c.deviceIp)
-            }
-          })
+          if (g.checked) {
+            s.push(g.deviceIp)
+          }
         })
         this.deviceIps = s
       },
       loadNode(node, resolve) {
         let that = this
         if (node.level === 0) {
-          this.groupList.forEach(g => {
-            if (!g.children) {
-              g.name = g.groupName
-              g.checked = false
-              that.$post(that.$uri.device.deviceList, {groupId: g.id}).then(res => {
-                if (res.success) {
-                  let list = res.list
-                  list.forEach(d => {
-                    d.name = d.deviceIp
-                    d.checked = false
-                    d.leaf = true
-                  })
-                  g.children = list
-                }
-              })
-            }
-          })
           return resolve(this.groupList);
         }
         if (node.level = 1) return resolve(node.data.children);
@@ -289,10 +270,20 @@
       edit(row) {
         this.changeIpInfo = row
         this.changeIpPopShow = true
+        this.row = row
+        this.getRecordList(row)
+      },
+      getRecordList(row) {
         let that = this
+        if(row.id !== this.row.id) {
+          return
+        }
         that.$post(that.$uri.devMaster.record, {operationId: row.operationId}).then(res => {
           if (res.success) {
             that.restoreList = res.list
+            if (that.$route.path === '/home/group/devMaster' && this.changeIpPopShow) {
+              setTimeout(() => {that.getRecordList(row)}, 5000)
+            }
           }
         })
       },
@@ -367,12 +358,26 @@
         })
         that.$message.success("修改成功")
         that.ftpPopShow = false
+      },
+      getDevList() {
+        let that = this
+        that.$post(that.$uri.device.deviceList, {groupId: that.$store.state.groupInfo.id}).then(res => {
+          if (res.success) {
+            res.list.forEach(dev => {
+              dev.checked = false
+              dev.leaf = true
+            })
+            this.groupList = res.list
+
+          }
+        })
       }
     },
     mounted () {
       this.searchInfo.groupId = this.$store.state.groupInfo.id
       this.getIpList()
       this.getFtpInfo()
+      this.getDevList()
     }
   };
 </script>

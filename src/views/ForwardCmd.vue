@@ -25,9 +25,9 @@
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
-            <el-button type="text" size="small" @click.stop="edit(scope.row)">编辑</el-button>
-            <el-button type="text" size="small" @click.stop="forward(scope.row)">转发</el-button>
-            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" @click.stop="edit(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="forward(scope.row)" v-if="$store.getters.checkChangeAuth()">转发</el-button>
+            <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

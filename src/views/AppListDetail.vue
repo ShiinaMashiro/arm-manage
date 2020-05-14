@@ -35,7 +35,7 @@
               <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
             </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="primary" v-if="!changePopShow" @click="changePop()">设置</el-button>
+            <el-button size="small" type="primary" v-if="!changePopShow && $store.getters.checkChangeAuth()" @click="changePop()">设置</el-button>
             <el-button size="small" type="primary" :disabled="!canChangePop" v-if="changePopShow" @click="saveAppInfo(changePopInfo)">保存</el-button>
             <el-button size="small" type="info" v-if="changePopShow" @click="changePopShow = false">取消</el-button>
           </div>
@@ -85,7 +85,7 @@
             </el-select>
           </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="primary" v-if="!switchPopShow" @click="switchPop()">设置</el-button>
+            <el-button size="small" type="primary" v-if="!switchPopShow && $store.getters.checkChangeAuth()" @click="switchPop()">设置</el-button>
             <el-button size="small" type="primary" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo)">保存</el-button>
             <el-button size="small" type="info" v-if="switchPopShow" @click="switchPopShow = false">取消</el-button>
           </div>
@@ -110,7 +110,7 @@
             </div>
           </div>
           <div class="info-view-item-btn">
-            <el-button size="small" type="primary" v-if="!whitePopShow" @click="whitePop()">设置</el-button>
+            <el-button size="small" type="primary" v-if="!whitePopShow && $store.getters.checkChangeAuth()" @click="whitePop()">设置</el-button>
             <el-button size="small" type="primary" v-if="whitePopShow" @click="whiteAddSave()">保存</el-button>
             <el-button size="small" type="info" v-if="whitePopShow" @click="cancelWhitePop()">取消</el-button>
           </div>

@@ -15,8 +15,8 @@
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
             <el-button type="text" size="small" @click.stop="goCaseDetail(scope.row)">详情</el-button>
-            <el-button type="text" size="small" @click.stop="scanDevice(scope.row.id)">扫描设备</el-button>
-            <el-button type="text" size="small" @click.stop="deleteCase(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" @click.stop="scanDevice(scope.row.id)" v-if="$store.getters.checkChangeAuth()">扫描设备</el-button>
+            <el-button type="text" size="small" @click.stop="deleteCase(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
