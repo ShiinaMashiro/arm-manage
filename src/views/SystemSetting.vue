@@ -203,18 +203,8 @@
 
     <!-- 引擎升级 -->
     <Drawer title="引擎升级" :visible.sync="engineUpdatePopShow" @handClick="submitUpload" :before-close="engineUploadPopClose">
-    <!--<el-dialog title="引擎升级" :append-to-body="true"
-               :close-on-click-modal="false" :show-close="false" top="15vh"
-               :visible.sync="engineUpdatePopShow" width="500px">-->
-      <div>
+      <div v-if="engineUpdatePopShow">
         <el-form ref="form" :model="engineUpdateExtraInfo" label-width="130px" label-position="left">
-          <!--<el-form-item size="mini" label="系统当前版本">
-            <div style="display: flex;flex-direction: column;justify-content: flex-start">
-              <template v-for="(item, index) in engineList">
-                <span style="line-height: normal" :key="index">{{item.engineTypeName}}: {{item.versionName}}-{{item.versionCode}}</span>
-              </template>
-            </div>
-          </el-form-item>-->
           <el-form-item size="mini" label="类型">
             <div class="item-input">
               <el-select v-model="engineUpdateExtraInfo.engineType" size="samll" placeholder="引擎版本">
@@ -363,9 +353,9 @@
       fileList() {
         if (this.fileList.length) {
           let name = this.fileList[0].name
-          let s = name.indexOf('__')
+          let s = name.lastIndexOf('_')
           let e = name.indexOf('.')
-          let version = name.substr(s + 2, e - s - 2)
+          let version = name.substr(s + 1, e - s - 1)
           this.engineUpdateExtraInfo.versionCode = version
           this.engineUpdateExtraInfo.versionName = version
         }
@@ -445,11 +435,13 @@
             this.engineUpdatePopShow = false
             this.engineUploadTip = false
             this.$refs.upload.clearFiles()
+            this.fileList = []
           }).catch( () => {})
         } else {
           this.engineUpdatePopShow = false
           this.engineUploadTip = false
           this.$refs.upload.clearFiles()
+          this.fileList = []
         }
       },
       /* 上传文件 */
@@ -483,6 +475,7 @@
           this.engineUpdatePopShow = false
           this.engineUploadTip = false
           this.$refs.upload.clearFiles()
+          this.fileList = []
           this.$message.success("升级成功")
         } else {
           console.log(response)
