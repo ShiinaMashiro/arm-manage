@@ -323,7 +323,8 @@
         }
       },
       isCommonCard (row, index) {
-        return row.cardType === 1
+        // return row.cardType === 1
+        return true
       },
       /* 当前页改变 */
       currentChangeHandle (val) {

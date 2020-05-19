@@ -885,7 +885,8 @@ export default {
       }
     },
     isCommonCard (row, index) {
-      return row.cardType === 1
+      // return row.cardType === 1
+      return true
     },
     rowKey (row) {
       return row.id
