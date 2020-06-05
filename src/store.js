@@ -284,12 +284,13 @@ const state = {
   logGroupId: '',
   groupDevShowMode: false, // true为列表，false为预览
 
-  deviceWindowMode: {
+ /* deviceWindowMode: {
     show: false,
     id: 0,
     deviceNo: 0,
     ip: ''
-  },
+  },*/
+  deviceWindowMode: [],
   sideInfo: {
     item: null,
     child: null,
@@ -483,12 +484,17 @@ export default new Vuex.Store({
     /* 设置设备控制窗口状态 */
     [mutation.DEVICE_WINDOW_SHOW_MODE] (state, mode) {
       console.log(mode);
-      state.deviceWindowMode.show = mode.show;
+      if (mode.show) {
+        state.deviceWindowMode.push(mode.mode)
+      } else {
+        state.deviceWindowMode.splice(state.deviceWindowMode.indexOf(mode.mode), 1)
+      }
+      /*state.deviceWindowMode.show = mode.show;
       if (mode.id && mode.deviceNo) {
         state.deviceWindowMode.id = mode.id;
         state.deviceWindowMode.deviceNo = mode.deviceNo;
         state.deviceWindowMode.ip = mode.ip;
-      }
+      }*/
     },
     /* 设置设备控制窗口状态 */
     [mutation.DEVICE_SYNC_SHOW_MODE] (state, mode) {

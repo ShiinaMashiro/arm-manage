@@ -472,14 +472,18 @@ export default {
       let msgs = []
       devs.forEach(dev => {
         ips.push(dev.deviceIp)
-        msgs.push(dev.deviceNo + '(' + dev.deviceIp + ')')
+        msgs.push(dev.id + '(' + dev.deviceIp + ')')
       })
       this.ipStartInfo.ips = ips
-      this.ipStartInfo.msg = msgs.join(',')
+      this.ipStartInfo.msg = msgs.join('，')
       let that = this
       that.$post(that.$uri.ipProxy.list).then(res => {
         if (res.success) {
-          that.ipList = res.list
+          let list = res.list
+          list.sort((a, b) => {
+            return b.connectionLast - a.connectionLast
+          })
+          that.ipList = list
         }
       })
       this.ipStartPopShow = true
@@ -873,16 +877,25 @@ export default {
     },
     */
     deviceWindowOpen (id, deviceNo, ip) {
-      if (this.$store.state.deviceWindowMode.show) {
-        this.$message.error("同时只能控制一台设备！")
-      } else {
-        this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
+      let hasSign = false
+      this.$store.state.deviceWindowMode.forEach(mode => {
+        if (id === mode.id) {
+          hasSign = true
+        }
+      })
+      if (hasSign) {
+        this.$message.warning('当前云机的推流窗口已打开')
+        return
+      }
+      this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
+        show: true,
+        mode: {
           show: true,
           id,
           deviceNo,
           ip: ip
-        });
-      }
+        }
+      });
     },
     isCommonCard (row, index) {
       // return row.cardType === 1

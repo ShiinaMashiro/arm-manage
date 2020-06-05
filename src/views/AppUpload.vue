@@ -92,7 +92,7 @@
           </el-table>
         </div>
         <div class="info-view-item-btn" style="margin-top: 20px">
-          <el-button size="small" style="width: 80px" :disabled="(multipleSelection.length === 0) || mergeBtnDisabled" type="primary" @click="mergeGroup()">确定</el-button>
+          <el-button size="small" style="width: 80px" :disabled="mergeBtnDisabled" type="primary" @click="mergeGroup()">确定</el-button>
           <el-button size="small" style="width: 80px" type="danger" :disabled="mergeBtnDisabled" @click="$router.push('/home/app/list')">取消</el-button>
         </div>
       </div>
@@ -125,6 +125,10 @@
     },
     methods: {
       mergeGroup() {
+        if (that.multipleSelection.length === 0) {
+          that.$router.push('/home/app/list')
+          return
+        }
         that.mergeBtnDisabled = true
         let ids = []
         that.multipleSelection.forEach(group => {

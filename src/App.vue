@@ -73,6 +73,14 @@ textarea::-webkit-scrollbar {display:none}
   align-items: center;
 }
 
+.el-pager li {
+  color: #409EFF;
+}
+
+.el-pager li.active {
+  color: black!important;
+}
+
 .search-btn {
   display: flex;
   flex-direction: row;

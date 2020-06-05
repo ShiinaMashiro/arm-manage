@@ -10,11 +10,13 @@
       </div>
     </div>
     <div :style="{display: $store.state.guide > 0 ? 'block' : 'none'}" class="mask"></div>
-    <template v-if="$store.state.deviceWindowMode.show">
-      <device-window :id="$store.state.deviceWindowMode.id"
-                     :device-id="$store.state.deviceWindowMode.deviceNo"
-                     :ip="$store.state.deviceWindowMode.ip"
-                     @close="deviceWindowClose"
+    <template v-for="(mode, index) in $store.state.deviceWindowMode">
+      <device-window :id="mode.id"
+                     :key="mode.id"
+                     :index="index"
+                     :device-id="mode.deviceNo"
+                     :ip="mode.ip"
+                     @close="deviceWindowClose(mode)"
       ></device-window>
     </template>
     <el-dialog
@@ -212,9 +214,10 @@ export default {
       }
       this.$store.commit(this.$mutation.SIDE_INFO, sideInfo)
     },
-    deviceWindowClose () {
+    deviceWindowClose (mode) {
       this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
-        show: false
+        show: false,
+        mode
       })
     },
     systemPop() {

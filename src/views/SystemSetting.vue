@@ -352,9 +352,10 @@
     watch: {
       fileList() {
         if (this.fileList.length) {
+          console.log(this.fileList[0])
           let name = this.fileList[0].name
           let s = name.lastIndexOf('_')
-          let e = name.indexOf('.')
+          let e = name.lastIndexOf('.')
           let version = name.substr(s + 1, e - s - 1)
           this.engineUpdateExtraInfo.versionCode = version
           this.engineUpdateExtraInfo.versionName = version

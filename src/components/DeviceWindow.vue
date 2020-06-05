@@ -8,7 +8,7 @@
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
           <div v-if="deviceMessage" class="message"> {{ deviceMessage }} </div>
-          <div id="target" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
+          <div :id="'target' + id" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
         </div>
         <div class="footer" :style="{ width: deviceWidth + 'px' }">
           <el-tooltip class="tooltip" effect="dark" content="返回键" placement="top-start">
@@ -60,6 +60,7 @@ export default {
   name: "DeviceWindow",
   props: {
     id: Number,
+    index: Number,
     deviceId: Number,
     appid: {
       type: String,
@@ -82,14 +83,14 @@ export default {
     }
   },
   beforeMount () {
-    window.addEventListener('resize', this.computeDeviceSize);
+    // window.addEventListener('resize', this.computeDeviceSize);
     this.computeDeviceSize();
   },
   mounted () {
     LongeneClient.LoggingControl.setLogLevel('info');
 
     let shinoIp = this.$store.getters.shinoIp();
-    this.player = LongeneClient.createAppPlayer('target', {
+    this.player = LongeneClient.createAppPlayer('target' + this.id, {
       keyboard: true,
       orientation: 'portrait'
     });
@@ -119,12 +120,14 @@ export default {
   computed: {
     windowLeft () {
       let clientWidth = document.documentElement.clientWidth;
-      let windowLeft = Math.floor((clientWidth - this.deviceWidth) / 2);
+      // let windowLeft = Math.floor((clientWidth - this.deviceWidth) / 2) + 20 * this.index;
+      let windowLeft = document.documentElement.clientWidth * 0.25 * (this.index % 4);
       return windowLeft > 0 ? windowLeft : 0;
     },
     windowTop () {
       let clientHeight = document.documentElement.clientHeight;
-      let windowTop = Math.floor((clientHeight - this.deviceHeight - 36 * 2) / 2);
+      // let windowTop = Math.floor((clientHeight - this.deviceHeight - 36 * 2) / 2) ;
+      let windowTop = 80 * Math.floor(this.index / 4) ;
       return windowTop > 0 ? windowTop : 0;
     }
   },
