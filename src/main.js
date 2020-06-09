@@ -13,7 +13,9 @@ import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import axios from 'axios'
 import VueDraggableResizable from 'vue-draggable-resizable'
+import VueClipboard from 'vue-clipboard2'
 
+Vue.use(VueClipboard)
 Vue.use(mavonEditor)
 Vue.use(ElementUI)
 Vue.config.productionTip = false
@@ -43,7 +45,9 @@ Vue.prototype.$enableKey = {
   devMaster: 'd',
   adb: 'a',
   cmdForward: 'c',
-  sync: 's'
+  sync: 's',
+  live: 'l',
+  flowSync: 'f'
 }
 Vue.prototype.$isEnable = (key) => {
   if (key && process.env.VUE_APP_OREKI) {

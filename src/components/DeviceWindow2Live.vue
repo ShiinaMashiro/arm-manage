@@ -1,6 +1,5 @@
 <template>
   <div class="device">
-    <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="windowLeft" :y="windowTop">
       <div class="window">
         <div class="header" :style="{ width: deviceWidth + 'px' }">
           <span class="id">{{ id }}</span>
@@ -8,7 +7,7 @@
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
           <div v-if="deviceMessage" class="message"> {{ deviceMessage }} </div>
-          <div :id="'target' + id" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
+          <div id="targetLive" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
         </div>
         <div class="footer" :style="{ width: deviceWidth + 'px' }">
           <el-tooltip class="tooltip" effect="dark" content="返回键" placement="top-start">
@@ -16,9 +15,6 @@
           </el-tooltip>
           <el-tooltip class="tooltip" effect="dark" content="主页键" placement="top">
             <div class="home" @click="homeClick"></div>
-          </el-tooltip>
-          <el-tooltip class="tooltip" effect="dark" content="截图" placement="top">
-            <div class="snapshot" @click="snapshotClick"></div>
           </el-tooltip>
           <el-tooltip class="tooltip" effect="dark" content="任务键" placement="top">
             <div class="recent" @click="recentClick"></div>
@@ -34,22 +30,6 @@
           </el-tooltip>
         </div>
       </div>
-    </vue-draggable-resizable>
-    <el-dialog
-            title="设备截图"
-            :visible.sync="dialogVisible"
-            :modal="false"
-            :append-to-body="true"
-            width="30%">
-      <div style="display: flex;flex-direction: column;">
-        <el-image v-if="url"
-                  style="width: 100%;"
-                  :src="url"
-                  fit="cover"></el-image>
-        <el-button type="primary" size="medium" style="margin: 10px 0" @click="downloadPng">下载图片</el-button>
-        <span style="font-size: 12px;color: red">如无法下载，可右键-图片另存为(图片已默认保存至云机相册内)</span>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -60,13 +40,17 @@ export default {
   name: "DeviceWindow",
   props: {
     id: Number,
-    index: Number,
     deviceId: Number,
     appid: {
       type: String,
       default: "0"
     },
-    ip: String
+    isVideo: {
+      type: Boolean,
+      default: true
+    },
+    ip: String,
+    port: Number,
   },
   data () {
     return {
@@ -77,26 +61,27 @@ export default {
       player: null,
       deviceWidth: 720,
       deviceHeight: 1280,
-      deviceMessage: "",
-      dialogVisible: false,
-      url: ''
+      deviceMessage: ""
     }
   },
   beforeMount () {
-    // window.addEventListener('resize', this.computeDeviceSize);
+    window.addEventListener('resize', this.computeDeviceSize);
     this.computeDeviceSize();
   },
   mounted () {
     LongeneClient.LoggingControl.setLogLevel('info');
 
     let shinoIp = this.$store.getters.shinoIp();
-    this.player = LongeneClient.createAppPlayer('target' + this.id, {
+    this.player = LongeneClient.createAppPlayer('targetLive', {
       keyboard: true,
+      mediaType: 'image',
       orientation: 'portrait'
     });
     this.player.open({
       appkey: this.appkey,
       appid: this.appid,
+      // ip: this.port === 0 ? this.ip : shinoIp,
+      // port: this.port === 0 ? 20000 : this.port,
       ljyip: shinoIp,
       deviceId: this.deviceId,
       requestUrl: window.location.host + '/' + this.requestUrl,
@@ -108,6 +93,7 @@ export default {
       }
     })
     this.deviceMessage = '正在连接中...';
+
     this.player.on('statechange', () => {
       if (this.player.state == 'playing') {
         this.deviceMessage = '';
@@ -120,34 +106,20 @@ export default {
   computed: {
     windowLeft () {
       let clientWidth = document.documentElement.clientWidth;
-      let windowLeft = Math.floor((clientWidth - this.deviceWidth) / 2) + 20 * this.index;
-      if (this.$isEnable(this.$enableKey.flowSync)) {
-        windowLeft = document.documentElement.clientWidth * 0.25 * (this.index % 4);
-      }
+      let windowLeft = Math.floor((clientWidth - this.deviceWidth) / 2);
       return windowLeft > 0 ? windowLeft : 0;
     },
     windowTop () {
       let clientHeight = document.documentElement.clientHeight;
-      let windowTop = Math.floor((clientHeight - this.deviceHeight - 36 * 2) / 2) ;
-      if (this.$isEnable(this.$enableKey.flowSync)) {
-        windowTop = 80 * Math.floor(this.index / 4) ;
-      }
+      let windowTop = Math.floor((clientHeight - this.deviceHeight - 36 * 2) / 2);
       return windowTop > 0 ? windowTop : 0;
     }
   },
   methods: {
-    downloadPng() {
-      let downloadHref = '/snapshot/' + this.deviceId + '.png?temp=' + Math.random()
-      let filename = this.deviceId + '.png'
-      let a = document.createElement('a')
-      a.href = downloadHref
-      a.download = filename
-      a.click()
-    },
     computeDeviceSize () {
       let clientWidth = document.documentElement.clientWidth;
 
-      this.deviceWidth = Math.floor(clientWidth * 0.25);
+      this.deviceWidth = Math.floor(clientWidth * 0.2);
       this.deviceHeight = Math.floor(this.deviceWidth * 16 / 9);
 
       if (this.player) {
@@ -182,17 +154,11 @@ export default {
         this.player.emitHome();
       }
     },
-    snapshotClick() {
-      let that = this
-      that.$post(that.$uri.device.snapshot, {deviceIp: that.ip, isSave: 1}).then(res => {
-        that.url = res.data
-        that.dialogVisible = true
-      })
-    },
 
     recentClick () {
       if (this.player) {
         this.player.openRecent();
+        this.$emit('openRecent')
       }
     },
 
@@ -232,11 +198,11 @@ export default {
 
 <style lang="less" scoped>
 .device {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  /*position: fixed;*/
+  /*top: 0;*/
+  /*left: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
   z-index: 2000;
   pointer-events: none;
 
@@ -292,11 +258,6 @@ export default {
 
       .return {
         background: url('../assets/i_back.png') no-repeat;
-        background-size: 100% 100%;
-      }
-
-      .snapshot {
-        background: url('../assets/i_jt.png') no-repeat;
         background-size: 100% 100%;
       }
 

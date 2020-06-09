@@ -22,9 +22,7 @@
         <el-button v-if="$isEnable($enableKey.sync)" type="info" size="small" plain :disabled="!hasSelect" style="margin-left: 10px" @click="devSync()">云机同步</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipStartPop()">切换IP</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
-        <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="homeOne">一键HOME</el-button>-->
-        <!--<el-button type="primary" size="mini" :disabled="!hasSelect" @click="recoverOne">恢复出厂设置</el-button>-->
-        <!--<el-button type="primary" size="mini" :disabled="!hasSelect || !snapshotComplete" @click="snapshotOne">刷新截图</el-button>-->
+        <el-button v-if="$isEnable($enableKey.live)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="liveManage()">多路直播</el-button>
       </div>
       <div class="preview-bar-operate" v-if="false">
         <div style="padding: 0 10px 0 0; margin-right: 10px">
@@ -228,6 +226,53 @@
       </div>
     </Drawer>
 
+    <!-- 多路直播设置弹窗 -->
+    <Drawer title="多路直播" :visible.sync="liveManagePopShow" @handClick="live">
+      <div>
+        <el-form ref="form" size="mini" label-width="160px" label-position="left">
+          <el-form-item size="mini" label="媒体服务器外网地址：">
+            <div v-if="!livePopInfo.mediaAddressWanSet">
+              {{livePopInfo.mediaAddressWan}}
+              <el-button type="text" size="mini" @click="livePopInfo.mediaAddressWanSet = true">设置</el-button></div>
+            <div v-else>
+              <el-input v-model="livePopInfo.mediaAddressWanNew"></el-input>
+              <el-button type="primary" size="mini" @click="changeWan">确定</el-button>
+              <el-button size="mini" @click="livePopInfo.mediaAddressWanSet = false">取消</el-button>
+            </div>
+          </el-form-item>
+          <el-form-item size="mini" label="媒体服务器内网地址：">
+            <div v-if="!livePopInfo.mediaAddressLanSet">
+              {{livePopInfo.mediaAddressLan}}
+              <el-button type="text" size="mini" @click="livePopInfo.mediaAddressLanSet = true">设置</el-button></div>
+            <div v-else>
+              <el-input v-model="livePopInfo.mediaAddressLanNew"></el-input>
+              <el-button type="primary" size="mini" @click="changeLan">确定</el-button>
+              <el-button size="mini" @click="livePopInfo.mediaAddressLanSet = false">取消</el-button>
+            </div>
+          </el-form-item>
+          <el-form-item size="mini" label="RTMP URL地址："></el-form-item>
+          <div style="width: 100%; min-height: 200px; max-height: 400px;display: flex;flex-direction: column;font-size: 12px;border: thin solid;padding: 5px;overflow-y: auto">
+            <div style="display: flex;flex-direction: row;font-size: 14px">
+              <div style="width: 60%;text-align: center">RTMP服务器地址</div>
+              <div style="text-align: center">推流密钥</div>
+            </div>
+            <div v-for="(item, index) in livePopInfo.urlList"  style="display: flex;flex-direction: row"
+                 :key="item.id" :style="{backgroundColor: livePopInfo.checked === index ? '#ddd' : 'white', padding: '2px'}"
+                 @click="checkUrl(index)">
+              <div style="width: 60%">rtmp://{{livePopInfo.mediaAddressWan}}</div>
+              <div>{{item.secretKey}}</div>
+            </div>
+          </div>
+          <div style="display: flex;flex-direction: row;padding: 10px 0">
+            <el-button type="primary" size="mini" @click="createUrl">生成URL</el-button>
+            <el-button type="primary" size="mini" @click="copyAddress">复制地址</el-button>
+            <el-button type="primary" size="mini" @click="copyKey">复制密钥</el-button>
+            <el-button type="danger" size="mini" @click="delUrl">删除URL</el-button>
+          </div>
+        </el-form>
+      </div>
+    </Drawer>
+
     <el-drawer
             ref="sync"
             :visible.sync="devSyncShow"
@@ -250,6 +295,34 @@
       <DeviceSync style="border-top: thin solid #ddd" :devList="devSyncList" :deviceStatusStr="deviceStatusStr" @fail="devSyncShow = false"></DeviceSync>
     </el-drawer>
 
+    <el-drawer
+            ref="sync"
+            :visible.sync="liveSyncShow"
+            :append-to-body="true"
+            size="100%"
+            direction="rtl"
+            :show-close="false"
+            :destroy-on-close="true"
+            :before-close="handleLiveSyncClose">
+      <div slot="title" style="display: flex;flex-direction: row;justify-content: flex-start;align-items: flex-end;margin-bottom: -10px;padding-top: 10px">
+        <div style="font-size: 20px;font-weight: 600;min-width: 120px;color: black;padding-right: 50px">多路直播</div>
+        <div style="font-size: 12px;min-width: 400px">
+          <div v-if="liveSyncShow">RTMP URL：{{livePopInfo.mediaAddressWan + '/' + livePopInfo.urlList[livePopInfo.checked].secretKey}}</div>
+          <div style="margin-top: 5px">多路直播页面拥有云机同步的功能，如果视频卡顿丢帧，请控制视频文件大小或检查网络。</div>
+        </div>
+        <div style="flex-grow: 1;text-align: right">
+          <el-button type="primary" style="width: 80px" size="mini" @click="$refs.sync.closeDrawer()">退出</el-button>
+        </div>
+      </div>
+      <DeviceSync style="border-top: thin solid #ddd"
+                  v-if="liveSyncShow"
+                  :live="true"
+                  :devList="devSyncList" :deviceStatusStr="deviceStatusStr"
+                  :address="livePopInfo.mediaAddressWan"
+                  :secretKey="livePopInfo.urlList[livePopInfo.checked].secretKey"
+                  @fail="devSyncShow = false"></DeviceSync>
+    </el-drawer>
+
     <el-dialog
             title="云机识别码"
             :visible.sync="qrCodeShow"
@@ -266,9 +339,10 @@
 <script>
   import Drawer from '@/components/Drawer'
   import DeviceSync from '@/components/DeviceSync'
+  import DeviceSync2 from '@/components/DeviceSync2'
 export default {
   name: "GroupListDevShow",
-  components: {Drawer, DeviceSync},
+  components: {Drawer, DeviceSync, DeviceSync2},
   data () {
     return {
       devSyncShow: false,
@@ -369,7 +443,23 @@ export default {
         last: 0
       },
       ipList: [],
-      ipStartPopShow: false
+      ipStartPopShow: false,
+      liveManagePopShow: false,
+      livePopInfo: {
+        mediaAddressWan: '',
+        mediaAddressWanName: '',
+        mediaAddressWanNew: '',
+        mediaAddressWanId: -1,
+        mediaAddressWanSet: false,
+        mediaAddressLan: '',
+        mediaAddressLanName: '',
+        mediaAddressLanNew: '',
+        mediaAddressLanId: -1,
+        mediaAddressLanSet: false,
+        urlList: [],
+        checked: 0
+      },
+      liveSyncShow: false
     }
   },
   computed: {
@@ -420,6 +510,123 @@ export default {
     }
   },
   methods: {
+    copyAddress() {
+      if (!this.livePopInfo.urlList[this.livePopInfo.checked]) {
+        this.$message.error('未选择URL')
+        return
+      }
+      this.$copyText('rtmp://' + this.livePopInfo.mediaAddressWan).then(res => {
+        this.$message.success("复制成功")
+      }, res => {
+        this.$message.error("复制失败")
+      })
+    },
+    copyKey() {
+      if (!this.livePopInfo.urlList[this.livePopInfo.checked]) {
+        this.$message.error('未选择URL')
+        return
+      }
+      this.$copyText(this.livePopInfo.urlList[this.livePopInfo.checked].secretKey).then(res => {
+        this.$message.success("复制成功")
+      }, res => {
+        this.$message.error("复制失败")
+      })
+    },
+    createUrl() {
+      if (!this.livePopInfo.mediaAddressWan || !this.livePopInfo.mediaAddressLan) {
+        this.$message.warning('请先设置媒体服务器地址')
+        return
+      }
+      let that = this
+      that.$post(that.$uri.live.add).then(res => {
+        if (res.success) {
+          that.$message.success('生成成功')
+          that.getUrlList()
+        } else {
+          that.$message.error('生成失败')
+        }
+      })
+    },
+    delUrl() {
+      let that = this
+      that.$post(that.$uri.live.del, {id: that.livePopInfo.urlList[that.livePopInfo.checked].id}).then(res => {
+        if (res.success) {
+          that.$message.success('删除成功')
+          that.getUrlList()
+        } else {
+          that.$message.error('删除失败')
+        }
+      })
+    },
+    live() {
+      if (!this.livePopInfo.urlList[this.livePopInfo.checked]) {
+        this.$message.error('未选择URL')
+        return
+      }
+      let devs = []
+      if (this.viewMode) {
+        devs = this.multipleSelection
+      } else {
+        for (let i = 0; i < this.info.list.length; i++) {
+          if (this.test[i] === true) {
+            devs.push(this.info.list[i])
+          }
+        }
+      }
+      if (devs.length < 2) {
+        this.$message.warning('请选择2台以上的设备')
+        return
+      }
+      this.devSyncList = devs
+      this.liveSyncShow = true
+    },
+    checkUrl(id) {
+      this.livePopInfo.checked = id
+    },
+    changeLan() {
+      this.$confirm("媒体服务器内网地址修改后，原有地址将失效并自动将RTMP服务器更换为新的地址，请及时更换直播工具的RTMP服务器地址。", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.$post(that.$uri.system.paramSave, {
+          id: that.livePopInfo.mediaAddressLanId,
+          paramName: that.livePopInfo.mediaAddressLanName,
+          paramValue: that.livePopInfo.mediaAddressLanNew,
+        }).then(res => {
+          if (res.success) {
+            that.livePopInfo.mediaAddressLan = that.livePopInfo.mediaAddressLanNew
+            that.livePopInfo.mediaAddressLanSet = false
+          } else {
+            that.$message.error('修改失败')
+          }
+        })
+      }).catch( () => {})
+    },
+    changeWan() {
+      this.$confirm("媒体服务器外网地址修改后，原有地址将失效并自动将RTMP服务器更换为新的地址，请及时更换直播工具的RTMP服务器地址。", "提示", {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirm-btn-blue',
+        iconClass: 'el-icon-c-blue',
+        cancelButtonText: '取消'
+      }).then( () => {
+        let that = this
+        that.$post(that.$uri.system.paramSave, {
+          id: that.livePopInfo.mediaAddressWanId,
+          paramName: that.livePopInfo.mediaAddressWanName,
+          paramValue: that.livePopInfo.mediaAddressWanNew,
+        }).then(res => {
+          if (res.success) {
+            that.livePopInfo.mediaAddressWan = that.livePopInfo.mediaAddressWanNew
+            that.livePopInfo.mediaAddressWanSet = false
+          } else {
+            that.$message.error('修改失败')
+          }
+        })
+      }).catch( () => {})
+    },
     handleCurrentChange(row) {
       this.startStopAppid = row.appId
       this.startStopApp = row
@@ -431,6 +638,15 @@ export default {
     handleSyncClose(done) {
       let that = this
       this.$confirm('退出同步？')
+        .then(_ => {
+          that.devSyncList = []
+          done();
+        })
+        .catch(_ => {});
+    },
+    handleLiveSyncClose(done) {
+      let that = this
+      this.$confirm('退出多路直播？')
         .then(_ => {
           that.devSyncList = []
           done();
@@ -581,6 +797,36 @@ export default {
         that.$message.success("开始关闭IP代理...")
       }).catch( () => {})
 
+    },
+    liveManage () {
+      let that = this
+      that.$post(that.$uri.system.paramGet, {paramName: 'mediaServerLan'}).then(res => {
+        if (res.success) {
+          that.livePopInfo.mediaAddressLanId = res.data.id
+          that.livePopInfo.mediaAddressLan = res.data.paramValue
+          that.livePopInfo.mediaAddressLanName = res.data.paramName
+        }
+      })
+
+      that.$post(that.$uri.system.paramGet, {paramName: 'mediaServerWan'}).then(res => {
+        if (res.success) {
+          that.livePopInfo.mediaAddressWanId = res.data.id
+          that.livePopInfo.mediaAddressWan = res.data.paramValue
+          that.livePopInfo.mediaAddressWanName = res.data.paramName
+        }
+      })
+
+      this.getUrlList()
+      that.liveManagePopShow = true
+
+    },
+    getUrlList() {
+      let that = this
+      that.$post(that.$uri.live.list).then(res => {
+        if (res.success) {
+          that.livePopInfo.urlList = res.list
+        }
+      })
     },
     getGroupAppList() {
       let that = this
@@ -877,6 +1123,10 @@ export default {
     },
     */
     deviceWindowOpen (id, deviceNo, ip) {
+      if (!this.$isEnable(this.$enableKey.flowSync) && this.$store.state.deviceWindowMode.length > 0) {
+        return
+      }
+
       let hasSign = false
       this.$store.state.deviceWindowMode.forEach(mode => {
         if (id === mode.id) {

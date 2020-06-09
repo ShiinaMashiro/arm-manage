@@ -148,5 +148,12 @@ export const uri = {
       restore: '/deviceMasterLongene/restore/', //
       upload: '/deviceMasterLongene/upload/', //
       del: '/deviceMasterLongene/delete/', //
+    },
+    live: {
+        list: '/live/list/',
+        edit: '/live/edit/',
+        add: '/live/saveAdd/',
+        del: '/live/delete/',
+        start: '/live/start/',
     }
 }

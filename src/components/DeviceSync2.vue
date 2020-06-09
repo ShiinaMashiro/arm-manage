@@ -19,7 +19,7 @@
 </template>
 
 <script>
-  import DeviceWindow from '@/components/DeviceWindow2'
+  import DeviceWindow from '@/components/DeviceWindow2Live'
   import DeviceWindowImg from '@/components/DeviceWindow3'
   let that
   export default {
@@ -87,9 +87,6 @@
         that.syncList.forEach(dev => {
           ips.push(dev.deviceIp)
         })
-        let ipsStr = ips.join(',')
-        ips.push(that.devList[0].deviceIp)
-
         if (this.live){
           that.$post(that.$uri.live.start, {
             deviceIps: ips.join(','),
@@ -97,21 +94,11 @@
             secretKey: that.secretKey
           }).then(res => {
             if (res.success) {
-              that.$post(that.$uri.device.sync, {
-                deviceIpMain: that.devList[0].deviceIp,
-                deviceIps: ipsStr
-              }).then(res1 => {
-                if (res1.success) {
-                  this.syncData = res1.data
-                  that.syncSuccess = true
-                  that.snapshotOne()
-                } else {
-                  that.$message.error('多路直播请求失败')
-                  that.$emit('fail')
-                }
-              })
+              this.syncData = res.data
+              that.syncSuccess = true
+              that.snapshotOne()
             } else {
-              that.$message.error('多路直播请求失败')
+              that.$message.error('请求失败')
               that.$emit('fail')
             }
           })
@@ -130,7 +117,6 @@
             }
           })
         }
-
       },
       statusImg(status) {
         return status === 1 ? this.snapNotUpdate :
