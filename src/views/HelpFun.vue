@@ -7,7 +7,8 @@
     </div>
     <div class="help-fun-pdf">
       <span class="help-fun-pdf-title">龙境安卓云系统管理软件用户手册.pdf</span>
-      <el-button type="text" @click="pdfDownload">点击下载</el-button>
+      <!--<el-button type="text" @click="pdfDownload">点击下载</el-button>-->
+      <a style="font-size: 14px;color: #409EFF" target="_blank" href="https://lcloud.longene.com.cn/%E9%BE%99%E5%A2%83%E5%AE%89%E5%8D%93%E4%BA%91%E7%B3%BB%E7%BB%9F%E7%AE%A1%E7%90%86%E8%BD%AF%E4%BB%B6%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.pdf" download="龙境安卓云系统管理软件用户手册">下载</a>
     </div>
   </div>
 </template>

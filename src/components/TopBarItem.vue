@@ -5,8 +5,7 @@
       <UserInfo @change="changePasswordPop"></UserInfo>
     </template>
     <!-- 修改密码 -->
-    <Drawer title="重新分发" :visible.sync="changePasswordPopShow" @handClick="changePassword">
-    <!--<Drawer title="修改密码" :append-to-body="true" :visible.sync="changePasswordPopShow" width="500px" top="15vh">-->
+    <Drawer title="修改密码" :visible.sync="changePasswordPopShow" @handClick="changePassword">
       <div>
         <el-form ref="form" :model="changeInfo" label-width="130px" label-position="left">
           <el-form-item size="mini" label="原密码">

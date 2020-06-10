@@ -88,6 +88,7 @@
           ips.push(dev.deviceIp)
         })
         let ipsStr = ips.join(',')
+        console.log(ipsStr)
         ips.push(that.devList[0].deviceIp)
 
         if (this.live){
@@ -118,7 +119,7 @@
         } else {
           that.$post(that.$uri.device.sync, {
             deviceIpMain: that.devList[0].deviceIp,
-            deviceIps: ips.join(',')
+            deviceIps: ipsStr
           }).then(res => {
             if (res.success) {
               this.syncData = res.data

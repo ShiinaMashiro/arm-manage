@@ -296,7 +296,7 @@
     </el-drawer>
 
     <el-drawer
-            ref="sync"
+            ref="sync2"
             :visible.sync="liveSyncShow"
             :append-to-body="true"
             size="100%"
@@ -311,7 +311,7 @@
           <div style="margin-top: 5px">多路直播页面拥有云机同步的功能，如果视频卡顿丢帧，请控制视频文件大小或检查网络。</div>
         </div>
         <div style="flex-grow: 1;text-align: right">
-          <el-button type="primary" style="width: 80px" size="mini" @click="$refs.sync.closeDrawer()">退出</el-button>
+          <el-button type="primary" style="width: 80px" size="mini" @click="$refs.sync2.closeDrawer()">退出</el-button>
         </div>
       </div>
       <DeviceSync style="border-top: thin solid #ddd"
@@ -646,7 +646,7 @@ export default {
     },
     handleLiveSyncClose(done) {
       let that = this
-      this.$confirm('退出多路直播？')
+      this.$confirm('确定退出？')
         .then(_ => {
           that.devSyncList = []
           done();
