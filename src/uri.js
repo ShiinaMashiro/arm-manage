@@ -25,7 +25,9 @@ export const uri = {
         engineCodeChange: '/bmEngine/saveEdit', // 引擎编码修改
         engineCodeDelete: '/bmEngine/delete', // 引擎编码删除
         license: '/system/activateLicense/', // license激活接口
-        licenseGet: '/system/getLicense'
+        licenseGet: '/system/getLicense',
+        updateRecord: '/engine/record/',
+        updateRecordDetail: '/engine/record/device/'
     },
     user: { // 用户管理模块
         list: '/user/list', // 用户信息列表
@@ -66,6 +68,7 @@ export const uri = {
         sync: '/device/sync/', // 开关ADB
         startProxy: '/device/startProxy/', // 开关ADB
         stopProxy: '/device/stopProxy/', // 开关ADB
+        changeRemark: '/device/saveEdit'
     },
     apk: { // 应用模块管理
         apkList: '/apk/list', // 应用信息列表
@@ -97,6 +100,8 @@ export const uri = {
         dispatchLogDelete: '/log/deleteDispatch', // 调度日志删除
         groupLog: '/log/group', // 分组日志列表
         groupLogDelete: '/log/deleteGroup', // 分组日志删除
+        opsList: '/log/devops/', // 运维日志列表
+        opsDel: '/log/deleteDevops/', // 运维日志删除
     },
     help: { // 帮助中心
         faqList: '/faq/list', // FAQ信息列表

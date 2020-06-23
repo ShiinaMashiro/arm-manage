@@ -8,6 +8,73 @@ Vue.use(Vuex);
 
 const vm = new Vue()
 
+let busSideItems = [
+  {
+    src: "group",
+    name: "分组列表",
+    authorCode: "_09",
+    queryAuthor: "_0901_",
+    path: '/home/group/list',
+    sceneList: [
+      {
+        name: "组内设备",
+        path: "/home/group/dev",
+        author: "_0201_",
+        queryAuthor: "3_2-1",
+        updateAuthor: "3_3-0",
+      }, {
+        name: "应用管理",
+        path: "/home/group/app/manage",
+        author: "_0201_",
+        queryAuthor: "3_4-1",
+        updateAuthor: "3_4-0",
+      }
+    ]
+  },{
+    src: "app",
+    name: "应用列表",
+    authorCode: "_09",
+    queryAuthor: "_0901_",
+    path: '/home/app/list',
+    sceneList: [
+      {
+        name: "应用上传",
+        path: "/home/app/upload",
+        author: "_0301_"
+      },{
+        name: "应用详情",
+        path: "/home/app/detail",
+        author: "_0301_"
+      }, {
+        name: "所属分组",
+        path: "/home/app/group",
+        author: "_0301_"
+      }
+    ]
+  },{
+    src: "log",
+    name: "文件分发",
+    authorCode: "_09",
+    queryAuthor: "_0901_",
+    path: '/home/file/list',
+    sceneList: [
+      {
+        name: "新增文件",
+        path: "/home/file/add",
+        author: "_0201_",
+        queryAuthor: "4_1-1",
+        updateAuthor: "4_1-0",
+      }, {
+        name: "文件分发",
+        path: "/home/file/issue",
+        author: "_0201_",
+        queryAuthor: "4_2-1",
+        updateAuthor: "4_2-0",
+      }
+    ]
+  }
+]
+
 let sideItems = [
   {
     src: "overview",
@@ -181,6 +248,13 @@ let sideItems = [
         author: '_0501_',
         queryAuthor: "10-1",
         updateAuthor: "10-0",
+      },
+      {
+        name: "运维日志",
+        path: '/home/log/ops',
+        author: '_0501_',
+        queryAuthor: "0511-1",
+        updateAuthor: "0511-0",
       }
     ]
   }, {
@@ -247,6 +321,7 @@ const state = {
     authority: '_0000_,_0001_,_0100_,_0101_,_0200_,_0201_,_0300_,_0301_,_0400_,_0401_,_0500_,_0501_'
   },
   isAdmin: false,
+  isAdminRoot: false,
   caseInfo: {
     id: 0,
     caseNo: "",
@@ -280,6 +355,7 @@ const state = {
   sceneCheck: 0,
   sceneChildCheck: 0,
   sideItems: sideItems,
+  busSideItems: busSideItems,
   loginTimeout: false,
   logGroupId: '',
   groupDevShowMode: false, // true为列表，false为预览
@@ -310,7 +386,12 @@ const state = {
     deviceNum: 0,
     badNum: 0,
     streamNum: 0
-  }
+  },
+  ssh: {
+    start: false,
+    show: false,
+  },
+  loginNow: true
 }
 
 let admin = {
@@ -393,6 +474,12 @@ export default new Vuex.Store({
     },
     /* 查看设备池详情跳转时保存信息 */
     [mutation.CASE_DETAIL] (state, caseInfo) {
+      console.log(caseInfo)
+      for (let v in caseInfo) {
+        if (typeof v === "number") {
+          caseInfo[v] = v + ""
+        }
+      }
       state.caseInfo = caseInfo
       sessionStorage.setItem('caseInfo', JSON.stringify(caseInfo))
     },
@@ -508,6 +595,11 @@ export default new Vuex.Store({
       sessionStorage.setItem('sideInfo', JSON.stringify(sideInfo))
     },
     /* 设置用户管理员状态 */
+    [mutation.IS_ADMIN_ROOT] (state, isAdminRoot) {
+      state.isAdminRoot = isAdminRoot
+      sessionStorage.setItem('isAdminRoot', JSON.stringify(isAdminRoot))
+    },
+    /* 设置用户管理员状态 */
     [mutation.IS_ADMIN] (state, isAdmin) {
       state.isAdmin = isAdmin
       sessionStorage.setItem('isAdmin', JSON.stringify(isAdmin))
@@ -586,6 +678,20 @@ export default new Vuex.Store({
       // sessionStorage.setItem('licenseUpdate', JSON.stringify(licenseUpdate))
     },
     [mutation.ENABLE_DEV_MASTER] (state) {
+      if (!state.isAdmin) {
+        state.busSideItems[0].sceneList.push({
+          name: "备份管理",
+          path: '/home/group/devMaster',
+          author: '_0201_',
+        })
+        state.busSideItems[0].sceneList.push({
+          name: "新建备份",
+          path: '/home/group/devMaster/new',
+          author: '_0201_',
+        })
+        return
+      }
+
       state.sideItems[2].children.push({
         name: "备份管理",
         path: '/home/app/devMaster',
@@ -620,6 +726,13 @@ export default new Vuex.Store({
       state.devInfo = info
       sessionStorage.setItem('devInfo', JSON.stringify(info))
     },
+    [mutation.SSH_INFO] (state, ssh) {
+      state.ssh = ssh
+    },
+    [mutation.LOGIN_NOW] (state, loginNow) {
+      state.loginNow = loginNow
+      sessionStorage.setItem('loginNow', JSON.stringify(loginNow))
+    },
   },
   actions: {
     /* 登陆 */
@@ -631,10 +744,14 @@ export default new Vuex.Store({
         /*if (res.data.isFirstLogin == 1){
           commit(mutation.GUIDE, 1)
         }*/
-
-        commit(mutation.IS_ADMIN, res.data.groupId === 1)
-
-        router.push("/home")
+        commit(mutation.LOGIN_NOW, true)
+        commit(mutation.IS_ADMIN_ROOT, res.data.groupId === 1)
+        that.$post(that.$uri.user.groupInfo, {id: res.data.groupId}).then(res => {
+          if (res.success) {
+            commit(mutation.IS_ADMIN, res.data.groupType === 1)
+            router.push(res.data.groupType === 1 ? "/home" : '/home/group/list')
+          }
+        })
       })
     },
     /* 查看设备池详情 */
@@ -685,7 +802,7 @@ export default new Vuex.Store({
   getters: {
     /* 检查是否有当前模块的修改权限 */
     checkChangeAuth: (state) => () => {
-      if(state.isAdmin) {
+      if(state.isAdminRoot) {
         return true
       }
       let auth = 'oreki'
@@ -760,9 +877,21 @@ export default new Vuex.Store({
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
       let list = []
-      if (state.isAdmin) {
+      if (state.isAdminRoot) {
+        state.sideItems[5].children.push({
+          name: "SSH",
+          path: '/home/system/ssh',
+          author: '_0001_',
+          queryAuthor: "15-1",
+          updateAuthor: "15-0",
+        })
         return state.sideItems
       }
+
+      if (!state.isAdmin) {
+        return state.busSideItems
+      }
+
       state.sideItems.forEach(i => {
         if (state.userInfo.authority.indexOf(i.authorCode) !== -1) {
           list.push(i)

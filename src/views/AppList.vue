@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="$router.push('/home/app/upload')" v-if="$store.getters.checkChangeAuth()">新增/更新应用</el-button>
+        <el-button size="small" type="primary" @click="$router.push('/home/app/upload')" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin">新增/更新应用</el-button>
         <div @keyup.enter="getAppList">
           <el-input size="small" placeholder="输入应用名称/apk名称/APPID 搜索" v-model="searchInfo.appNameLike" style="width: 320px">
             <el-button slot="append" icon="el-icon-search" @click="getAppList"></el-button>
@@ -47,7 +47,7 @@
           <template slot-scope="scope">
             <el-button type="text" size="small" @click.stop="goDetail(scope.row)">编辑</el-button>
             <el-button type="text" size="small" @click.stop="goGroup(scope.row)">分组</el-button>
-            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" @click.stop="apkOffBatch(scope.row)">下架</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin" @click.stop="apkOffBatch(scope.row)">下架</el-button>
           </template>
         </el-table-column>
       </el-table>

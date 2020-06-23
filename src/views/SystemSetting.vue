@@ -4,9 +4,22 @@
       <div class="info-view-title">设备引擎升级</div>
       <div class="info-view-main">
         <span class="info-view-item" style="font-size: 12px">检查当前版本并对设备引擎进行升级</span>
+
+        <div class="info-view-item" style="align-items: flex-start;height: auto">
+          <span style="height: 30px;line-height: 30px">当前引擎版本：</span>
+          <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
+            <div style="display: flex;flex-direction: column;align-items: flex-start;">
+              <template v-for="(item, index) in engineList">
+                <span :key="index" style="height: 30px;display: flex;align-items: center">{{item.engineTypeName}} - {{item.versionCode}}</span>
+              </template>
+            </div>
+          </div>
+        </div>
+
         <div class="info-view-item-btn">
           <el-button size="small" type="primary" @click="engineUpdatePopShow = true" v-if="$store.getters.checkChangeAuth()">引擎升级</el-button>
           <el-button size="small" type="primary" @click="checkVersion()" v-if="$store.getters.checkChangeAuth()">版本检查</el-button>
+          <el-button size="small" type="primary" @click="engineUpdateRecordPop">升级记录</el-button>
         </div>
       </div>
     </div>
@@ -15,7 +28,7 @@
       <div class="info-view-main">
         <span class="info-view-item" style="font-size: 12px">设备引擎版本对应的引擎版本</span>
         <div class="info-view-item" style="align-items: flex-start;height: auto">
-          <span style="height: 30px;line-height: 30px">当前引擎版本：</span>
+          <span style="height: 30px;line-height: 30px">当前版本编码：</span>
           <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
             <div v-for="(version, index) in engineVersionList" :key="index" style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start;height: 30px">
               <span v-if="!enginePopShow">{{'引擎编码：' + version.code + '   引擎版本：' + version.content}}</span>
@@ -247,10 +260,83 @@
           <el-form-item size="mini" label="MD5" v-if="fileList.length">
             <el-input v-model="engineUpdateExtraInfo.md5"></el-input>
           </el-form-item>
-          <!--<el-form-item>
-            <el-button type="primary" :disabled="engineUploadTip" @click="submitUpload">确定</el-button>
-            <el-button @click="engineUploadPopClose">取消</el-button>
-          </el-form-item>-->
+        </el-form>
+      </div>
+    </Drawer>
+
+    <!-- 引擎升级记录 -->
+    <Drawer title="升级记录" :visible.sync="engineUpdateRecordPopShow" :opt="false">
+      <div v-if="engineUpdateRecordPopShow">
+        <el-form ref="form" size="mini" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
+          <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">当前引擎版本</div>
+          <div style="display: flex;flex-direction: column;justify-content: center;align-items: flex-start">
+            <div style="display: flex;flex-direction: column;align-items: flex-start;font-size: 14px;color: #606266">
+              <template v-for="(item, index) in engineList">
+                <span :key="index" style="height: 26px;display: flex;align-items: center">{{item.engineTypeName}} - {{item.versionCode}}</span>
+              </template>
+            </div>
+          </div>
+          <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
+          <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">升级记录</div>
+          <template v-for="record in updateRecordList">
+            <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime || formatDateTime}}</el-form-item>
+            <el-form-item label="升级版本：" style="margin-bottom: 8px!important;" label-width="90px">{{record.versionName}}</el-form-item>
+            <el-form-item label="升级文件：" style="margin-bottom: 8px!important;" label-width="90px">{{record.fileName}}</el-form-item>
+            <el-form-item label="升级详情：" style="margin-bottom: 8px!important;" label-width="90px">当前已升级{{record.upgradeNum}}路，
+              未升级<span style="color: red">{{record.notUpgradeNum}}</span>路。
+              <el-button type="text" size="mini" style="margin-left: 10px;display: inline" @click="engineUpdateRecordDetailPop(record)">查看详情</el-button>
+            </el-form-item>
+            <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
+          </template>
+
+        </el-form>
+      </div>
+    </Drawer>
+
+    <!-- 引擎升级记录详情 -->
+    <Drawer title="升级记录详情" :visible.sync="engineUpdateRecordDetailPopShow" :opt="false">
+      <div v-if="engineUpdateRecordDetailPopShow">
+        <el-form ref="form" size="mini" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
+          <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime || formatDateTime}}</el-form-item>
+          <el-form-item label="升级版本：" style="margin-bottom: 8px!important;" label-width="90px">{{record.versionName}}</el-form-item>
+          <el-form-item label="升级文件：" style="margin-bottom: 8px!important;" label-width="90px">{{record.fileName}}</el-form-item>
+          <el-form-item label="升级详情：" style="margin-bottom: 8px!important;" label-width="90px">当前已升级{{record.upgradeNum}}路，
+            未升级<span style="color: red">{{record.notUpgradeNum}}</span>路。
+          </el-form-item>
+          <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
+          <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">未升级设备</div>
+          <div style="display: flex;justify-content: stretch;font-size: 14px;color: #606266">
+            <div style="width: 25%">设备池ID</div>
+            <div style="width: 20%">槽位号</div>
+            <div style="width: 30%">设备IP</div>
+            <div style="width: 25%">所属分组</div>
+          </div>
+          <div style="display: flex;justify-content: stretch;font-size: 14px;padding: 2px 0" v-for="detail in detailNotUpdateList">
+            <div style="width: 25%">{{detail.caseNo}}</div>
+            <div style="width: 20%">{{detail.slotNo}}</div>
+            <div style="width: 30%">{{detail.deviceIp}}</div>
+            <div style="width: 25%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis">{{detail.groupName}}</div>
+          </div>
+          <el-button type="text" size="mini" style="text-align: left;margin-top: 5px" @click="completeShow = !completeShow">{{completeShow ? '&#9650点击收起已升级设备列表' : '&#9660点击查看已升级设备列表'}}</el-button>
+          <transition name="el-zoom-in-top">
+            <div v-show="completeShow">
+              <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">已升级设备</div>
+              <div style="display: flex;justify-content: stretch;font-size: 14px;color: #606266">
+                <div style="width: 25%">设备池ID</div>
+                <div style="width: 20%">槽位号</div>
+                <div style="width: 30%">设备IP</div>
+                <div style="width: 25%">所属分组</div>
+              </div>
+              <div style="display: flex;justify-content: stretch;font-size: 14px;padding: 2px 0" v-for="detail in detailUpdateList">
+                <div style="width: 25%">{{detail.caseNo}}</div>
+                <div style="width: 20%">{{detail.slotNo}}</div>
+                <div style="width: 30%">{{detail.deviceIp}}</div>
+                <div style="width: 25%;overflow: hidden;white-space: nowrap;text-overflow: ellipsis">{{detail.groupName}}</div>
+              </div>
+            </div>
+          </transition>
+
+
         </el-form>
       </div>
     </Drawer>
@@ -333,7 +419,13 @@
           md5: ""
         },
         systemUpdatePopShow: false,
-        fileList: []
+        fileList: [],
+        engineUpdateRecordPopShow: false,
+        updateRecordList: [],
+        updateRecordDetail: [],
+        engineUpdateRecordDetailPopShow: false,
+        record: null,
+        completeShow: false
       }
     },
     computed: {
@@ -347,6 +439,16 @@
         })
         console.log("dddsdfadf")
         return list
+      },
+      detailUpdateList() {
+        return this.updateRecordDetail.filter(d => {
+          return d.isUpgrade > 0
+        })
+      },
+      detailNotUpdateList() {
+        return this.updateRecordDetail.filter(d => {
+          return d.isUpgrade === 0
+        })
       },
     },
     watch: {
@@ -513,6 +615,26 @@
             that.$message.success("设备版本检查成功")
           })
         }).catch( () => {})
+      },
+      engineUpdateRecordPop() {
+        let that = this
+        that.$post(that.$uri.system.updateRecord).then(res => {
+          if (res.success) {
+            that.updateRecordList = res.list
+            that.engineUpdateRecordPopShow = true
+          }
+        })
+      },
+      engineUpdateRecordDetailPop(record) {
+        let that = this
+        that.$post(that.$uri.system.updateRecordDetail).then(res => {
+          if (res.success) {
+            that.updateRecordDetail = res.list
+            that.record = record
+            that.completeShow = false
+            that.engineUpdateRecordDetailPopShow = true
+          }
+        })
       },
       deleteVersion(index) {
         let that = this
@@ -786,6 +908,22 @@
         justify-content: flex-start;
         align-items: flex-start;
         padding: 5px 0;
+      }
+    }
+  }
+
+  .engine-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    .engine-version {
+      display: flex;
+      flex-direction: column;
+      padding: 0 10px;
+      span {
+        color: #333;
+        font-size: 12px;
       }
     }
   }

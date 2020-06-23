@@ -1,6 +1,6 @@
 <template>
   <div class="nav-list-item" :style="checkStyle" @click="check">
-    <span><span v-if="back">< 返回</span>{{item.name}}</span>
+    <span><span v-if="back">< </span>{{item.name}}</span>
     <span style="color: #888" v-if="!back">></span>
   </div>
 </template>
@@ -10,7 +10,8 @@ export default {
   name: "MainSceneItem",
   props: {
     item: Object,
-    back: Boolean
+    back: Boolean,
+    clickHandle: Function
   },
   data () {
     return {
@@ -24,7 +25,9 @@ export default {
   },
   methods: {
     check () {
-      this.$router.push(this.item.path)
+      this.clickHandle
+      ? this.clickHandle()
+      : this.$router.push(this.item.path)
     }
   }
 };

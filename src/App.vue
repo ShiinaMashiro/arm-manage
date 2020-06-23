@@ -77,6 +77,10 @@ textarea::-webkit-scrollbar {display:none}
   color: #409EFF;
 }
 
+.el-popover {
+  min-width: 100px!important;
+}
+
 .el-pager li.active {
   color: black!important;
 }
@@ -143,4 +147,52 @@ textarea::-webkit-scrollbar {display:none}
   content: "\e7a3";
   color: #F46C6C;
 }
+
+  /* ssh */
+#ssh{
+  .el-tabs__header {
+    margin-bottom: 0!important;
+  }
+  .el-tabs__content {
+    flex-grow: 1;
+  }
+  .el-tabs__item {
+    height: auto!important;
+    line-height: normal!important;
+    color: white!important;
+    font-size: 13px!important;
+  }
+  .el-tabs--card>.el-tabs__header .el-tabs__nav{
+    border-radius: 0!important;
+    border-left: 0.5px solid #E4E7ED!important;
+    border-right: 0.5px solid #E4E7ED!important;
+    border-top: 0.5px solid #E4E7ED!important;
+  }
+  .el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
+    border-bottom: 0.5px solid #000!important;
+    background-color: #000;
+  }
+  .el-tabs__nav-wrap {
+    /*margin-bottom: -0.5px!important;*/
+  }
+  .el-tabs--card>.el-tabs__header {
+    border-bottom: 0.5px solid #E4E7ED!important;
+  }
+}
+
+  .snapshot-main-head {
+    .el-checkbox {
+      display: flex;
+      align-items: center;
+    }
+    .el-checkbox__label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 5px!important;
+    }
+    .el-checkbox__input {
+      display: flex;
+      align-items: center;
+    }
+  }
 </style>

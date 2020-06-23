@@ -200,6 +200,13 @@ export default new Router({
             changeAuth: "_0500_"
           }
         }, {
+          path: "log/ops",
+          name: "运维日志",
+          component: () => import('./views/LogOps.vue'),
+          meta: {
+            changeAuth: "_0500_"
+          }
+        }, {
           path: "group/list",
           name: "分组列表",
           component: GroupList,
@@ -310,6 +317,13 @@ export default new Router({
           path: "system/ipproxy",
           name: "IP代理",
           component: IpPorxy,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "system/ssh",
+          name: "SSH",
+          component: () => import('./views/SSH.vue'),
           meta: {
             changeAuth: "_0000_"
           }

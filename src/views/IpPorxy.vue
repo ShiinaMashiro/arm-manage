@@ -11,18 +11,26 @@
     <div v-if="info.success" class="device-case border-all">
       <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" stripe size="mini"
                 tooltip-effect="dark" style="width: 100%">
-        <el-table-column prop="id" label="ID"></el-table-column>
-        <el-table-column prop="name" label="名称"></el-table-column>
+        <el-table-column prop="id" label="ID" width="50px"></el-table-column>
+        <el-table-column prop="name" label="名称" min-width="100px"></el-table-column>
         <el-table-column prop="ip" label="IP"></el-table-column>
         <el-table-column prop="dns" label="DNS"></el-table-column>
         <el-table-column prop="gateway" label="网关"></el-table-column>
         <el-table-column prop="port" label="端口"></el-table-column>
         <el-table-column prop="connectionMax" label="最大连接数"></el-table-column>
         <el-table-column prop="connectionLast" label="剩余连接数"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="状态" width="80px">
           <template slot-scope="scope">
-            <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
+            {{scope.row.isUsable === 1 ? '可用' : '不可用'}}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180px">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click.stop="scope.row.isUsable === 1 ? changeIpStatusPop(scope.row) : changeIpStatus(scope.row)" v-if="$store.getters.checkChangeAuth()">{{scope.row.isUsable === 1 ? '禁用' : '启用'}}</el-button>
             <el-button type="text" size="small" @click.stop="edit(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="connectionPop(scope.row)"
+                       :disabled="!scope.row.isUsable || scope.row.connectionLast === scope.row.connectionMax"
+                       v-if="$store.getters.checkChangeAuth()">管理连接</el-button>
             <el-button type="text" size="small" @click.stop="deleteIp(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
         </el-table-column>
@@ -49,10 +57,10 @@
             <el-input size="mini" v-model="addIpInfo.name"></el-input>
           </el-form-item>
           <el-form-item size="mini" label="IP地址">
-              <el-input size="mini" v-model="addIpInfo.ip"></el-input>
+            <el-input size="mini" v-model="addIpInfo.ip"></el-input>
           </el-form-item>
           <el-form-item size="mini" label="DNS">
-              <el-input size="mini" v-model="addIpInfo.dns"></el-input>
+            <el-input size="mini" v-model="addIpInfo.dns"></el-input>
           </el-form-item>
           <el-form-item size="mini" label="网关">
             <el-input size="mini" v-model="addIpInfo.gateway"></el-input>
@@ -133,6 +141,52 @@
         </el-form>
       </div>
     </Drawer>
+
+    <Drawer title="连接管理" :visible.sync="connectionPopShow">
+      <div v-if="connectionPopShow">
+        <el-form ref="form" label-position="left" size="mini">
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="IP名称：">{{connectionRow.name}}</el-form-item>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="IP：">{{connectionRow.ip}}</el-form-item>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="DNS：">{{connectionRow.dns}}</el-form-item>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="网关：">{{connectionRow.gateway}}</el-form-item>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="端口：">{{connectionRow.port}}</el-form-item>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="最大连接数：">{{connectionRow.connectionMax}}</el-form-item>
+          <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
+          <el-form-item size="mini" style="margin-bottom: 8px!important;" label="已连接设备：">{{devList.length}}</el-form-item>
+          <div style="display: flex;justify-content: stretch;font-size: 14px;color: #606266">
+            <div style="width: 35%">设备IP</div>
+            <div style="width: 35%">分组名</div>
+            <div style="width: 30%">操作</div>
+          </div>
+          <div style="display: flex;justify-content: stretch;font-size: 14px;padding: 2px 0" v-for="dev in devList">
+            <div style="width: 35%">{{dev.deviceIp}}</div>
+            <div style="width: 35%">{{dev.groupName}}</div>
+            <div style="width: 30%"><el-button type="text" size="mini" @click="stopProxy(dev.deviceIp)">断开</el-button></div>
+          </div>
+        </el-form>
+      </div>
+    </Drawer>
+
+    <el-dialog
+            title="禁用IP"
+            :visible.sync="popShow"
+            width="450px"
+            :modal="true"
+            :append-to-body="true">
+      <div style="display: flex;margin-top: -20px">
+        <i class="el-icon-warning" style="color: red;font-size: 28px;padding: 20px 5px"></i>
+        <div style="font-size: 13px;flex-grow: 1">
+          <div>禁用IP后新设备将无法切换至该IP，已有连接可根据下方选项决定是否断开，确认禁用？</div>
+          <div style="color: red;font-size: 12px">仅禁用：已连接设备不断开，禁用IP，新设备无法连接该IP。</div>
+          <div style="color: red;font-size: 12px">断开并禁用：断开所有已连接设备，禁用IP，新设备无法连接该IP。</div>
+          <div style="display: flex;justify-content: flex-end;margin-top: 20px">
+            <el-button type="danger" size="mini" @click="changeIpStatus">仅禁用</el-button>
+            <el-button type="danger" size="mini" @click="changeIpStatusAndStop">断开并禁用</el-button>
+            <el-button size="mini" @click="closePop()">取消</el-button>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -173,7 +227,12 @@
           issuePath: '/system/bin/',
           deviceIps: '',
         },
-        fileList: []
+        fileList: [],
+        row: null,
+        popShow: false,
+        connectionPopShow: false,
+        connectionRow: null,
+        devList: []
       }
     },
     computed: {
@@ -296,6 +355,33 @@
         this.changeIpInfo = row
         this.changeIpPopShow = true
       },
+      connectionPop(row) {
+        this.connectionRow = row
+        let that = this
+        that.$post(that.$uri.device.deviceList, {proxyId: row.id}).then(res => {
+          if (res.success) {
+            that.devList = res.list
+            that.connectionPopShow = true
+          } else {
+            that.$message('数据获取异常')
+          }
+        })
+      },
+      stopProxy(deviceIp) {
+        let that = this
+        that.$post(that.$uri.device.stopProxy, {deviceIp}).then(res => {
+          if (res.success) {
+            that.$message.success('断开成功')
+            that.$post(that.$uri.device.deviceList, {proxyId: that.connectionRow.id}).then(res => {
+              if (res.success) {
+                that.devList = res.list
+              }
+            })
+          } else {
+            that.$message.error('断开失败')
+          }
+        })
+      },
       addIp() {
         let that = this
         that.$post(that.$uri.ipProxy.add, that.addIpInfo).then(res => {
@@ -318,6 +404,56 @@
           } else {
             that.$message.error(res.msg)
           }
+        })
+      },
+      changeIpStatusPop(row) {
+        this.popShow = true
+        this.row = row
+      },
+      closePop() {
+        this.popShow = false
+      },
+      changeIpStatus(r) {
+        let loading = this.$loading()
+        let that = this
+        let row = this.row || r
+        let info = {...row}
+        info.isUsable = row.isUsable === 1 ? 0 : 1
+        that.$post(that.$uri.ipProxy.save, info).then(res => {
+          if (res.success) {
+            that.$message.success((row.isUsable === 1 ? '禁用' : '启用') + "成功")
+            that.getIpList()
+          } else {
+            that.$message.error(res.msg)
+          }
+        }).finally(() => {
+          that.popShow = false
+          loading.close()
+        })
+      },
+      async changeIpStatusAndStop() {
+        let loading = this.$loading()
+        let that = this
+        let row = this.row
+        let info = {...row}
+        info.isUsable = row.isUsable === 1 ? 0 : 1
+        let devData = await that.$post(that.$uri.device.deviceList, {proxyId: row.id})
+        console.log(devData)
+        if (devData.success) {
+          devData.list.forEach(dev => {
+            that.$post(that.$uri.device.stopProxy, {deviceIp: dev.deviceIp}).then(res => {}).catch(() => {})
+          })
+        }
+        that.$post(that.$uri.ipProxy.save, info).then(res => {
+          if (res.success) {
+            that.$message.success((row.isUsable === 1 ? '禁用' : '启用') + "成功")
+            that.getIpList()
+          } else {
+            that.$message.error(res.msg)
+          }
+        }).finally(() => {
+          that.popShow = false
+          loading.close()
         })
       }
     },

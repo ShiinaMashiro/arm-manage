@@ -22,7 +22,7 @@
         </el-checkbox-group>
       </el-card>
     </div>
-    <el-button type="primary" size="small" style="width: 100px;margin-top: 30px" @click="backupPop" v-if="$store.getters.checkChangeAuth()">备份</el-button>
+    <el-button type="primary" size="small" style="width: 100px;margin-top: 30px" @click="backupPop" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin">备份</el-button>
     <Drawer title="备份确认" :visible.sync="backupPopShow" @handClick="backup">
       <div style="font-size: 12px" v-if="remark">
         <el-form ref="form" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">

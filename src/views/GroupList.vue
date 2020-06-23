@@ -2,7 +2,8 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="addGroupPopShow = true" v-if="$store.getters.checkChangeAuth()">新增分组</el-button>
+        <el-button size="small" type="primary" @click="addGroupPopShow = true" v-if="$store.getters.checkChangeAuth() && $store.state.isAdmin">新增分组</el-button>
+        <div></div>
         <div @keyup.enter="getGroupList">
           <el-input size="small" placeholder="输入分组名称 搜索" v-model="searchInfo.groupNameLike" style="width: 230px">
             <el-button slot="append" icon="el-icon-search" @click="getGroupList"></el-button>
@@ -22,14 +23,14 @@
         <el-table-column prop="appNum" label="组内应用数量"></el-table-column>
         <el-table-column label="操作" min-width="200px">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click.stop="manage(scope.row)" v-if="$store.getters.checkChangeAuth()">增减设备</el-button>
+            <el-button type="text" size="small" @click.stop="manage(scope.row)" v-if="$store.getters.checkChangeAuth() && $store.state.isAdmin">增减设备</el-button>
             <el-button type="text" size="small" @click.stop="goGroupDev(scope.row)">组内设备</el-button>
             <el-button type="text" size="small" @click.stop="goAppManage(scope.row)">应用管理</el-button>
-            <el-button type="text" size="small" @click.stop="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
+            <el-button type="text" size="small" @click.stop="confirmChangeGroupName(scope.row)" v-if="$store.getters.checkChangeAuth() && $store.state.isAdmin">编辑</el-button>
             <!--<el-button type="text" size="small" @click="uploadFilePop(scope.row.id)" v-if="$store.getters.checkChangeAuth()">上传文件</el-button>-->
             <!--<el-button type="text" size="small" @click.stop="changeGroupAuthPop(scope.row)" v-if="$store.getters.checkChangeAuth()">权限控制</el-button>-->
-            <el-button type="text" size="small" @click.stop="goLog(scope.row)" v-if="$store.getters.checkChangeAuth()">日志监控</el-button>
-            <el-button type="text" size="small" @click.stop="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
+            <el-button type="text" size="small" @click.stop="goLog(scope.row)" v-if="$store.getters.checkChangeAuth() && $store.state.isAdmin">日志监控</el-button>
+            <el-button type="text" size="small" @click.stop="deleteDev(scope.row.id)" v-if="$store.getters.checkChangeAuth() && $store.state.isAdmin">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -220,6 +221,12 @@ export default {
       let that = this
       that.$post(that.$uri.group.list, {...that.page, ...that.searchInfo}).then(res => {
         that.info = res
+        if (!that.$store.state.isAdmin && that.$store.state.loginNow) {
+          that.$store.commit(that.$mutation.LOGIN_NOW, false)
+          if (res.list.length === 1) {
+            that.goGroupDev(that.info.list[0])
+          }
+        }
       })
     },
     /* 当前页改变 */

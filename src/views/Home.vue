@@ -92,6 +92,19 @@
         </el-form>
       </div>
     </Drawer>
+
+    <div id="ssh" class="ssh" v-show="$store.state.ssh.show">
+      <el-tabs v-model="ssh.activeName" type="card"
+               @tab-click="handleSshClick"
+               @tab-remove="removeSsh"
+               style="height: 100%;display: flex;flex-direction: column">
+        <el-tab-pane v-for="tab in ssh.tabs" :key="tab.name" :label="tab.title" :name="tab.name"
+                     :closable="tab.closable" :disabled="tab.disabled" style="height: 100%">
+          <iframe v-if="tab.closable && $store.state.ssh.start" class="ssh-console" :ref="'term-' + tab.name" :id="'term-' + tab.name" :src="'http://' + $store.state.webIp + '/ssh/host/127.0.0.1?name=' + tab.name"></iframe>
+        </el-tab-pane>
+
+      </el-tabs>
+    </div>
   </div>
 </template>
 
@@ -114,7 +127,7 @@ export default {
     UserInfo,
     DeviceWindow,
     MainScene,
-    Drawer
+    Drawer,
   },
   data() {
     return {
@@ -133,6 +146,23 @@ export default {
         ntpAddress: {},
         mediaServerLan: {},
         mediaServerWan: {},
+      },
+      ssh: {
+        activeName: '1',
+        tabs: [
+          {
+            title: '调试窗口1',
+            name: '1',
+            closable: true,
+            disabled: false
+          },{
+            title: '+',
+            name: '+',
+            closable: false,
+            disabled: false
+          }
+        ],
+        index: 1
       }
     }
   },
@@ -165,6 +195,31 @@ export default {
     }
   },
   methods: {
+    handleSshClick(tab, event) {
+      if (tab.name === '+'){
+        this.ssh.tabs.splice(this.ssh.tabs.length - 1, 0, {
+          title: '调试窗口' + ++this.ssh.index,
+          name: '' + this.ssh.index,
+          closable: true,
+          disabled: false
+        })
+        this.ssh.activeName = '' + this.ssh.index
+      }
+    },
+    removeSsh(name) {
+      let acName = this.ssh.activeName
+      if (acName === name) {
+        this.ssh.tabs.forEach((tab, index) => {
+          if (tab.name === name) {
+            let temp = this.ssh.tabs[index - 1] || this.ssh.tabs[index + 1]
+            if (temp) {
+              this.ssh.activeName = temp.name
+            }
+          }
+        })
+      }
+      this.ssh.tabs = this.ssh.tabs.filter(tab => tab.name !== name)
+    },
     startUse() {
       this.licenseResult = false
       this.$router.go(0)
@@ -188,8 +243,19 @@ export default {
         child: null,
         scene: null
       }
-      let sideItems = this.$store.state.sideItems
+      let sideItems = this.$store.state.isAdmin ? this.$store.state.sideItems : this.$store.state.busSideItems
+      let sign = false
       for (let item of sideItems) {
+        if (sign) {
+          break
+        }
+
+        if (item.path === path) {
+          sign = true
+          sideInfo.item = item
+          break
+        }
+
         if (item.children) {
           for (let child of item.children) {
             if (child.path === path) {
@@ -204,11 +270,22 @@ export default {
                   sideInfo.item = item
                   sideInfo.child = child
                   sideInfo.scene = scene
+                  break
                 }
               }
             }
           }
-        } else {
+        } else if (item.sceneList) {
+          for (let scene of item.sceneList) {
+            if (scene.path === path) {
+              sideInfo.item = item
+              sideInfo.child = item
+              sideInfo.scene = scene
+              sign = true
+              break
+            }
+          }
+        }else {
           sideInfo.item = item
         }
       }
@@ -265,6 +342,8 @@ export default {
     }*/
     this.sideInit(to)
     console.log('home update')
+    console.log(this.$store.state.busSideItems)
+    console.log(this.$store.state.sideInfo)
     console.log(to.path)
     let page = this.$store.getters.isChildren(to.path)
     console.log(page)
@@ -277,6 +356,16 @@ export default {
 </script>
 
 <style scoped lang="less">
+  .ssh {
+    position: fixed;
+    top: 50px;
+    left: 220px;
+    right: 0;
+    bottom: 0;
+    background-color: #333333;
+    border: none;
+    padding-bottom: 3px;
+  }
 .home {
   .home-main-top-bar-fixed {
     margin: 0 10px;
@@ -310,4 +399,10 @@ export default {
     right: 0;
     z-index: 1055;
   }
+  .ssh-console {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
 </style>

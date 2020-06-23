@@ -11,6 +11,15 @@ module.exports = {
   devServer: {
     proxy: "http://10.3.10.71"
     // proxy: "http://10.3.10.99"
+    /*proxy: {
+      '/ssh/host': {
+        target: 'http://10.3.10.71:2222',
+        ws: true
+      },
+      '/': {
+        target: 'http://10.3.10.71'
+      }
+    }*/
   },
   assetsDir: "assets",
 }

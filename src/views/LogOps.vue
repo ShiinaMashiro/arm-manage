@@ -2,59 +2,41 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-date-picker
-                v-model="dateValue"
-                type="datetimerange"
-                size="small"
-                :picker-options="pickerOptions"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                @change="getLogList"
-                align="right">
-        </el-date-picker>
-        <div @keyup.enter="getLogList">
-          <el-input size="small" placeholder="输入设备IP 搜索" v-model="searchInfo.deviceIp" style="width: 320px">
-            <el-button slot="append" icon="el-icon-search" @click="getLogList"></el-button>
-          </el-input>
-        </div>
-      </div>
-      <div class="search-advanced" v-show="advancedShow">
-        <div class="search-main">
+        <div style="display: flex;flex-direction: row">
           <div class="search-main-item">
-            <span>选择日期:</span>
+            <!--<span>选择日期:</span>-->
             <el-date-picker
                     v-model="dateValue"
                     type="datetimerange"
-                    size="mini"
+                    size="small"
                     :picker-options="pickerOptions"
                     range-separator="至"
                     start-placeholder="开始日期"
                     end-placeholder="结束日期"
+                    @change="getLogList"
                     align="right">
             </el-date-picker>
           </div>
-          <div class="search-main-item">
-            <span>设备IP:</span>
-            <div class="item-input">
-              <el-input v-model="searchInfo.deviceIp" size="mini"></el-input>
-            </div>
+          <div class="search-main-item" style="margin-left: 20px">
+            <el-select size="small" v-model="searchInfo.operationId" @change="getLogList" placeholder="操作原因">
+              <el-option label="跨版重启" :value="1"></el-option>
+            </el-select>
           </div>
         </div>
-        <div class="search-btn">
-          <!--<el-button size="mini" @click="advancedShow = false">取消</el-button>-->
-          <el-button type="primary" size="mini" @click="getLogList">搜索</el-button>
+        <div @keyup.enter="getLogList">
+          <el-input size="small" placeholder="输入设备IP 搜索" v-model="searchInfo.queryParam" style="width: 320px">
+            <el-button slot="append" icon="el-icon-search" @click="getLogList"></el-button>
+          </el-input>
         </div>
       </div>
     </div>
     <div class="device-case-dev border-all">
-      <el-table ref="multipleTable" :data="info.list" :header-cell-style="{backgroundColor: '#efefef'}" size="mini" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" :data="info.list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" align="center" header-align="center"></el-table-column>
         <el-table-column type="index"></el-table-column>
-        <el-table-column prop="terminal" label="终端信息"></el-table-column>
-        <el-table-column prop="deviceName" label="设备信息"></el-table-column>
-        <el-table-column prop="deviceIp" label="设备IP"></el-table-column>
-        <el-table-column prop="remark" label="操作内容" min-width="150px"></el-table-column>
+        <el-table-column prop="deviceIp" label="设备IP" min-width="80px"></el-table-column>
+        <el-table-column prop="content" label="操作内容" min-width="80px"></el-table-column>
+        <!--<el-table-column prop="operationId" label="操作原因" min-width="80px"></el-table-column>-->
         <el-table-column label="操作时间">
           <template slot-scope="scope">
             {{scope.row.updateTime | formatDateTime}}
@@ -87,7 +69,7 @@
 
 <script>
   export default {
-    name: "LogDispatch",
+    name: "LogOps",
     data () {
       return {
         info: {
@@ -138,10 +120,12 @@
         dateValue: [new Date(new Date() - 3600 * 1000 * 24), new Date()],
         advancedShow: false,
         searchInfo: {
-          deviceIp: "",
+          groupNameLike: "",
+          operationId: "",
           updateTimeFrom: "",
-          updateTimeTo: ""
-        }
+          updateTimeTo: "",
+          queryParam: ""
+        },
       }
     },
     methods: {
@@ -154,7 +138,7 @@
         let that = this
         that.searchInfo.updateTimeFrom = that.$util.formatDate(that.dateValue[0])
         that.searchInfo.updateTimeTo = that.$util.formatDate(that.dateValue[1])
-        that.$post(that.$uri.log.dispatchLog, {...that.page, ...that.searchInfo}).then(res => {
+        that.$post(that.$uri.log.opsList, {...that.page, ...that.searchInfo}).then(res => {
           that.info = res
         })
       },
@@ -176,7 +160,7 @@
       /* 删除设备池 */
       async deleteCase (id) {
         let that = this
-        await that.$post(that.$uri.log.dispatchLogDelete, {id})
+        await that.$post(that.$uri.log.groupLogDelete, {id})
       },
       /* 批量删除设备池 */
       deleteCaseBatch () {
@@ -203,14 +187,18 @@
           cancelButtonText: '取消'
         }).then( () => {
           let that = this
-          that.$post(that.$uri.log.dispatchLogDelete, {id}).then(res => {
+          that.$post(that.$uri.log.opsDel, {id}).then(res => {
             that.$message.success("删除成功")
             that.getLogList()
           })
         }).catch( () => {})
-      }
+      },
     },
     mounted () {
+      if (this.$store.state.logGroupId != '') {
+        this.searchInfo.groupNameLike = this.$store.state.logGroupId
+        this.$store.commit(this.$mutation.LOG_GROUP_ID, '')
+      }
       this.getLogList()
     }
   };

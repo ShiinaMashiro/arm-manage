@@ -23,7 +23,15 @@
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipStartPop()">切换IP</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
         <el-button v-if="$isEnable($enableKey.live)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="liveManage()">多路直播</el-button>
+        <el-select size="small" v-model="snapshotTime" placeholder="请选择" style="margin-left: 10px;width: 100px">
+          <el-option label="不刷新" :value="0"></el-option>
+          <el-option label="10秒" :value="10"></el-option>
+          <el-option label="20秒" :value="20"></el-option>
+          <el-option label="30秒" :value="30"></el-option>
+          <el-option label="60秒" :value="60"></el-option>
+        </el-select>
       </div>
+
       <div class="preview-bar-operate" v-if="false">
         <div style="padding: 0 10px 0 0; margin-right: 10px">
           <el-button type="primary" size="small" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
@@ -36,7 +44,14 @@
         <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
       </div>
     </div>
-    <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 70px">
+
+    <div @keyup.enter="changeMode($store.state.groupDevShowMode)"  style="margin-top: 70px;text-align: left">
+      <el-input size="mini" placeholder="输入云机IP/备注操作 搜索" v-model="queryParam" style="width: 320px">
+        <el-button slot="append" icon="el-icon-search" @click="changeMode($store.state.groupDevShowMode)"></el-button>
+      </el-input>
+    </div>
+
+    <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 20px">
       <el-table ref="multipleTable" :data="info.list" size="mini" :header-cell-style="{backgroundColor: '#efefef'}" :row-key="rowKey" @row-click="checkRow" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
         <el-table-column type="selection" align="center" header-align="center" :selectable="isCommonCard"></el-table-column>
         <el-table-column prop="id" label="ID" min-width="50px">
@@ -56,21 +71,22 @@
           </span>
           </template>
         </el-table-column>
-        <el-table-column prop="groupName" label="分组"></el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column prop="disk" label="空间">
           <template slot-scope="scope">
             {{scope.row.disk}}/{{scope.row.diskSd}}
           </template>
         </el-table-column>
-        <el-table-column min-width="120px" label="操作">
+        <el-table-column min-width="150px" label="操作">
           <template slot-scope="scope">
-            <!--<el-button type="text" size="small" :disabled="scope.row.isDistributed === 0" @click="recoverDev(scope.row.deviceIp)">回收</el-button>-->
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" @click="initDev(scope.row.deviceIp)"
-                       v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">恢复出厂</el-button>
+                       v-if="($store.getters.checkChangeAuth() || !$store.state.isAdmin) && scope.row.cardType !== 2">恢复出厂</el-button>
             <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
                        v-if="$store.state.isAdmin && scope.row.cardType !== 2">分组</el-button>
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
-                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"  v-if="$store.getters.checkChangeAuth() && scope.row.cardType !== 2">控制</el-button>
+                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"
+                       v-if="($store.getters.checkChangeAuth() || !$store.state.isAdmin) && scope.row.cardType !== 2">控制</el-button>
+            <el-button type="text" size="mini" @click="changeRemarkPop(scope.row.id, scope.row.remark)">修改备注</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -129,13 +145,13 @@
         </div>
       </Drawer>
     </div>
-    <div class="preview-main" v-else  style="margin-top: 70px;">
+    <div class="preview-main" v-else  style="margin-top: 0px;">
       <template v-for="(item, index) in info.list">
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #f6f6f6'}">
           <el-tooltip class="item" effect="dark" :content="$isEnable($enableKey.adb) ? (item.deviceIp + ' adb端口：' + adbPortFilter(item)) : item.deviceIp" placement="top-start">
-          <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between" class="snapshot-main-head">
-            <el-checkbox v-model="test[index]" @change="itemCheckedChange" style="flex-grow: 1">
-                <span>{{item.id}}</span>
+          <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between;" class="snapshot-main-head">
+            <el-checkbox v-model="test[index]"  @change="itemCheckedChange" style="flex-grow: 1;width: 50px;overflow: hidden; white-space: nowrap;">
+                <span style="font-size: 11px;overflow: hidden;width: 100%">{{item.remark || item.id}}</span>
             </el-checkbox>
             <span :style="item | statusClassFilter" style="padding-right: 5px;font-size: 12px">
             {{deviceStatusStr[item.deviceIp]}}
@@ -150,6 +166,7 @@
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
               <div v-if="$isEnable($enableKey.adb)" style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 1)">打开ADB</el-button></div>
               <div v-if="$isEnable($enableKey.adb)" style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
+              <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="changeRemarkPop(item.id, item.remark)">修改备注</el-button></div>
             </div>
             <el-image @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
                       v-loading="snapshotImgLoading[item.deviceIp]"
@@ -224,6 +241,14 @@
           </el-table>
         </div>
       </div>
+    </Drawer>
+
+    <!-- 修改备注弹窗 -->
+    <Drawer title="修改备注" :visible.sync="changeRemarkPopShow" @handClick="changeRemark">
+      <el-form size="mini">
+        <el-form-item label="云机ID：">{{changeRemarkInfo.id}}</el-form-item>
+        <el-form-item label="备注名称："><el-input v-model="changeRemarkInfo.remark"></el-input></el-form-item>
+      </el-form>
     </Drawer>
 
     <!-- 多路直播设置弹窗 -->
@@ -459,7 +484,16 @@ export default {
         urlList: [],
         checked: 0
       },
-      liveSyncShow: false
+      liveSyncShow: false,
+      snapshotTime: 0,
+      snapshotAutoId: null,
+      // remark
+      changeRemarkPopShow: false,
+      changeRemarkInfo: {
+        id: 0,
+        remark: ''
+      },
+      queryParam: ''
     }
   },
   computed: {
@@ -509,7 +543,20 @@ export default {
       return !success
     }
   },
+  watch: {
+    snapshotTime() {
+      this.snapshotAuto()
+    }
+  },
   methods: {
+    snapshotAuto() {
+      if (this.snapshotAutoId) {
+        clearInterval(this.snapshotAutoId)
+      }
+      if (this.snapshotTime > 0) {
+        this.snapshotAutoId = setInterval(this.snapshotOne, this.snapshotTime * 1000)
+      }
+    },
     copyAddress() {
       if (!this.livePopInfo.urlList[this.livePopInfo.checked]) {
         this.$message.error('未选择URL')
@@ -695,7 +742,9 @@ export default {
       let that = this
       that.$post(that.$uri.ipProxy.list).then(res => {
         if (res.success) {
-          let list = res.list
+          let list = res.list.filter(i => {
+            return i.isUsable === 1
+          })
           list.sort((a, b) => {
             return b.connectionLast - a.connectionLast
           })
@@ -899,6 +948,28 @@ export default {
         }
       })
     },
+    changeRemarkPop(id, remark) {
+      this.changeRemarkInfo.id = id
+      this.changeRemarkInfo.remark = remark
+      this.changeRemarkPopShow = true
+    },
+    changeRemark() {
+      let that = this
+      that.changeRemarkInfo.remark = that.changeRemarkInfo.remark.trim()
+      if (that.changeRemarkInfo.remark.length > 10) {
+        that.$message.warning('备注不能超过10个字')
+        return
+      }
+      that.$post(that.$uri.device.changeRemark, that.changeRemarkInfo).then(res => {
+        if (res.success) {
+          that.$message.success('修改成功')
+          that.changeRemarkPopShow = false
+          that.changeMode(that.$store.state.groupDevShowMode)
+        } else {
+          that.$message.error('修改失败')
+        }
+      })
+    },
     statusImg(status) {
       return status === 1 ? this.snapNotUpdate :
         (status === 3 ? this.snapError : null)
@@ -1021,7 +1092,7 @@ export default {
           startPage: 1
         }
         let that = this
-        that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id}).then(res => {
+        that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id, queryParam: that.queryParam}).then(res => {
           that.info = res
           that.test = []
           that.info.list.forEach(v => {
@@ -1068,7 +1139,7 @@ export default {
     /* 获取设备列表 */
     getDeviceList () {
       let that = this
-      that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id}).then(res => {
+      that.$post(that.$uri.device.deviceList, {...that.page, groupId: that.$store.state.groupInfo.id, queryParam: that.queryParam}).then(res => {
         that.$set(this, 'info', res)
         // that.info = res
         console.log(res)
@@ -1091,7 +1162,7 @@ export default {
           startPage: 1
         }
       }
-      that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id}).then(res => {
+      that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id, queryParam: that.queryParam}).then(res => {
         that.info.list.forEach(v => {
           res.list.forEach(i => {
             if (v.id === i.id) {

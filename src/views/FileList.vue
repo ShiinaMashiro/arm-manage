@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="uploadFilePop()" v-if="$store.getters.checkChangeAuth()">新增文件</el-button>
+        <el-button size="small" type="primary" @click="uploadFilePop()" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin">新增文件</el-button>
       </div>
       <!--<div class="search-advanced">
         <div class="search-main">

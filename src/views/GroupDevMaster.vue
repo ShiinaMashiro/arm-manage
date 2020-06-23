@@ -2,7 +2,7 @@
   <div>
     <div class="search-btn">
       <div style="display: flex;flex-direction: row">
-        <el-button size="small" type="primary" @click="$router.push('/home/group/devMaster/new')"  v-if="$store.getters.checkChangeAuth()">新建备份</el-button>
+        <el-button size="small" type="primary" @click="$router.push('/home/group/devMaster/new')"  v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin">新建备份</el-button>
         <div>
           <span style="font-size: 12px;padding: 0 10px">FTP服务器：{{ftpHost.paramValue}}:{{ftpPort.paramValue}}</span>
           <el-button size="small" type="text" @click="ftpPopShow = true"  v-if="$store.getters.checkChangeAuth()">修改</el-button>
@@ -30,10 +30,10 @@
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template slot-scope="scope">
-            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
-            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1 && $store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
+            <el-button v-if="[2,-5,6].indexOf(scope.row.operationStatus) !== -1 && ($store.getters.checkChangeAuth() || !$store.state.isAdmin)" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="uploadBackup(scope.row)">上传</el-button>
+            <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1 && ($store.getters.checkChangeAuth() || !$store.state.isAdmin)" :disabled="scope.row.isDel === 1" type="text" size="small" @click.stop="restorePop(scope.row)">恢复</el-button>
             <el-button v-if="scope.row.operationStatus !== 1 && scope.row.operationStatus !== -1" type="text" size="small" @click.stop="edit(scope.row)">操作记录</el-button>
-            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth()" :disabled="scope.row.isDel === 1" @click.stop="deleteIp(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin" :disabled="scope.row.isDel === 1" @click.stop="deleteIp(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -182,18 +182,21 @@
     filters: {
       statusFilter(status) {
         switch (status) {
-          case -5: return '上传失败'
-          case -1: return '备份失败'
+          case -503: return '上传失败'
+          case -102: return '备份失败'
           case 1: return '备份中'
           case 2: return '备份完成'
           case 5: return '上传中'
           case 6: return '上传完成'
+          case -501: return '压缩失败'
+          case -502: return '空间不足'
+          case -504: return '备份文件不存在'
           default: return '未知'
         }
       },
       recordStatusFilter(status) {
         switch (status) {
-          case -1: return '备份失败'
+          case -102: return '备份失败'
           case -3: return '恢复失败'
           case -5: return '上传失败'
           case -7: return '下载失败'
@@ -205,6 +208,17 @@
           case 6: return '上传完成'
           case 7: return '下载中'
           case 8: return '下载成功'
+          case -301: return '备份文件不存在'
+          case -302: return '备份记录不存在'
+          case -501: return '压缩失败'
+          case -502: return '空间不足'
+          case -503: return '上传失败'
+          case -504: return '备份文件不存在'
+          case -701: return 'FTP连接失败'
+          case -702: return '空间不足'
+          case -703: return 'FTP下载失败'
+          case -704: return 'FTP文件不存在'
+          case -705: return '其他未知错误'
           default: return '未知'
         }
       }

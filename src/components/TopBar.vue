@@ -10,20 +10,8 @@
         </TopBarItem2>
       </div>
     </div>
-    <el-popover
-            ref="guide3"
-            placement="bottom"
-            title=""
-            width="250"
-            :value="$store.getters.isGuideShow(lastGuide) && show"
-            trigger="manual">
-      <p>如果还有其他问题，可以进入帮助中心查看并下载用户手册。</p>
-      <div style="text-align: right; margin: 0">
-        <el-button type="primary" size="mini" @click="$store.commit($mutation.GUIDE, 0);$store.commit($mutation.SIDE_CHECK, 0)">结束</el-button>
-      </div>
-    </el-popover>
     <div class="arm-info">
-      <TopBarItem2 class="sys-link" :jump="true" path="/home/help/faq" v-popover:guide3>
+      <TopBarItem2 v-if="$store.state.isAdmin" class="sys-link" :jump="true" path="/home/help/faq">
         <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link" style="color: white">
             帮助中心<i class="el-icon-arrow-down el-icon--right"></i>

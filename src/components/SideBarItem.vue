@@ -1,31 +1,4 @@
 <template xmlns:v-popover="http://www.w3.org/1999/xhtml">
-  <!--<div class="side-bar-item" :style="checkStyle" @click="clickHandler" v-popover:guide2>
-    <div class="item-icon center-container">
-      <i class="iconfont" v-if="item.src === 'dev'">&#xe8a8;</i>
-      <i class="iconfont" v-if="item.src === 'group'">&#xe8b1;</i>
-      <i class="iconfont" v-if="item.src === 'log'">&#xe74d;</i>
-      <i class="iconfont" v-if="item.src === 'system'">&#xe610;</i>
-      <i class="iconfont" v-if="item.src === 'user'">&#xe638;</i>
-      <i class="iconfont" v-if="item.src === 'app'">&#xe600;</i>
-      <i class="iconfont" v-if="item.src === 'admin'">&#xe601;</i>
-    </div>
-    <div class="item-name ">
-      <span>{{item.name}}</span>
-    </div>
-    <el-popover
-            ref="guide2"
-            placement="right"
-            title=""
-            width="250"
-            :value="$store.getters.isGuideShow(index + 2) && show"
-            trigger="manual">
-      <p style="white-space: pre-line">{{guideContent}}</p>
-      <div style="text-align: right; margin: 0">
-        <el-button size="mini" type="text" @click="jumpStep">跳过</el-button>
-        <el-button type="primary" size="mini" @click="nextStep">下一步</el-button>
-      </div>
-    </el-popover>
-  </div>-->
   <el-menu-item :index="item.path" v-if="item.path">
     <i class="iconfont" v-if="item.src === 'dev'">&#xe8a8;</i>
     <i class="iconfont" v-if="item.src === 'group'">&#xe8b1;</i>

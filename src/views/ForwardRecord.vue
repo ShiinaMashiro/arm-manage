@@ -21,8 +21,18 @@
             {{scope.row.createTime | formatDateTime}}
           </template>
         </el-table-column>
-        <el-table-column prop="deviceIps" label="转发云机" width="200"></el-table-column>
-        <el-table-column label="操作" width="200">
+        <el-table-column prop="deviceIps" label="转发云机">
+          <template slot-scope="scope">
+            <div style="display: flex;flex-direction: column;padding: 0 10px">
+              <div v-for="detail in scope.row.details.slice(0, 5)">
+                <span>{{detail.deviceIp}}</span>
+                <span :style="{color: detail.isSuccess ? 'green' : 'red', marginLeft: '20px'}">{{detail.isSuccess ? '成功' : '失败'}}</span>
+              </div>
+              <el-button v-if="scope.row.details.length > 5" type="text" size="mini" @click.stop="forwardRecord(scope.row)">查看更多</el-button>
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="120">
           <template slot-scope="scope">
             <!--<el-button type="text" size="small" @click="goCaseDetail(scope.row)">管理</el-button>-->
             <el-button type="text" size="small" @click.stop="forwardRecord(scope.row)">查看</el-button>
@@ -108,7 +118,7 @@
       </div>
     </Drawer>
 
-    <Drawer title="转发详情" :visible.sync="forwardPopShow">
+    <Drawer title="转发详情" :visible.sync="forwardPopShow" :opt="false">
       <div style="font-size: 12px" v-if="forwardInfo">
         <el-form ref="form" :model="forwardInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
           <el-form-item size="mini" label="转发ID">{{forwardInfo.id}}</el-form-item>
@@ -179,7 +189,20 @@
       getIpList () {
         let that = this
         that.$post(that.$uri.cmd.record, {...that.page, ...that.searchInfo}).then(res => {
-          that.info = res
+          if (res.success) {
+            res.list.forEach(ip => {
+              ip.details = []
+            })
+            that.info = res
+
+            that.info.list.forEach(ip => {
+              that.$post(that.$uri.cmd.recordDetail, {recordId: ip.id}).then(res => {
+                if (res.success) {
+                  ip.details = res.list
+                }
+              })
+            })
+          }
         })
       },
       /* 当前页改变 */

@@ -19,14 +19,14 @@
                 style="width: 16px;height: 16px"
                 :src="usernameUrl"
                 fit="fill"></el-image>
-        <input v-model="info.username"/>
+        <input name="username" v-model="info.username"/>
       </div>
       <div class="item">
         <el-image
                 style="width: 16px;height: 16px"
                 :src="passwordUrl"
                 fit="fill"></el-image>
-        <input type="password" v-model="info.password"/>
+        <input name="password" type="password" v-model="info.password"/>
       </div>
       <el-checkbox style="text-align: left;padding: 10px 0" v-model="info.save">记住用户名</el-checkbox>
       <el-button type="primary" style="width: auto;margin-top: 40px" @click="login">登录</el-button>

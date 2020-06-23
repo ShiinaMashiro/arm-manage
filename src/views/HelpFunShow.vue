@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100%">
     <mavon-editor
       :value="$store.state.funList[parseInt($route.query.index)].content || '# 无内容'"
       :subfield = "prop.subfield"
@@ -24,6 +24,12 @@
           scrollStyle: true
         }
       }
+    },
+    beforeCreate() {
+      document.getElementsByClassName('home-main')[0].style.zIndex = 1022
+    },
+    beforeDestroy() {
+      document.getElementsByClassName('home-main')[0].style.zIndex = 0
     }
   };
 </script>

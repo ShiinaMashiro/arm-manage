@@ -64,15 +64,15 @@
             {{scope.row.updateTime | formatDateTime}}
           </template>
         </el-table-column>
-        <!--<el-table-column min-width="80px" label="操作">
+        <el-table-column min-width="80px" label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="logDelete(scope.row.id)" v-if="$store.getters.checkChangeAuth()">删除</el-button>
           </template>
-        </el-table-column>-->
+        </el-table-column>
       </el-table>
       <div class="list-bottom">
         <div class="list-bottom-btn">
-          <el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteCaseBatch">删除</el-button>
+          <!--<el-button size="small" :disabled="multipleSelection.length === 0" plain @click="deleteCaseBatch">删除</el-button>-->
         </div>
         <el-pagination
                 @size-change="sizeChangeHandle"

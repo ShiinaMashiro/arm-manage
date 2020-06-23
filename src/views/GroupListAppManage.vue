@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.getters.checkChangeAuth()">保存修改</el-button>
+        <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.getters.checkChangeAuth() || !$store.state.isAdmin">保存修改</el-button>
         <div @keyup.enter="init">
           <el-input size="small" placeholder="输入应用名称/APPID 搜索" v-model="searchInfo.queryParam" style="width: 320px">
             <el-button slot="append" icon="el-icon-search" @click="init"></el-button>

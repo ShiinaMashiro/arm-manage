@@ -21,6 +21,7 @@ Vue.use(ElementUI)
 Vue.config.productionTip = false
 Vue.prototype.$post = postData
 Vue.prototype.$uri = uri
+Vue.prototype.$axios = axios
 Vue.prototype.$filePost = () => {
   return axios.create({
     timeout: 1000,

@@ -2,7 +2,7 @@
   <div class="dev-list">
     <div class="dev-list-search">
       <div class="search-btn">
-        <el-button size="small" type="primary" @click="confirmSaveDev" v-if="$store.state.isAdmin">保存修改</el-button>
+        <el-button size="small" type="primary" @click="confirmSaveDev">保存修改</el-button>
         <el-select v-model="searchInfo.engineType" size="small" placeholder="引擎版本" style="margin-left: 10px">
           <el-option
                   v-for="item in searchOptions.version"

@@ -205,7 +205,7 @@
       nameList: [
         {
           name: 'ID',
-          key: 'id',
+          key: 'caseNo',
           edit: false,
         },{
           name: '备注',
@@ -370,7 +370,8 @@
         that.$message.success("修改成功")
         that.$refs[refName].isEdit = false
         // 把修改保存到store
-        that.$store.commit(that.$mutation.CASE_DETAIL, that.info)
+        console.log(info)
+        that.$store.commit(that.$mutation.CASE_DETAIL, info)
         // 刷新数据
         this.list = this.$store.getters.detailTableList
       })
