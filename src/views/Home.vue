@@ -100,7 +100,7 @@
                style="height: 100%;display: flex;flex-direction: column">
         <el-tab-pane v-for="tab in ssh.tabs" :key="tab.name" :label="tab.title" :name="tab.name"
                      :closable="tab.closable" :disabled="tab.disabled" style="height: 100%">
-          <iframe v-if="tab.closable && $store.state.ssh.start" class="ssh-console" :ref="'term-' + tab.name" :id="'term-' + tab.name" :src="'http://' + $store.state.webIp + '/ssh/host/127.0.0.1?name=' + tab.name"></iframe>
+          <iframe v-if="tab.closable && $store.state.ssh.start" class="ssh-console" :ref="'term-' + tab.name" :id="'term-' + tab.name" :src="'/ssh/host/127.0.0.1?name=' + tab.name"></iframe>
         </el-tab-pane>
 
       </el-tabs>
