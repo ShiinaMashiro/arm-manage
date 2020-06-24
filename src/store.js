@@ -746,12 +746,14 @@ export default new Vuex.Store({
         }*/
         commit(mutation.LOGIN_NOW, true)
         commit(mutation.IS_ADMIN_ROOT, res.data.groupId === 1)
-        that.$post(that.$uri.user.groupInfo, {id: res.data.groupId}).then(res => {
+        commit(mutation.IS_ADMIN, res.data.groupType === 1)
+        router.push(res.data.groupType === 1 ? "/home" : '/home/group/list')
+        /*that.$post(that.$uri.user.groupInfo, {id: res.data.groupId}).then(res => {
           if (res.success) {
             commit(mutation.IS_ADMIN, res.data.groupType === 1)
             router.push(res.data.groupType === 1 ? "/home" : '/home/group/list')
           }
-        })
+        })*/
       })
     },
     /* 查看设备池详情 */
