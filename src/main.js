@@ -48,7 +48,8 @@ Vue.prototype.$enableKey = {
   cmdForward: 'c',
   sync: 's',
   live: 'l',
-  flowSync: 'f'
+  flowSync: 'f',
+  webSsh: 'w'
 }
 Vue.prototype.$isEnable = (key) => {
   if (key && process.env.VUE_APP_OREKI) {

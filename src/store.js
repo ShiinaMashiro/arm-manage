@@ -879,7 +879,7 @@ export default new Vuex.Store({
     /* 获取权限过滤后的展示信息 */
     authorItems (state) {
       let list = []
-      if (state.isAdminRoot) {
+      if (state.isAdminRoot && vm.$isEnable(vm.$enableKey.webSsh)) {
         state.sideItems[5].children.push({
           name: "SSH",
           path: '/home/system/ssh',
