@@ -53,6 +53,10 @@ export default new Router({
       path: "/",
       name: "login",
       component: Login
+    },{
+      path: "/test",
+      name: "test",
+      component: () => import('./views/VideoTest.vue')
     }, {
       path: "/manage",
       name: "后台管理",
