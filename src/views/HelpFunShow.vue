@@ -1,6 +1,7 @@
 <template>
   <div style="width: 100%">
     <mavon-editor
+            style="width: 100%"
       :value="$store.state.funList[parseInt($route.query.index)].content || '# 无内容'"
       :subfield = "prop.subfield"
       :defaultOpen = "prop.defaultOpen"

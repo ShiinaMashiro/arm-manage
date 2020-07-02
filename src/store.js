@@ -367,6 +367,17 @@ const state = {
     ip: ''
   },*/
   deviceWindowMode: [],
+  cameraWeight: 0,
+  cameraShow: true,
+  cameraLeft: 0,
+  cameraTop: 0,
+  /*
+  {
+    id: 223333,
+
+   }
+  */
+  videoInfo: [],
   sideInfo: {
     item: null,
     child: null,
@@ -565,6 +576,8 @@ export default new Vuex.Store({
     },
     /* 保存显示模式 */
     [mutation.GROUP_DEV_SHOW_MODE] (state, mode) {
+      console.log('GROUP_DEV_SHOW_MODE')
+      console.log(mode)
       state.groupDevShowMode = mode
       sessionStorage.setItem('groupDevShowMode', JSON.stringify(mode))
     },
@@ -582,6 +595,54 @@ export default new Vuex.Store({
         state.deviceWindowMode.deviceNo = mode.deviceNo;
         state.deviceWindowMode.ip = mode.ip;
       }*/
+    },
+    /* 设置摄像头窗口状态 */
+    [mutation.CAMERA_SHOW_MODE] (state, mode) {
+      console.log(mode);
+      if (mode.display) {
+        state.cameraShow = mode.show
+        return
+      }
+      if (mode.show && state.cameraWeight === 0) {
+        state.cameraLeft = mode.left
+        state.cameraTop = mode.top
+      }
+      mode.show ? state.cameraWeight++ : state.cameraWeight--
+    },
+    /* 设置视频窗口状态 */
+    [mutation.VIDEO_SHOW_MODE] (state, mode) {
+      console.log(mode);
+      console.log(state.videoInfo);
+      if (mode.display) {
+        state.videoInfo.forEach((v, i) => {
+          if (mode.id === v.id) {
+            v.show = mode.show
+          }
+        })
+        return
+      }
+
+      if (mode.show) {
+        state.videoInfo.push(mode.mode)
+      } else {
+        let index = -1
+        let indexP = -1
+        let only = false
+        state.videoInfo.forEach((v, i) => {
+          only = v.players.length === 1
+          v.players.forEach((p, j) => {
+            if (p === (mode.ref || mode.player)) {
+              index = i
+              indexP = j
+            }
+          })
+        })
+        if (only) {
+          state.videoInfo.splice(index, 1)
+        } else {
+          state.videoInfo[index].players.splice(indexP, 1)
+        }
+      }
     },
     /* 设置设备控制窗口状态 */
     [mutation.DEVICE_SYNC_SHOW_MODE] (state, mode) {
@@ -973,6 +1034,17 @@ export default new Vuex.Store({
       let list = []
 
       return list
+    },
+    videoDisplay: (state) => (id) => {
+      console.log(id)
+      console.log(state.videoInfo)
+      for(let i = 0; i < state.videoInfo.length; i++) {
+        if (id === state.videoInfo[i].id) {
+          return state.videoInfo[i].show
+        }
+      }
+
+      return false
     }
   }
 });

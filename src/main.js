@@ -49,7 +49,8 @@ Vue.prototype.$enableKey = {
   sync: 's',
   live: 'l',
   flowSync: 'f',
-  webSsh: 'w'
+  webSsh: 'w',
+  remoteCamera: 'r'
 }
 Vue.prototype.$isEnable = (key) => {
   if (key && process.env.VUE_APP_OREKI) {

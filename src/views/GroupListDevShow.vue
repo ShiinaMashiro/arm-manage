@@ -23,6 +23,7 @@
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipStartPop()">切换IP</el-button>
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
         <el-button v-if="$isEnable($enableKey.live)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="liveManage()">多路直播</el-button>
+        <el-button v-if="$isEnable($enableKey.remoteCamera)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="openLocalVideo()">本地视频导入</el-button>
         <el-select size="small" v-model="snapshotTime" placeholder="请选择" style="margin-left: 10px;width: 100px">
           <el-option label="不刷新" :value="0"></el-option>
           <el-option label="10秒" :value="10"></el-option>
@@ -91,10 +92,7 @@
         </el-table-column>
       </el-table>
       <div class="list-bottom">
-        <div class="list-bottom-btn">
-          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>-->
-          <!--<el-button size="small" plain :disabled="multipleSelection.length === 0" @click="deleteDevBatch" v-if="$store.getters.checkChangeAuth()">删除</el-button>-->
-        </div>
+        <div class="list-bottom-btn"></div>
         <el-pagination
                 @size-change="sizeChangeHandle"
                 @current-change="currentChangeHandle"
@@ -174,7 +172,7 @@
                       element-loading-spinner="el-icon-loading"
                       element-loading-background="rgba(0, 0, 0, 0.8)"
                     style="width: 144px;"
-                    :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp]"
+                    :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
                     fit="cover"></el-image>
             <div v-if="$isEnable($enableKey.ipProxy)" style="font-size: 12px;text-align: left;padding: 0 5px;margin-top: -5px;
             height: 18px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">IP：{{item.proxyIp || '无'}}</div>
@@ -846,6 +844,33 @@ export default {
         that.$message.success("开始关闭IP代理...")
       }).catch( () => {})
 
+    },
+    openLocalVideo() {
+      console.log(this.multipleSelection)
+      let ses = []
+      for (let i = 0; i < this.info.list.length; i++) {
+        if (this.test[i] === true) {
+          ses.push(this.info.list[i])
+        }
+      }
+      ses.forEach(dev => {
+        this.deviceWindowOpen(dev.id, dev.deviceNo, dev.deviceIp)
+      })
+      this.$parent.selectShow = true
+      this.$parent.$nextTick().then(() => {
+        let localId = new Date().getTime()
+        this.$parent.video.id = localId
+        this.$parent.video.many = true
+        this.$parent.video.players = []
+        ses.forEach(dev => {
+          this.$parent.video.players.push('ref' + dev.id)
+          this.$parent.$refs['ref' + dev.id][0].localId = localId
+        })
+        let index = this.$store.state.deviceWindowMode.length + this.$store.state.videoInfo.length + (this.$store.state.cameraWeight > 0 ? 1 : 0)
+        this.$parent.video.left = 288 * (index % Math.floor(document.documentElement.clientWidth / 288))
+        this.$parent.video.top = 80 * Math.floor(index / Math.floor(document.documentElement.clientWidth / 288))
+        document.getElementById('selectFile').click()
+      })
     },
     liveManage () {
       let that = this

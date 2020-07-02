@@ -1,10 +1,32 @@
 <template>
   <div class="device">
-    <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="windowLeft" :y="windowTop">
+    <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="left" :y="top">
       <div class="window">
         <div class="header" :style="{ width: deviceWidth + 'px' }">
           <span class="id">{{ id }}</span>
-          <i class="close el-icon-close" @click="closeClick"></i>
+          <div v-show="camera || video" style="color: #409EFF;font-size: 12px;padding-right: 5px">{{camera ? '摄像头同步中' : '视频同步中'}}</div>
+          <el-button style="margin-right: 5px"
+                     v-show="(camera && !$store.state.cameraShow) || (video && !$store.getters.videoDisplay(localId))"
+                     type="primary" size="mini" @click="showLocal(true)">打开预览</el-button>
+          <el-button style="margin-left: 0!important;margin-right: 5px"
+                     v-show="(camera && $store.state.cameraShow) || (video && $store.getters.videoDisplay(localId))"
+                     type="primary" size="mini" @click="showLocal(false)">关闭预览</el-button>
+          <div  v-show="!camera && !video" style="float: right;display: flex;flex-direction: row;align-items: center" v-if="$isEnable($enableKey.remoteCamera)">
+            <el-button :disabled="video || !status" size="mini" type="primary" @click="openLocalCamera">摄像头</el-button>
+            <!--<el-button v-if="camera" size="mini" type="primary" @click="closeLocalCamera">关闭本地摄像头</el-button>-->
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">将本地PC摄像头与云机摄像头同步，延迟约在200ms以内，可查看本地画面进行实时对比。当前最多支持10台云机进行同步。目前仅支持最新版chrome浏览器。</div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <el-button :disabled="camera || !status"  size="mini" type="primary" @click="openLocalVideo">视频导入</el-button>
+            <!--<el-button v-if="video" size="mini" type="primary" @click="closeLocalVideo">关闭视频导入</el-button>-->
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">上传本地视频文件至云机并作为云机摄像头获取画面进行播放。当前最多支持10台云机进行同步。目前仅支持最新版chrome浏览器。</div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+          </div>
+          <i v-if="!video && !camera" class="close el-icon-close" @click="closeClick"></i>
+          <i v-else class="close el-icon-switch-button" style="color: red" @click="closeLocal()"></i>
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
           <div v-if="deviceMessage" class="message"> {{ deviceMessage }} </div>
@@ -50,6 +72,23 @@
         <span style="font-size: 12px;color: red">如无法下载，可右键-图片另存为(图片已默认保存至云机相册内)</span>
       </div>
     </el-dialog>
+
+    <el-dialog
+            title="提示"
+            :visible.sync="cameraErrorVisible"
+            :append-to-body="true"
+            width="400">
+      <div>检测到您未对chrome浏览器打开摄像头权限</div>
+      <br/>
+      <div>解决方法如下：</div><br/>
+      <div style="padding-left: 20px">1.浏览器进入地址：chrome://flags/#unsafely-treat-insecure-origin-as-secure<el-button type="text" @click="copyLink">复制</el-button>，设置
+        为enable，并将当前页面域名（http://<span>{{$store.state.orekiIp || $store.state.webIp}}<el-button type="text" @click="copyIp">复制</el-button></span>）添加至文本框后重启浏览器。</div><br/>
+      <div style="padding-left: 20px">2.点击浏览器地址栏连接左方感叹号按钮，设置摄像头权限为允许。</div><br/>
+      <div>如有问题，可查看<el-button type="text" @click="goFun">帮助文档-chrome浏览器打开摄像头权限</el-button>。</div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="cameraErrorVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -75,24 +114,37 @@ export default {
       reportUrl: '/mosico/player/terminate',
 
       player: null,
-      deviceWidth: 720,
-      deviceHeight: 1280,
+      deviceWidth: 288,
+      deviceHeight: 512,
       deviceMessage: "",
       dialogVisible: false,
-      url: ''
+      url: '',
+      camera: false,
+      video: false,
+      status: false,
+      localId: null,
+      openVideo: null,
+      many: false,
+      cameraErrorVisible: false,
+      left: 0,
+      top: 0
     }
   },
   beforeMount () {
     // window.addEventListener('resize', this.computeDeviceSize);
-    this.computeDeviceSize();
+    // this.computeDeviceSize();
   },
   mounted () {
+    this.left = this.windowLeft
+    this.top = this.windowTop
+
     LongeneClient.LoggingControl.setLogLevel('info');
 
     let shinoIp = this.$store.getters.shinoIp();
     this.player = LongeneClient.createAppPlayer('target' + this.id, {
       keyboard: true,
-      orientation: 'portrait'
+      orientation: 'portrait',
+      // enableRemoteCamera: true
     });
     this.player.open({
       appkey: this.appkey,
@@ -111,7 +163,14 @@ export default {
     this.player.on('statechange', () => {
       if (this.player.state == 'playing') {
         this.deviceMessage = '';
+        this.status = true
+        if (this.openVideo){
+          this.player.openLocalVideo(this.openVideo)
+        }
       }
+    })
+    this.player.on('networkinfo', network => {
+      // console.log(network)
     })
   },
   beforeDestroy () {
@@ -119,23 +178,43 @@ export default {
   },
   computed: {
     windowLeft () {
+      let index = this.index + this.$store.state.videoInfo.length + (this.$store.state.cameraWeight > 0 ? 1 : 0)
       let clientWidth = document.documentElement.clientWidth;
       let windowLeft = Math.floor((clientWidth - this.deviceWidth) / 2) + 20 * this.index;
       if (this.$isEnable(this.$enableKey.flowSync)) {
-        windowLeft = document.documentElement.clientWidth * 0.25 * (this.index % 4);
+        windowLeft = this.deviceWidth * (index % Math.floor(clientWidth / this.deviceWidth));
       }
       return windowLeft > 0 ? windowLeft : 0;
     },
     windowTop () {
+      let index = this.index + this.$store.state.videoInfo.length + (this.$store.state.cameraWeight > 0 ? 1 : 0)
       let clientHeight = document.documentElement.clientHeight;
       let windowTop = Math.floor((clientHeight - this.deviceHeight - 36 * 2) / 2) ;
       if (this.$isEnable(this.$enableKey.flowSync)) {
-        windowTop = 80 * Math.floor(this.index / 4) ;
+        windowTop = 80 * Math.floor(index / Math.floor(document.documentElement.clientWidth / this.deviceWidth))
       }
       return windowTop > 0 ? windowTop : 0;
     }
   },
   methods: {
+    copyLink() {
+      this.$copyText('chrome://flags/#unsafely-treat-insecure-origin-as-secure').then(res => {
+        this.$message.success("复制成功")
+      }, res => {
+        this.$message.error("复制失败")
+      })
+    },
+    copyIp() {
+      this.$copyText('http://' + (this.$store.state.orekiIp || this.$store.state.webIp)).then(res => {
+        this.$message.success("复制成功")
+      }, res => {
+        this.$message.error("复制失败")
+      })
+    },
+    goFun() {
+      this.cameraErrorVisible = false
+      this.$store.dispatch(this.$action.GO_FUN, '浏览器摄像头权限获取')
+    },
     downloadPng() {
       let downloadHref = '/snapshot/' + this.deviceId + '.png?temp=' + Math.random()
       let filename = this.deviceId + '.png'
@@ -167,10 +246,59 @@ export default {
       if (this.player) {
         this.player.close();
       }
-
       this.$emit('close')
     },
-
+    openLocalCamera() {
+      this.$store.commit(this.$mutation.CAMERA_SHOW_MODE, {show: true, left: this.left + this.deviceWidth, top: this.top})
+      this.camera = true
+      let promise
+      if (this.$store.state.cameraWeight > 1) {
+        promise = this.player.openLocalCamera()
+      } else {
+        let cameraMedia = document.getElementById('localCamera')
+        promise = this.player.openLocalCamera(cameraMedia)
+      }
+      promise.then(() => {
+        console.log('camera success!')
+      }).catch(err => {
+        this.cameraErrorVisible = true
+        console.log(err)
+      })
+    },
+    closeLocal() {
+      this.camera ? this.closeLocalCamera() : this.closeLocalVideo()
+    },
+    closeLocalCamera() {
+      this.$store.commit(this.$mutation.CAMERA_SHOW_MODE, {show: false})
+      this.camera = false
+      this.player.closeLocalCamera()
+    },
+    openLocalVideo() {
+      this.video = true
+      this.localId = new Date().getTime()
+      this.$parent.video.id = this.localId
+      this.$parent.video.players = [this.player]
+      this.$parent.video.left = this.left + this.deviceWidth
+      this.$parent.video.top = this.top
+      this.$parent.video.many = false
+      this.$parent.video.show = true
+      this.$parent.selectShow = true
+      this.$parent.$nextTick().then(() => {
+        document.getElementById('selectFile').click()
+      })
+    },
+    closeLocalVideo() {
+      this.video = false
+      this.$store.commit(this.$mutation.VIDEO_SHOW_MODE, {show: false, player: this.player, ref: this.many ? 'ref' + this.id : null})
+      this.player.closeLocalVideo()
+    },
+    showLocal(show) {
+      if(this.camera) {
+        this.$store.commit(this.$mutation.CAMERA_SHOW_MODE, {display: true, show})
+      } else {
+        this.$store.commit(this.$mutation.VIDEO_SHOW_MODE, {display: true, show, id: this.localId})
+      }
+    },
     returnClick () {
       if (this.player) {
         this.player.emitBack();
@@ -244,21 +372,27 @@ export default {
     pointer-events: visible;
     .header {
       height: 36px;
-      background: #252a2f;
+      background: #111;
       text-align: center;
       font-size: 18px;
       line-height: 36px;
       color: #fff;
       cursor:move;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
       .id {
-        float: left;
+        flex-grow: 1;
+        text-align: left;
+        /*float: left;*/
         line-height: 36px;
         padding: 0 10px;
       }
       .close {
-        float: right;
+        /*float: right;*/
         line-height: 36px;
-        padding: 0 10px;
+        padding: 0 10px 0 0;
         cursor: pointer;
       }
     }
@@ -278,7 +412,7 @@ export default {
     }
 
     .footer {
-      background: #252a2f;
+      background: #111;
       height: 36px;
       display: flex;
       justify-content: space-around;

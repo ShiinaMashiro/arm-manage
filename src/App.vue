@@ -195,4 +195,10 @@ textarea::-webkit-scrollbar {display:none}
       align-items: center;
     }
   }
+
+  .device{
+    .el-button{
+      padding: 5px 7px;
+    }
+  }
 </style>

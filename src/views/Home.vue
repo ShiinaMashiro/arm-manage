@@ -12,6 +12,7 @@
     <div :style="{display: $store.state.guide > 0 ? 'block' : 'none'}" class="mask"></div>
     <template v-for="(mode, index) in $store.state.deviceWindowMode">
       <device-window :id="mode.id"
+                     :ref="'ref' + mode.id"
                      :key="mode.id"
                      :index="index"
                      :device-id="mode.deviceNo"
@@ -19,6 +20,14 @@
                      @close="deviceWindowClose(mode)"
       ></device-window>
     </template>
+
+    <CameraWindow v-show="$store.state.cameraWeight > 0 && $store.state.cameraShow"></CameraWindow>
+    <input v-if="selectShow" type="file" id="selectFile" @change="selectFile()" style="display: none"></input>
+    <template v-for="v in $store.state.videoInfo">
+      <VideoWindow v-show="v.show" :key="v.id" :id="v.id" :many="v.many" :video="v.video" :players="v.players" :left="v.left" :top="v.top"></VideoWindow>
+    </template>
+
+
     <el-dialog
             :title="$store.state.isAdmin ? '请输入license激活龙境安卓云系统' : '请联系管理员激活系统'"
             :visible.sync="$store.state.needLicense || $store.state.licenseUpdate"
@@ -115,6 +124,8 @@ import SideBar from "@/components/SideBar.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import HomeMainTopBar from "@/components/HomeMainTopBar.vue";
 import DeviceWindow from "@/components/DeviceWindow.vue";
+import CameraWindow from "@/components/CameraWindow.vue";
+import VideoWindow from "@/components/VideoWindow.vue";
 import MainScene from "@/components/MainScene.vue";
 import Drawer from "@/components/Drawer.vue";
 
@@ -128,6 +139,8 @@ export default {
     DeviceWindow,
     MainScene,
     Drawer,
+    CameraWindow,
+    VideoWindow,
   },
   data() {
     return {
@@ -163,7 +176,17 @@ export default {
           }
         ],
         index: 1
-      }
+      },
+      video: {
+        id: null,
+        video: null,
+        players: [],
+        show: true,
+        left: 0,
+        top: 0,
+        many: false
+      },
+      selectShow: false
     }
   },
   computed: {
@@ -195,6 +218,15 @@ export default {
     }
   },
   methods: {
+    selectFile() {
+      let videoFile = document.getElementById('selectFile').files[0]
+      this.selectShow = false
+      if (!videoFile) {
+        return false
+      }
+      this.video.video = videoFile
+      this.$store.commit(this.$mutation.VIDEO_SHOW_MODE, {show: true, mode: {...this.video}})
+    },
     handleSshClick(tab, event) {
       if (tab.name === '+'){
         this.ssh.tabs.splice(this.ssh.tabs.length - 1, 0, {
