@@ -26,7 +26,8 @@
         </el-table-column>
         <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click.stop="scope.row.isUsable === 1 ? changeIpStatusPop(scope.row) : changeIpStatus(scope.row)" v-if="$store.getters.checkChangeAuth()">{{scope.row.isUsable === 1 ? '禁用' : '启用'}}</el-button>
+            <el-button type="text" size="small" @click.stop="scope.row.isUsable === 1 ? changeIpStatusPop(scope.row)
+            : changeIpStatus(scope.row)" v-if="$store.getters.checkChangeAuth()">{{scope.row.isUsable === 1 ? '禁用' : '启用'}}</el-button>
             <el-button type="text" size="small" @click.stop="edit(scope.row)" v-if="$store.getters.checkChangeAuth()">编辑</el-button>
             <el-button type="text" size="small" @click.stop="connectionPop(scope.row)"
                        :disabled="!scope.row.isUsable || scope.row.connectionLast === scope.row.connectionMax"
@@ -50,54 +51,102 @@
     </div>
 
     <!-- 录入IP弹窗 -->
-    <Drawer title="录入IP" :visible.sync="addIpPopShow" @handClick="addIp">
+    <Drawer title="录入IP" :visible.sync="addIpPopShow" @handClick="addIpValid">
       <div style="font-size: 12px">
-        <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
+        <el-form ref="addForm" :model="addIpInfo" :rules="rules" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
           <el-form-item size="mini" label="IP名称">
-            <el-input size="mini" v-model="addIpInfo.name"></el-input>
+            <el-input size="mini" v-model="addIpInfo.name" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                当前IP节点的备注，在云机切换IP时展示。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
-          <el-form-item size="mini" label="IP地址">
-            <el-input size="mini" v-model="addIpInfo.ip"></el-input>
+          <el-form-item size="mini" label="IP地址" prop="ip">
+            <el-input size="mini" v-model="addIpInfo.ip" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                IP节点的服务器地址。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
-          <el-form-item size="mini" label="DNS">
-            <el-input size="mini" v-model="addIpInfo.dns"></el-input>
+          <el-form-item size="mini" label="DNS" prop="dns">
+            <el-input size="mini" v-model="addIpInfo.dns" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                IP节点的服务器DNS。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
-          <el-form-item size="mini" label="网关">
-            <el-input size="mini" v-model="addIpInfo.gateway"></el-input>
+          <el-form-item size="mini" label="网关" prop="gateway">
+            <el-input size="mini" v-model="addIpInfo.gateway" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                IP节点服务器的网关。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
-          <el-form-item size="mini" label="端口">
-            <el-input-number size="mini" v-model="addIpInfo.port" :min="0" :max="65000" :controls="false"></el-input-number>
+          <el-form-item size="mini" label="端口" prop="port">
+            <el-input-number size="mini" v-model="addIpInfo.port" :min="1" :max="65535" :controls="false" style="width: auto"></el-input-number>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                IP节点服务器的端口。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
           <el-form-item size="mini" label="用户名">
-            <el-input size="mini" v-model="addIpInfo.username"></el-input>
+            <el-input size="mini" v-model="addIpInfo.username" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                登录IP节点服务器所需要的用户名。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
           <el-form-item size="mini" label="密码">
-            <el-input size="mini" v-model="addIpInfo.password"></el-input>
+            <el-input size="mini" v-model="addIpInfo.password" style="width: auto"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                登录IP节点服务器所需要的密码。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
           <el-form-item size="mini" label="最大连接数">
             <el-input-number size="mini" v-model="addIpInfo.connectionMax" :min="0" :max="100"></el-input-number>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                可同时分配给云机连接的最大数量。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
           </el-form-item>
         </el-form>
       </div>
     </Drawer>
     <!-- 修改IP弹窗 -->
-    <Drawer title="修改IP" :visible.sync="changeIpPopShow" @handClick="changeIp">
+    <Drawer title="修改IP" :visible.sync="changeIpPopShow" @handClick="changeIpValid">
       <div style="font-size: 12px" v-if="changeIpInfo">
-        <el-form ref="form" :model="addIpInfo" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
+        <el-form ref="changeForm" :model="changeIpInfo" :rules="rules" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
           <el-form-item size="mini" label="IP名称">
             <el-input size="mini" v-model="changeIpInfo.name"></el-input>
           </el-form-item>
-          <el-form-item size="mini" label="IP地址">
+          <el-form-item size="mini" label="IP地址" prop="ip">
             <el-input size="mini" v-model="changeIpInfo.ip"></el-input>
           </el-form-item>
-          <el-form-item size="mini" label="DNS">
+          <el-form-item size="mini" label="DNS" prop="dns">
             <el-input size="mini" v-model="changeIpInfo.dns"></el-input>
           </el-form-item>
-          <el-form-item size="mini" label="网关">
+          <el-form-item size="mini" label="网关" prop="gateway">
             <el-input size="mini" v-model="changeIpInfo.gateway"></el-input>
           </el-form-item>
-          <el-form-item size="mini" label="端口">
-            <el-input-number size="mini" v-model="changeIpInfo.port" :min="0" :max="65000" :controls="false"></el-input-number>
+          <el-form-item size="mini" label="端口" prop="port">
+            <el-input-number size="mini" v-model="changeIpInfo.port" :min="1" :max="65535" :controls="false"></el-input-number>
           </el-form-item>
           <el-form-item size="mini" label="用户名">
             <el-input size="mini" v-model="changeIpInfo.username"></el-input>
@@ -129,6 +178,7 @@
                     :multiple="false"
                     :file-list="fileList"
                     :on-success="handleSuccess"
+                    :on-error="errorHandle"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
                     :on-change="handleChange"
@@ -142,7 +192,7 @@
       </div>
     </Drawer>
 
-    <Drawer title="连接管理" :visible.sync="connectionPopShow">
+    <Drawer title="连接管理" :visible.sync="connectionPopShow" :opt="false">
       <div v-if="connectionPopShow">
         <el-form ref="form" label-position="left" size="mini">
           <el-form-item size="mini" style="margin-bottom: 8px!important;" label="IP名称：">{{connectionRow.name}}</el-form-item>
@@ -232,7 +282,24 @@
         popShow: false,
         connectionPopShow: false,
         connectionRow: null,
-        devList: []
+        devList: [],
+        rules: {
+          ip: [
+            {required: true, message: 'ip不能为空', trigger: 'blur'}
+            ,{type: 'string', pattern: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/, message: '请输入正确的ip', trigger: 'blur'}
+          ],
+          dns: [
+            {required: true, message: 'dns不能为空', trigger: 'blur'}
+            ,{type: 'string', pattern: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/, message: '请输入正确的dns', trigger: 'blur'}
+          ],
+          gateway: [
+            {required: true, message: '网关不能为空', trigger: 'blur'}
+            ,{type: 'string', pattern: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/, message: '请输入正确的网关', trigger: 'blur'}
+          ],
+          port: [
+            {type: 'number', min: 1, max: 65535, message: '端口范围为1-65535', trigger: 'blur'}
+          ]
+        }
       }
     },
     computed: {
@@ -277,9 +344,11 @@
       },
       /* 上传文件 */
       submitUpload() {
+        this.$loading()
         this.$refs.upload.submit();
       },
       handleSuccess(response, file, fileList) {
+        this.$loading().close()
         if (response.success) {
           this.uploadFilePopShow = false
           this.uploadFilePopShow = false
@@ -291,6 +360,9 @@
           this.$message.error(response.message)
           this.$refs.upload.clearFiles()
         }
+      },
+      errorHandle() {
+        this.$loading().close()
       },
       handleChange(file, fileList) {
         if (fileList.length) {
@@ -377,8 +449,16 @@
                 that.devList = res.list
               }
             })
+            this.getIpList()
           } else {
             that.$message.error('断开失败')
+          }
+        })
+      },
+      addIpValid() {
+        this.$refs.addForm.validate(valid => {
+          if (valid) {
+            this.addIp()
           }
         })
       },
@@ -391,6 +471,13 @@
             that.getIpList()
           } else {
             that.$message.error(res.msg)
+          }
+        })
+      },
+      changeIpValid() {
+        this.$refs.changeForm.validate(valid => {
+          if (valid) {
+            this.changeIp()
           }
         })
       },
@@ -414,11 +501,13 @@
         this.popShow = false
       },
       changeIpStatus(r) {
-        let loading = this.$loading()
+        // let loading = this.$loading()
         let that = this
         let row = this.row || r
+        this.row = null
         let info = {...row}
         info.isUsable = row.isUsable === 1 ? 0 : 1
+        console.log(row)
         that.$post(that.$uri.ipProxy.save, info).then(res => {
           if (res.success) {
             that.$message.success((row.isUsable === 1 ? '禁用' : '启用') + "成功")
@@ -428,11 +517,11 @@
           }
         }).finally(() => {
           that.popShow = false
-          loading.close()
+          // loading.close()
         })
       },
       async changeIpStatusAndStop() {
-        let loading = this.$loading()
+        // let loading = this.$loading()
         let that = this
         let row = this.row
         let info = {...row}
@@ -447,13 +536,14 @@
         that.$post(that.$uri.ipProxy.save, info).then(res => {
           if (res.success) {
             that.$message.success((row.isUsable === 1 ? '禁用' : '启用') + "成功")
-            that.getIpList()
+            setTimeout(that.getIpList, 1000)
+
           } else {
             that.$message.error(res.msg)
           }
         }).finally(() => {
           that.popShow = false
-          loading.close()
+          // loading.close()
         })
       }
     },

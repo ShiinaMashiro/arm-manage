@@ -161,18 +161,24 @@ let sideItems = [
         queryAuthor: "4-1",
         updateAuthor: "4-0",
         sceneList: [
-          {
+          /*{
             name: "新增文件",
             path: "/home/file/add",
             author: "_0201_",
             queryAuthor: "4_1-1",
             updateAuthor: "4_1-0",
-          }, {
+          },*/ {
             name: "文件分发",
             path: "/home/file/issue",
             author: "_0201_",
             queryAuthor: "4_2-1",
             updateAuthor: "4_2-0",
+          }, {
+            name: "分发记录",
+            path: "/home/file/record",
+            author: "_0201_",
+            queryAuthor: "4_3-1",
+            updateAuthor: "4_3-0",
           }
         ]
       }
@@ -367,6 +373,7 @@ const state = {
     ip: ''
   },*/
   deviceWindowMode: [],
+  cameraInfo: [],
   cameraWeight: 0,
   cameraShow: true,
   cameraLeft: 0,
@@ -402,7 +409,10 @@ const state = {
     start: false,
     show: false,
   },
-  loginNow: true
+  loginNow: true,
+  displayMode: 0,
+  fileRecordId: null,
+  fileIssueInfo: null
 }
 
 let admin = {
@@ -599,15 +609,39 @@ export default new Vuex.Store({
     /* 设置摄像头窗口状态 */
     [mutation.CAMERA_SHOW_MODE] (state, mode) {
       console.log(mode);
+      let array = state.cameraInfo.filter(camera => camera.videoDeviceId === mode.videoDeviceId)
+
       if (mode.display) {
-        state.cameraShow = mode.show
+        state.cameraInfo.forEach((v, i) => {
+          if (mode.videoDeviceId === v.videoDeviceId) {
+            v.show = mode.show
+          }
+        })
         return
       }
-      if (mode.show && state.cameraWeight === 0) {
-        state.cameraLeft = mode.left
-        state.cameraTop = mode.top
+
+      let camera
+      if (mode.show) {
+        if (array.length === 0) {
+          camera = {
+            show: true,
+            weight: 0,
+            left: mode.left,
+            top: mode.top,
+            label: mode.label,
+            videoDeviceId: mode.videoDeviceId
+          }
+          state.cameraInfo.push(camera)
+        } else {
+          camera = array[0]
+        }
+      } else {
+        camera = array[0]
       }
-      mode.show ? state.cameraWeight++ : state.cameraWeight--
+      mode.show ? camera.weight++ : camera.weight--
+      if (camera.weight === 0) {
+        state.cameraInfo.splice(state.cameraInfo.indexOf(camera), 1)
+      }
     },
     /* 设置视频窗口状态 */
     [mutation.VIDEO_SHOW_MODE] (state, mode) {
@@ -793,6 +827,18 @@ export default new Vuex.Store({
     [mutation.LOGIN_NOW] (state, loginNow) {
       state.loginNow = loginNow
       sessionStorage.setItem('loginNow', JSON.stringify(loginNow))
+    },
+    [mutation.DISPLAY_MODE] (state, mode) {
+      state.displayMode = mode
+      sessionStorage.setItem('displayMode', JSON.stringify(mode))
+    },
+    [mutation.FILE_RECORD_ID] (state, id) {
+      state.fileRecordId = id
+      sessionStorage.setItem('fileRecordId', JSON.stringify(id))
+    },
+    [mutation.FILE_ISSUE_INFO] (state, info) {
+      state.fileIssueInfo = info
+      sessionStorage.setItem('fileIssueInfo', JSON.stringify(info))
     },
   },
   actions: {
@@ -1044,6 +1090,22 @@ export default new Vuex.Store({
         }
       }
 
+      return false
+    },
+    getCameraWeight: (state) => (videoDeviceId) => {
+      for(let i = 0; i < state.cameraInfo.length; i++) {
+        if (videoDeviceId === state.cameraInfo[i].videoDeviceId) {
+          return state.cameraInfo[i].weight
+        }
+      }
+      return 0
+    },
+    getCameraShow: (state) => (videoDeviceId) => {
+      for(let i = 0; i < state.cameraInfo.length; i++) {
+        if (videoDeviceId === state.cameraInfo[i].videoDeviceId) {
+          return state.cameraInfo[i].show
+        }
+      }
       return false
     }
   }

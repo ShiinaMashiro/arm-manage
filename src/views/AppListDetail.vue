@@ -22,17 +22,63 @@
               <span v-if="!changePopShow">{{appInfo.activity}}</span>
               <el-input v-else size="mini" v-model="changePopInfo.activity" style="width: 150px"></el-input>
             </div>
+
             <div class="info-view-item">
-              <span style="color: red;" v-if="changePopShow">*</span>
-              <span>推流最大码率：</span>
-              <span v-if="!changePopShow">{{appInfo.encodeRateMax}}</span>
-              <el-input v-else size="mini" v-model="changePopInfo.encodeRateMax" style="width: 150px"></el-input>
+              <span>推流最小码率<span v-show="changePopShow" style="color: red;">*</span>：</span>
+              <span v-if="!changePopShow">{{appInfo.encodeRateMin}} kb/s<el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的最小码率，需输入100~8000的数字，默认为1000，必须小于等于推流最大码率。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip></span>
+              <div v-else>
+                <el-input size="mini" v-model="changePopInfo.encodeRateMin" :style="{width: '150px', border: checkInfo.encodeRateMin ? '1px solid red' : ''}"></el-input>
+                <el-tooltip placement="top" style="padding: 0 5px">
+                  <div slot="content" style="max-width: 400px">
+                    调整云机推流时画面的最小码率，需输入100~8000的数字，默认为1000，必须小于等于推流最大码率。
+                  </div>
+                  <i class="el-icon-question"></i>
+                </el-tooltip>
+                <span v-show="checkInfo.encodeRateMin" style="color: red;padding-left: 10px">请输入大于100并且小于推流最大码率和8000的数值。</span>
+              </div>
             </div>
             <div class="info-view-item">
-              <span style="color: red;" v-if="changePopShow">*</span>
-              <span>推流帧数：</span>
-              <span v-if="!changePopShow">{{appInfo.framerate}}</span>
-              <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
+              <span>推流最大码率<span v-show="changePopShow" style="color: red;">*</span>：</span>
+              <span v-if="!changePopShow">{{appInfo.encodeRateMax}} kb/s<el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的最打码率，需输入1000~40000的整数，默认为2000，必须大于等于推流最小码率。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip></span>
+              <div v-else>
+                <el-input size="mini" v-model="changePopInfo.encodeRateMax" :style="{width: '150px', border: checkInfo.encodeRateMax ? '1px solid red' : ''}"></el-input>
+                <el-tooltip placement="top" style="padding: 0 5px">
+                  <div slot="content" style="max-width: 400px">
+                    调整云机推流时画面的最打码率，需输入1000~40000的整数，默认为2000，必须大于等于推流最小码率。
+                  </div>
+                  <i class="el-icon-question"></i>
+                </el-tooltip>
+                <span v-show="checkInfo.encodeRateMax" style="color: red;padding-left: 10px">请输入大于1000和最小推流码率并且小于40000的数值。</span>
+              </div>
+            </div>
+            <div class="info-view-item">
+              <span>推流帧率<span v-show="changePopShow" style="color: red;">*</span>：</span>
+              <span v-if="!changePopShow">{{appInfo.framerate}}<el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的帧率，需输入1-60的整数，默认为30。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip></span>
+              <div v-else>
+                <el-input size="mini" v-model="changePopInfo.framerate" :style="{width: '150px', border: checkInfo.framerate ? '1px solid red' : ''}"></el-input>
+                <el-tooltip placement="top" style="padding: 0 5px">
+                  <div slot="content" style="max-width: 400px">
+                    调整云机推流时画面的帧率，需输入1-60的整数，默认为30。
+                  </div>
+                  <i class="el-icon-question"></i>
+                </el-tooltip>
+                <span v-show="checkInfo.framerate" style="color: red;padding-left: 10px">请输入1-60的整数。</span>
+              </div>
             </div>
           <div class="info-view-item-btn">
             <el-button size="small" type="primary" v-if="!changePopShow && $store.getters.checkChangeAuth()" @click="changePop()">设置</el-button>
@@ -145,6 +191,24 @@
         whiteList: [],
         whiteAddValue: '',
         appInfo: {},
+        regexMap: {
+          webIp: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          webMask: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          email: /^$/,
+          phone: /^$/,
+          // ntpAddress: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          encodeRateMax: /^([1-3]\d{3,4}|[4-9]\d{3})$/,
+          extranetIp: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          framerate: /^([0-5]\d|60|[1-9])$/,
+          // mediaServerWan: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          // mediaServerLan: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          webPort: /^[0-9]{1,5}$/,
+          encodeRateMin: /^([1-7][0-9]{2,3}|[89]\d{2})$/,
+          cameraUpFrameRate: /^([0-5]\d|60|[1-9])$/,
+          cameraUpCodeRate: /^([1-3]\d{3,4}|[4-9]\d{3})$/,
+          isVolume: /^[12]$/
+        },
+        checkInfo: null,
         list: [],
         rules: {
           activity: [
@@ -213,12 +277,29 @@
       /* 修改设备池信息 */
       saveAppInfo (info) {
         let that = this
+        let sign = false
+        if (!that.regexMap.encodeRateMax.test(info.encodeRateMax) || parseInt(info.encodeRateMax) < parseInt(info.encodeRateMin)) {
+          that.checkInfo['encodeRateMax'] = true
+          sign = true
+        }
+        if (!that.regexMap.encodeRateMin.test(info.encodeRateMin) || parseInt(info.encodeRateMax) < parseInt(info.encodeRateMin)) {
+          that.checkInfo['encodeRateMin'] = true
+          sign = true
+        }
+        if (!that.regexMap.framerate.test(info.framerate)) {
+          that.checkInfo['framerate'] = true
+          sign = true
+        }
+        if (sign) {
+          return
+        }
         that.loading = this.$loading({
           lock: true,
           text: 'Loading',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         });
+
         that.$post(that.$uri.apk.apkInfoSave, info).then(res => {
           that.changePopShow = false
           that.switchPopShow = false
@@ -290,6 +371,11 @@
         that.$post(that.$uri.apk.apkInfo, {id: that.id}).then(res => {
           let v = res.data
           that.appInfo = v
+          that.checkInfo = {
+            encodeRateMin: false,
+            encodeRateMax: false,
+            framerate: false
+          }
           that.whiteList = that.appInfo.whiteList.split(';')
         })
       }

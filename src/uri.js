@@ -127,6 +127,9 @@ export const uri = {
         fileAdd: '/fileIssue/saveAdd/', //文件新增
         fileDel: '/fileIssue/delete/', //文件删除
         fileIssue: '/fileIssue/issue/', //文件分发
+        record: '/fileIssue/record/', //文件分发
+        recordDetail: '/fileIssue/record/detail', //文件分发
+        recordDel: '/fileIssue/delete/record/', //文件分发
     },
     ipProxy: {
         list: '/proxy/list/', //代理信息列表
@@ -160,5 +163,11 @@ export const uri = {
         add: '/live/saveAdd/',
         del: '/live/delete/',
         start: '/live/start/',
+    },
+    database: {
+        list: '/database/list',
+        backup: '/database/backup',
+        restore: '/database/restore',
+        del: '/database/delete',
     }
 }

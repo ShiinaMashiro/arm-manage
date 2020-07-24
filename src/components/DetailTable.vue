@@ -221,37 +221,52 @@
           key: 'route',
           edit: true,
           notNull: true,
-          value: ''
+          value: '',
+          valid: false,
+          regex: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          errorMsg: '填写正确的网关ip'
         },{
           name: '子网掩码',
           key: 'netmask',
           edit: true,
           notNull: true,
-          value: ''
+          value: '',
+          valid: false,
+          regex: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          errorMsg: '填写正确的子网掩码'
         },{
           name: 'DNS',
           key: 'dns',
           edit: true,
           notNull: true,
-          value: ''
+          value: '',
+          valid: false,
+          regex: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          errorMsg: '填写正确的dns'
         },{
           name: 'NTP地址',
           key: 'ntpAddress',
           edit: true,
           // notNull: true,
-          value: ''
+          value: '',
+          valid: false,
+          regex: null
         },{
           name: '初始端口',
           key: 'initialPort',
           edit: true,
           // notNull: true,
-          value: ''
+          value: '',
+          valid: false,
+          regex: null
         },{
           name: 'ADB端口',
           key: 'adbPort',
           edit: true,
           // notNull: true,
           value: '',
+          valid: false,
+          regex: null
         },{
           name: '是否有状态',
           key: 'isStatus',
@@ -263,7 +278,9 @@
           inactive: '0',
           show: (status) => {
             return status == 1 ? '是' : '否'
-          }
+          },
+          valid: false,
+          regex: null
         },{
           name: '是否锁定',
           key: 'isLock',
@@ -275,7 +292,9 @@
           inactive: '1',
           show: (status) => {
             return status == 2 ? '是' : '否'
-          }
+          },
+          valid: false,
+          regex: null
         }
       ],
       cenList: [

@@ -58,7 +58,7 @@ export default {
       this.changePasswordPopShow = true
     },
     changePassword () {
-      let info = this.changeInfo
+      let info = {...this.changeInfo}
       if (!info.oldPassword || !info.newPassword) {
         this.$message.error("输入不能为空")
         return
@@ -67,6 +67,8 @@ export default {
         this.$message.error("两次密码不一致")
         return
       }
+      info.oldPassword= md5(info.oldPassword)
+      info.newPassword= md5(info.newPassword)
       let that = this
       that.$post(that.$uri.login.changePassword, info).then(res => {
         that.$message.success("修改成功")

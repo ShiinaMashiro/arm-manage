@@ -52,7 +52,9 @@
     },
     methods: {
       login () {
-        this.$store.dispatch(this.$action.LOGIN, this.info)
+        let loginInfo = {...this.info}
+        loginInfo.password = md5(loginInfo.password)
+        this.$store.dispatch(this.$action.LOGIN, loginInfo)
       }
     },
     mounted() {

@@ -3,8 +3,8 @@
     <div class="search-btn">
       <div>
       </div>
-      <div @keyup.enter="getLogList">
-        <el-input size="small" placeholder="输入消息ID/消息备注/云机ID 搜索" v-model="searchInfo.queryParam" style="width: 320px">
+      <div @keyup.enter="getIpList">
+        <el-input size="small" placeholder="输入消息ID/消息备注/云机IP 搜索" v-model="searchInfo.queryParam" style="width: 320px">
           <el-button slot="append" icon="el-icon-search" @click="getIpList"></el-button>
         </el-input>
       </div>
@@ -174,7 +174,7 @@
         changeIpPopShow: false,
         changeIpInfo: null,
         searchInfo: {
-          // queryParam: ''
+          queryParam: ''
         },
         forwardPopShow: false,
         forwardInfo: null,

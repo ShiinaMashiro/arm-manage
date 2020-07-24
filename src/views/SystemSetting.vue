@@ -23,6 +23,7 @@
         </div>
       </div>
     </div>
+
     <div class="info-view">
       <div class="info-view-title">设备引擎版本管理</div>
       <div class="info-view-main">
@@ -56,6 +57,19 @@
         </div>
       </div>
     </div>
+
+    <div class="info-view">
+      <div class="info-view-title">数据库备份恢复</div>
+      <div class="info-view-main">
+        <span class="info-view-item" style="font-size: 12px">备份数据库文件，并从数据库文件中恢复</span>
+        <span class="info-view-item" style="font-size: 12px">当前数据库版本：{{systemVersion}}</span>
+        <div class="info-view-item-btn">
+          <el-button size="small" type="primary" v-if="$store.getters.checkChangeAuth()" @click="backupDatabase">备份</el-button>
+          <el-button size="small" type="primary" v-if="$store.getters.checkChangeAuth()" @click="recoverDatabasePop">从数据库文件恢复</el-button>
+        </div>
+      </div>
+    </div>
+
     <div class="info-view">
       <div class="info-view-title">管理系统升级</div>
       <div class="info-view-main">
@@ -78,24 +92,36 @@
       <div class="info-view-main">
         <span class="info-view-item" style="font-size: 12px">配置管理中心网络及远程相机服务网络</span>
         <div class="info-view-item">
-          <span>管理中心网络IP：</span>
+          <span>管理中心网络IP<span v-show="changePopShow" style="color: red;">*</span>：</span>
           <span v-if="!changePopShow">{{sysInfo.webIp}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.webIp" style="width: 150px"></el-input>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.webIp" :style="{width: '150px', border: checkInfo.webIp ? '1px solid red' : ''}"></el-input>
+            <span v-show="checkInfo.webIp" style="color: red;padding-left: 10px">请输入有效的公网IP地址。</span>
+          </div>
         </div>
         <div class="info-view-item">
-          <span>管理中心网络端口：</span>
+          <span>管理中心网络端口<span v-show="changePopShow" style="color: red;">*</span>：</span>
           <span v-if="!changePopShow">{{sysInfo.webPort}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.webPort" style="width: 150px"></el-input>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.webPort" :style="{width: '150px', border: checkInfo.webPort ? '1px solid red' : ''}"></el-input>
+            <span v-show="checkInfo.webPort" style="color: red;padding-left: 10px">请输入有效的网络端口号。</span>
+          </div>
         </div>
         <div class="info-view-item">
-          <span>管理中心网络子网掩码：</span>
+          <span>管理中心网络子网掩码<span v-show="changePopShow" style="color: red;">*</span>：</span>
           <span v-if="!changePopShow">{{sysInfo.webMask}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.webMask" style="width: 150px"></el-input>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.webMask" :style="{width: '150px', border: checkInfo.webMask ? '1px solid red' : ''}"></el-input>
+            <span v-show="checkInfo.webMask" style="color: red;padding-left: 10px">请输入有效的子网掩码。</span>
+          </div>
         </div>
         <div class="info-view-item">
-          <span>公网IP：</span>
+          <span>公网IP<span v-show="changePopShow" style="color: red;">*</span>：</span>
           <span v-if="!changePopShow">{{sysInfo.extranetIp}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.extranetIp" style="width: 150px"></el-input>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.extranetIp" :style="{width: '150px', border: checkInfo.extranetIp ? '1px solid red' : ''}"></el-input>
+            <span v-show="checkInfo.extranetIp" style="color: red;padding-left: 10px">请输入有效的公网IP地址。</span>
+          </div>
         </div>
         <div class="info-view-item">
           <span>NTP服务器地址：</span>
@@ -124,14 +150,106 @@
       <div class="info-view-main">
         <span class="info-view-item" style="font-size: 12px">配置应用默认推流参数</span>
         <div class="info-view-item">
-          <span>推流最大码率：</span>
-          <span v-if="!streamPopShow">{{sysInfo.encodeRateMax}} kb/s</span>
-          <el-input v-else size="mini" v-model="changePopInfo.encodeRateMax" style="width: 150px"></el-input>
+          <span>推流最小码率<span v-show="streamPopShow" style="color: red;">*</span>：</span>
+          <span v-if="!streamPopShow">{{sysInfo.encodeRateMin}} kb/s<el-tooltip placement="top" style="padding: 0 5px">
+            <div slot="content" style="max-width: 400px">
+              调整云机推流时画面的最小码率，需输入100~8000的数字，默认为1000，必须小于等于推流最大码率。
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip></span>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.encodeRateMin" :style="{width: '150px', border: checkInfo.encodeRateMin ? '1px solid red' : ''}"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的最小码率，需输入100~8000的数字，默认为1000，必须小于等于推流最大码率。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <span v-show="checkInfo.encodeRateMin" style="color: red;padding-left: 10px">请输入大于100并且小于推流最大码率和8000的数值。</span>
+          </div>
         </div>
         <div class="info-view-item">
-          <span>推流帧率：</span>
-          <span v-if="!streamPopShow">{{sysInfo.framerate}}</span>
-          <el-input v-else size="mini" v-model="changePopInfo.framerate" style="width: 150px"></el-input>
+          <span>推流最大码率<span v-show="streamPopShow" style="color: red;">*</span>：</span>
+          <span v-if="!streamPopShow">{{sysInfo.encodeRateMax}} kb/s<el-tooltip placement="top" style="padding: 0 5px">
+            <div slot="content" style="max-width: 400px">
+              调整云机推流时画面的最打码率，需输入1000~40000的整数，默认为2000，必须大于等于推流最小码率。
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip></span>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.encodeRateMax" :style="{width: '150px', border: checkInfo.encodeRateMax ? '1px solid red' : ''}"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的最打码率，需输入1000~40000的整数，默认为2000，必须大于等于推流最小码率。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <span v-show="checkInfo.encodeRateMax" style="color: red;padding-left: 10px">请输入大于1000和最小推流码率并且小于40000的数值。</span>
+          </div>
+        </div>
+        <div class="info-view-item">
+          <span>推流帧率<span v-show="streamPopShow" style="color: red;">*</span>：</span>
+          <span v-if="!streamPopShow">{{sysInfo.framerate}}<el-tooltip placement="top" style="padding: 0 5px">
+            <div slot="content" style="max-width: 400px">
+              调整云机推流时画面的帧率，需输入1-60的整数，默认为30。
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip></span>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.framerate" :style="{width: '150px', border: checkInfo.framerate ? '1px solid red' : ''}"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机推流时画面的帧率，需输入1-60的整数，默认为30。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <span v-show="checkInfo.framerate" style="color: red;padding-left: 10px">请输入1-60的整数。</span>
+          </div>
+        </div>
+        <div class="info-view-item">
+          <span>摄像头上行帧率<span v-show="streamPopShow" style="color: red;">*</span>：</span>
+          <span v-if="!streamPopShow">{{sysInfo.cameraUpFrameRate}}<el-tooltip placement="top" style="padding: 0 5px">
+            <div slot="content" style="max-width: 400px">
+              调整云机本地摄像头同步时的上行帧率，需输入1-60的整数，默认为30。
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip></span>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.cameraUpFrameRate" :style="{width: '150px', border: checkInfo.cameraUpFrameRate ? '1px solid red' : ''}"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机本地摄像头同步时的上行帧率，需输入1-60的整数，默认为30。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <span v-show="checkInfo.cameraUpFrameRate" style="color: red;padding-left: 10px">请输入1-60的整数。</span>
+          </div>
+        </div>
+        <div class="info-view-item">
+          <span>摄像头上行码率<span v-show="streamPopShow" style="color: red;">*</span>：</span>
+          <span v-if="!streamPopShow">{{sysInfo.cameraUpCodeRate}} kb/s<el-tooltip placement="top" style="padding: 0 5px">
+            <div slot="content" style="max-width: 400px">
+              调整云机本地摄像头同步时的上行码率，需输入1000~40000的整数，默认为2000。
+            </div>
+            <i class="el-icon-question"></i>
+          </el-tooltip></span>
+          <div v-else>
+            <el-input size="mini" v-model="changePopInfo.cameraUpCodeRate" :style="{width: '150px', border: checkInfo.cameraUpCodeRate ? '1px solid red' : ''}"></el-input>
+            <el-tooltip placement="top" style="padding: 0 5px">
+              <div slot="content" style="max-width: 400px">
+                调整云机本地摄像头同步时的上行码率，需输入1000~40000的整数，默认为2000。
+              </div>
+              <i class="el-icon-question"></i>
+            </el-tooltip>
+            <span v-show="checkInfo.cameraUpCodeRate" style="color: red;padding-left: 10px">请输入1000~40000的整数。</span>
+          </div>
+        </div>
+        <div class="info-view-item">
+          <span>推流音频开关：</span>
+          <el-switch v-if="!streamPopShow" v-model="sysInfo.isVolume" :active-value="'1'" :inactive-value="'2'"
+                     :disabled="true" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch v-else size="mini" v-model="changePopInfo.isVolume" :active-value="'1'" :inactive-value="'2'"
+                     active-color="#13ce66" inactive-color="#ff4949"></el-switch>
         </div>
         <div class="info-view-item-btn">
           <el-button size="small" type="primary" v-if="!streamPopShow && $store.getters.checkChangeAuth()" @click="streamPop()">设置</el-button>
@@ -375,6 +493,20 @@
         </el-form>
       </div>
     </Drawer>
+
+    <Drawer title="数据库恢复" :visible.sync="recoverDatabasePopShow" @handClick="recoverDatabase">
+      <div v-if="recoverDatabasePopShow" style="font-size: 13px">
+        <div style="margin-bottom: 20px">当前管理端版本：{{systemVersion}}</div>
+        <div>请选择需要恢复的数据库文件</div>
+        <div style="margin: 10px 0 20px 0;color: red;font-size: 12px">不同管理端版本的数据库恢复会造成系统不稳定，当前仅支持同管理端版本数据库进行恢复。</div>
+        <el-table :data="databaseBackupList" ref="databaseBackupTable" size="mini" max-height="500px" :highlight-current-row="true"
+                  class="database-table"
+                  @current-change="rowClickHandle" :row-class-name="rowClassName">
+          <el-table-column prop="systemVersion" label="版本"></el-table-column>
+          <el-table-column prop="createTime" label="备份日期" :formatter="databaseBackupDateFormat"></el-table-column>
+        </el-table>
+      </div>
+    </Drawer>
   </div>
 </template>
 
@@ -388,7 +520,28 @@
     },
     data() {
       return {
+        recoverDatabasePopShow: false,
+        databaseBackupList: [],
+        recoverId: null,
         sysInfo: null,
+        checkInfo: null,
+        regexMap: {
+          webIp: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          webMask: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          email: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+          phone: /^1\d{10}$/,
+          // ntpAddress: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          encodeRateMax: /^([1-3]\d{3,4}|[4-9]\d{3})$/,
+          extranetIp: /^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/,
+          framerate: /^([0-5]\d|60|[1-9])$/,
+          // mediaServerWan: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          // mediaServerLan: '/^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)($|(?!\\.$)\\.)){4}$/',
+          webPort: /^[0-9]{1,5}$/,
+          encodeRateMin: /^([1-7][0-9]{2,3}|[89]\d{2})$/,
+          cameraUpFrameRate: /^([0-5]\d|60|[1-9])$/,
+          cameraUpCodeRate: /^([1-3]\d{3,4}|[4-9]\d{3})$/,
+          isVolume: /^[12]$/
+        },
         idInfo: null,
         changePopShow: false,
         streamPopShow: false,
@@ -719,6 +872,65 @@
         this.engineVersionAddList = []
         this.engineVersionDelList = []
       },
+      backupDatabase() {
+        this.$loading()
+        this.$post(this.$uri.database.backup).then(res => {
+          if (res.success) {
+            this.$message.success('备份成功')
+          } else {
+            this.$message.error('备份失败')
+          }
+        }).finally(() => {
+          this.$loading().close()
+        })
+      },
+      recoverDatabasePop() {
+        this.$post(this.$uri.database.list).then(res => {
+          if (res.success) {
+            this.databaseBackupList = res.list
+            this.recoverDatabasePopShow = true
+            this.$nextTick().then(() => {
+              let res = this.databaseBackupList.filter(backup => backup.systemVersion === this.systemVersion)
+              if (res.length) {
+                this.recoverId = res[0].id
+                this.$refs.databaseBackupTable.setCurrentRow(res[0])
+              }
+            })
+          } else {
+            this.$message.error('系统异常')
+          }
+        })
+      },
+      recoverDatabase() {
+        if (!this.recoverId) {
+          this.$message.error('未选择备份记录')
+          return
+        }
+        this.$loading()
+        this.$post(this.$uri.database.restore, {id: this.recoverId}).then(res => {
+          if (res.success) {
+            this.$message.success('恢复成功')
+            this.recoverDatabasePopShow = false
+          } else {
+            this.$message.error('恢复失败')
+          }
+        }).finally(() => {
+          this.$loading().close()
+        })
+      },
+      rowClickHandle(n, o) {
+        if (n.systemVersion !== this.systemVersion) {
+          this.$refs.databaseBackupTable.setCurrentRow(o)
+        } else {
+          this.recoverId = n.id
+        }
+      },
+      rowClassName({row}) {
+        return row.systemVersion === this.systemVersion ? 'click' : 'not-click'
+      },
+      databaseBackupDateFormat(r, c, cv, index) {
+        return this.$formatDate(new Date(r.createTime))
+      },
       getEngineVersionList() {
         that.$post(that.$uri.system.engineCodeList).then(res => {
           if (res.success) {
@@ -739,11 +951,14 @@
           if (res.success) {
             let idInf = {}
             let paramInf = {}
+            let checkInf = {}
             res.list.forEach(item => {
               idInf[item.paramName] = item.id
               paramInf[item.paramName] = item.paramValue
+              checkInf[item.paramName] = false
             })
             that.sysInfo = paramInf
+            that.checkInfo = checkInf
             that.idInfo = idInf
             that.emailList = that.sysInfo.email.split(',')
             that.phoneList = that.sysInfo.phone.split(',')
@@ -766,6 +981,9 @@
         that.streamPopShow = true
       },
       saveSysInfo(info) {
+        console.log(info)
+        let sign = true
+        let ps = []
         for (let key in info) {
           if (info[key] !== that.sysInfo[key]) {
             let temp = {
@@ -773,11 +991,41 @@
               paramName: key,
               paramValue: info[key]
             }
-            that.$post(that.$uri.system.paramSave, temp).then(res => {})
+            if (that.regexMap[temp.paramName] && !that.regexMap[temp.paramName].test(temp.paramValue)) {
+              console.log(temp.paramValue)
+              sign = false
+              that.checkInfo[temp.paramName] = true
+            } else if (key === 'encodeRateMax') {
+              if (parseInt(info[key]) < parseInt(info['encodeRateMin'])) {
+                console.log('max')
+                console.log(info[key])
+                console.log(info['encodeRateMin'])
+
+                sign = false
+                that.checkInfo[temp.paramName] = true
+              }
+            } else if (key === 'encodeRateMin') {
+              if (parseInt(info[key]) > parseInt(info['encodeRateMax'])) {
+                console.log('min')
+                console.log(info[key])
+                console.log(info['encodeRateMax'])
+                sign = false
+                that.checkInfo[temp.paramName] = true
+              }
+            }
+            ps.push(temp)
           }
-          that.getSysInfo()
-          that.changePopShow = false
-          that.streamPopShow = false
+        }
+        if (sign) {
+          let aps = []
+          ps.forEach(t => {
+            aps.push(that.$post(that.$uri.system.paramSave, t))
+          })
+          Promise.all(aps).then().catch().finally(() => {
+            that.getSysInfo()
+            that.changePopShow = false
+            that.streamPopShow = false
+          })
         }
       },
       deleteEmail(index) {
@@ -796,12 +1044,12 @@
       emailAddSave() {
         let check = false
         that.emailList.forEach(phone => {
-          if (!phone) {
+          if (!that.regexMap.email.test(phone)) {
             check = true
           }
         })
         if (check) {
-          that.$message.warning("邮箱不能为空")
+          that.$message.warning("请输入有效的邮箱地址")
           return
         }
         let temp = {
@@ -837,12 +1085,12 @@
       phoneAddSave() {
         let check = false
         that.phoneList.forEach(phone => {
-          if (!phone) {
+          if (!that.regexMap.phone.test(phone)) {
             check = true
           }
         })
         if (check) {
-          that.$message.warning("电话不能为空")
+          that.$message.warning("请输入有效的手机号")
           return
         }
         let temp = {
@@ -926,5 +1174,12 @@
         font-size: 12px;
       }
     }
+  }
+
+  .database-table /deep/ .not-click {
+    background-color: #F5F7FA;
+  }
+  .database-table /deep/ .click {
+
   }
 </style>

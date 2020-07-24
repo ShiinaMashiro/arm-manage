@@ -112,7 +112,14 @@
         that.changePopInfo = JSON.parse(JSON.stringify(that.logInfo))
         that.changePopShow = true
       },
-      saveLogInfo() {
+      async saveLogInfo() {
+        let address = that.changePopInfo.udpServer
+        if (address !== '127.0.0.1') {
+          let test = await that.$confirm('检测到您设置的日志服务器地址为外部服务器，日志文件需要手动进行清理，清理路径为:/var/log/longene_log.log', '提示')
+          if (test !== 'confirm') {
+            return
+          }
+        }
         if (that.changePopShow) {
           that.$post(that.$uri.system.logSave, that.changePopInfo).then(res => {
             if (res.success) {

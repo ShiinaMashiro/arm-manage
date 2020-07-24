@@ -21,7 +21,11 @@
       ></device-window>
     </template>
 
-    <CameraWindow v-show="$store.state.cameraWeight > 0 && $store.state.cameraShow"></CameraWindow>
+    <template v-for="camera in $store.state.cameraInfo">
+      <CameraWindow v-show="camera.weight > 0 && camera.show" :key="camera.videoDeviceId"
+                    :title="camera.label" :left="camera.left" :top="camera.top" :videoDeviceId="camera.videoDeviceId"></CameraWindow>
+    </template>
+
     <input v-if="selectShow" type="file" id="selectFile" @change="selectFile()" style="display: none"></input>
     <template v-for="v in $store.state.videoInfo">
       <VideoWindow v-show="v.show" :key="v.id" :id="v.id" :many="v.many" :video="v.video" :players="v.players" :left="v.left" :top="v.top"></VideoWindow>

@@ -28,8 +28,9 @@
         <el-table-column prop="updateTime" label="上传时间"></el-table-column>
         <el-table-column label="操作" min-width="200px">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="issueFile(scope.row)">重新分发</el-button>
-            <el-button type="text" size="small" @click="delFile(scope.row)">删除</el-button>
+            <el-button type="text" size="small" @click.stop="issueFile(scope.row)">重新分发</el-button>
+            <el-button type="text" size="small" @click.stop="goRecord(scope.row)">分发记录</el-button>
+            <el-button type="text" size="small" @click.stop="delFile(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -232,8 +233,14 @@
         })
       },
       issueFile(row) {
-        this.changeFile = row
-        this.changeGroupPopShow = true
+        // this.changeFile = row
+        // this.changeGroupPopShow = true
+        this.$store.commit(this.$mutation.FILE_ISSUE_INFO, row)
+        this.$router.push('/home/file/issue')
+      },
+      goRecord(row) {
+        this.$store.commit(this.$mutation.FILE_ISSUE_INFO, row)
+        this.$router.push('/home/file/record')
       },
       issueFileR() {
         let that = this
@@ -246,7 +253,8 @@
       },
       /* 表单击行事件 */
       checkRow(r, c ,e) {
-        this.$refs.multipleTable.toggleRowSelection(r)
+        this.$store.commit(this.$mutation.FILE_ISSUE_INFO, r)
+        this.$router.push('/home/file/issue')
       },
       /* 获取选中的数据 */
       handleSelectionChange (val) {

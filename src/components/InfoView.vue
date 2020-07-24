@@ -9,10 +9,11 @@
           <span>{{item.name}}：</span>
           <span v-if="!isEdit || !item.edit">{{item.show ? item.show(editInfo[item.key]) : editInfo[item.key]}}</span>
           <template v-else>
-            <el-input v-if="!item.type" size="mini" v-model="item.value" style="width: 150px"></el-input>
+            <el-input v-if="!item.type" size="mini" v-model="item.value" :style="{width: '150px', border: item.valid ? '1px solid red' : ''}"></el-input>
             <el-switch v-else v-model="item.value"
                        :active-value="item.active"
                        :inactive-value="item.inactive"></el-switch>
+            <span v-show="item.valid" style="color: red;padding-left: 10px">{{item.errorMsg}}</span>
           </template>
         </div>
       </template>
@@ -65,10 +66,19 @@
         this.isEdit = false
       },
       savePre() {
+        let sign = true
         this.itemList.forEach(item => {
+          if (item.regex && item.regex.test) {
+            item.valid = !item.regex.test(item.value)
+            if (item.valid) {
+              sign = false
+            }
+          }
           this.editInfo[item.key] = item.value
         })
-        this.save(this.editInfo, this.refName)
+        if (sign) {
+          this.save(this.editInfo, this.refName)
+        }
       }
     },
     created() {

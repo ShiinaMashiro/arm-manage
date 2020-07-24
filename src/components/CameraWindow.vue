@@ -1,13 +1,13 @@
 <template>
   <div class="device">
-    <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="$store.state.cameraLeft" :y="$store.state.cameraTop">
+    <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="left" :y="top">
       <div class="window">
         <div class="header" :style="{ width: deviceWidth + 'px' }">
-          <span class="id">本地摄像头画面</span>
+          <span class="id">{{title || '本地摄像头画面'}}</span>
           <!--<i class="close el-icon-close" @click="closeClick"></i>-->
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
-          <video id="localCamera" autoplay playsinline :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></video>
+          <video :id="'localCamera-' + videoDeviceId" autoplay playsinline :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></video>
         </div>
         <div class="footer" :style="{ width: deviceWidth + 'px' }">
 
@@ -30,7 +30,11 @@
         type: String,
         default: "0"
       },
-      ip: String
+      ip: String,
+      title: String,
+      top: Number,
+      left: Number,
+      videoDeviceId: String
     },
     data () {
       return {

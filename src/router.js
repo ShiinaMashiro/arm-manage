@@ -290,6 +290,14 @@ export default new Router({
             changeAuth: "_0200_"
           }
         }, {
+          path: "file/record",
+          name: "文件分发记录",
+          component: () => import('./views/FileRecord.vue'),
+          meta: {
+            c2c: true,
+            changeAuth: "_0200_"
+          }
+        }, {
           path: "user/list",
           name: "用户管理",
           component: UserList,

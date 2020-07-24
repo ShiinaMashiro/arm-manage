@@ -24,13 +24,6 @@
         <el-button v-if="$isEnable($enableKey.ipProxy)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="ipClose()">关闭IP代理</el-button>
         <el-button v-if="$isEnable($enableKey.live)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="liveManage()">多路直播</el-button>
         <el-button v-if="$isEnable($enableKey.remoteCamera)" type="primary" size="small" :disabled="!hasSelect" style="margin-left: 10px" @click="openLocalVideo()">本地视频导入</el-button>
-        <el-select size="small" v-model="snapshotTime" placeholder="请选择" style="margin-left: 10px;width: 100px">
-          <el-option label="不刷新" :value="0"></el-option>
-          <el-option label="10秒" :value="10"></el-option>
-          <el-option label="20秒" :value="20"></el-option>
-          <el-option label="30秒" :value="30"></el-option>
-          <el-option label="60秒" :value="60"></el-option>
-        </el-select>
       </div>
 
       <div class="preview-bar-operate" v-if="false">
@@ -50,6 +43,26 @@
       <el-input size="mini" placeholder="输入云机IP/备注操作 搜索" v-model="queryParam" style="width: 320px">
         <el-button slot="append" icon="el-icon-search" @click="changeMode($store.state.groupDevShowMode)"></el-button>
       </el-input>
+      <span style="font-size: 13px;margin-left: 10px">预览图缩放:</span>
+      <el-select size="mini" v-model="scaleMode" placeholder="请选择" style="margin-left: 10px;width: 100px">
+        <el-option label="不缩放" :value="100"></el-option>
+        <el-option label="50%" :value="50"></el-option>
+        <el-option label="75%" :value="75"></el-option>
+        <el-option label="150%" :value="150"></el-option>
+      </el-select>
+      <span style="font-size: 13px;margin-left: 10px">多开窗口:</span>
+      <el-select size="mini" v-model="displayMode" placeholder="请选择" style="margin-left: 10px;width: 100px">
+        <el-option label="平铺" :value="0"></el-option>
+        <el-option label="堆叠" :value="1"></el-option>
+      </el-select>
+      <span style="font-size: 13px;margin-left: 10px">截图刷新间隔:</span>
+      <el-select size="mini" v-model="snapshotTime" placeholder="请选择" style="margin-left: 10px;width: 100px">
+        <el-option label="不刷新" :value="0"></el-option>
+        <el-option label="10秒" :value="10"></el-option>
+        <el-option label="20秒" :value="20"></el-option>
+        <el-option label="30秒" :value="30"></el-option>
+        <el-option label="60秒" :value="60"></el-option>
+      </el-select>
     </div>
 
     <div class="device-case-dev border-all" v-if="viewMode" style="margin-top: 20px">
@@ -148,17 +161,19 @@
         <div :key="item.id" class="snapshot-main" :style="{'margin-right': '15px', 'margin-top': '20px', border: aaa === index ? '1px solid #409eff' : '1px solid #f6f6f6'}">
           <el-tooltip class="item" effect="dark" :content="$isEnable($enableKey.adb) ? (item.deviceIp + ' adb端口：' + adbPortFilter(item)) : item.deviceIp" placement="top-start">
           <div style="text-align: left;display: flex;flex-direction: row;justify-content: space-between;" class="snapshot-main-head">
-            <el-checkbox v-model="test[index]"  @change="itemCheckedChange" style="flex-grow: 1;width: 50px;overflow: hidden; white-space: nowrap;">
-                <span style="font-size: 11px;overflow: hidden;width: 100%">{{item.remark || item.id}}</span>
+            <el-checkbox v-model="test[index]"  @change="itemCheckedChange"
+                         :style="{width: scaleMode === 50 ? '30px' : '50px'}"
+                         style="flex-grow: 1;overflow: hidden; white-space: nowrap;">
+                <span style="font-size: 11px;overflow: hidden;width: 100%">{{scaleMode === 50 ? item.id : (item.remark || item.id)}}</span>
             </el-checkbox>
-            <span :style="item | statusClassFilter" style="padding-right: 5px;font-size: 12px">
-            {{deviceStatusStr[item.deviceIp]}}
-          </span>
+            <span :style="item | statusClassFilter" style="padding-right: 5px;font-size: 11px;display: flex;justify-content: center;align-items: center">
+              {{getStatus(item.deviceIp)}}
+            </span>
           </div>
           </el-tooltip>
           <div class="snapshot-main-img" style="position: relative;" @mouseenter="mouseEnter(index)"
                @mouseleave="mouseLeave(index)">
-            <div v-show="aaa === index" style="position: absolute;left: 0;top: 5px;z-index: 1111;display: flex;flex-direction: column;align-items: flex-start;">
+            <div v-show="aaa === index && scaleMode !== 50" style="position: absolute;left: 0;top: 5px;z-index: 1111;display: flex;flex-direction: column;align-items: flex-start;">
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="rebootOneOne(item.deviceIp)">重启云机</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="downloadSnapshot(index)">下载截图</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="showQrCode(item.deviceIp)">云机识别码</el-button></div>
@@ -166,16 +181,34 @@
               <div v-if="$isEnable($enableKey.adb)" style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="adbOpt(item.deviceIp, 0)">关闭ADB</el-button></div>
               <div style="margin-bottom: 5px"><el-button type="primary" size="mini" @click="changeRemarkPop(item.id, item.remark)">修改备注</el-button></div>
             </div>
-            <el-image @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
-                      v-loading="snapshotImgLoading[item.deviceIp]"
-                      element-loading-text="拼命加载中"
-                      element-loading-spinner="el-icon-loading"
-                      element-loading-background="rgba(0, 0, 0, 0.8)"
-                    style="width: 144px;"
-                    :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
-                    fit="cover"></el-image>
+            <el-popover
+                    placement="right"
+                    :disabled="scaleMode !== 50"
+                    v-model="popover[item.deviceIp]">
+              <el-image slot="reference"
+                        @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
+                        @mouseover="popover[item.deviceIp] = true"
+                        @mouseout="popover[item.deviceIp] = false"
+                        v-loading="snapshotImgLoading[item.deviceIp]"
+                        element-loading-text="拼命加载中"
+                        element-loading-spinner="el-icon-loading"
+                        element-loading-background="rgba(0, 0, 0, 0.8)"
+                        :style="{width: imgWidth + 'px'}"
+                        :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
+                        fit="cover"></el-image>
+              <el-image
+                        v-loading="snapshotImgLoading[item.deviceIp]"
+                        element-loading-text="拼命加载中"
+                        element-loading-spinner="el-icon-loading"
+                        element-loading-background="rgba(0, 0, 0, 0.8)"
+                        style="width: 288px"
+                        :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
+                        fit="cover"></el-image>
+            </el-popover>
+
             <div v-if="$isEnable($enableKey.ipProxy)" style="font-size: 12px;text-align: left;padding: 0 5px;margin-top: -5px;
-            height: 18px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">IP：{{item.proxyIp || '无'}}</div>
+            height: 18px;display: flex;flex-direction: row;justify-content: flex-start;align-items: center">
+              IP：{{(scaleMode === 50 ? (item.proxyIp ? '开' : '') : item.proxyIp ) || '关'}}</div>
           </div>
         </div>
       </template>
@@ -350,11 +383,26 @@
             title="云机识别码"
             :visible.sync="qrCodeShow"
             :modal="false"
-            width="20%">
+            width="400px">
             <!--<img :src="qrCodeUrl"/>-->
-            <el-image
+            <el-image v-if="qrCodeShow"
               :src="qrCodeUrl"
               fit="cover"></el-image>
+            <div style="display: flex;flex-direction: column">
+              <div style="display: flex;flex-direction: column">
+                <div v-if="!mediaServerWan && !wanSetShow" style="color: red">
+                  媒体服务器外网地址暂未设置!
+                  <el-button type="text" size="mini" @click="wanSetShow = true" style="margin-left: 10px">快速设置</el-button>
+                </div>
+                <div v-if="wanSetShow" style="display: flex;justify-content: center;align-items: center">
+                  <span>媒体服务器外网地址：</span>
+                  <el-input size="mini" v-model="wanNew" style="width: 120px;margin-right: 10px"></el-input>
+                  <el-button type="text" size="mini" @click="wanSet">确定</el-button>
+                </div>
+                <div>远程虚拟相机apk下载地址：<el-button type="text" size="mini">点击下载</el-button></div>
+              </div>
+
+            </div>
     </el-dialog>
   </div>
 </template>
@@ -368,6 +416,11 @@ export default {
   components: {Drawer, DeviceSync, DeviceSync2},
   data () {
     return {
+      mediaServerWan: 'null',
+      wanSetShow: false,
+      wanId: 0,
+      wanNew: '',
+      arCodeIp: '',
       devSyncShow: false,
       devSyncList: [],
       apkStartStopShow: false,
@@ -393,6 +446,7 @@ export default {
       allChecked: false,
       viewMode: false, // true为列表，false为预览
       snapshotSuccess: false,
+      popover: {},
       info: {
         success: false,
         list: [],
@@ -483,6 +537,9 @@ export default {
         checked: 0
       },
       liveSyncShow: false,
+      displayMode: 0,
+      scaleMode: 100,
+      imgWidth: 144,
       snapshotTime: 0,
       snapshotAutoId: null,
       // remark
@@ -544,9 +601,32 @@ export default {
   watch: {
     snapshotTime() {
       this.snapshotAuto()
+    },
+    displayMode(n) {
+      this.$store.commit(this.$mutation.DISPLAY_MODE, n)
+    },
+    scaleMode(n) {
+      this.imgWidth = 144 * n / 100
     }
   },
   methods: {
+    wanSet() {
+      this.$post(this.$uri.system.paramSave, {
+        id: this.wanId,
+        paramName: 'mediaServerWan',
+        paramValue: this.wanNew
+      }).then(res => {
+        if (res.success) {
+          this.mediaServerWan = this.wanNew
+          this.wanSetShow = false
+          this.$post(this.$uri.device.qrCode, {deviceIp: this.qrCodeIp}).then(res => {
+            this.qrCodeUrl = res.data
+          })
+        } else {
+          this.$message.error('修改失败')
+        }
+      })
+    },
     snapshotAuto() {
       if (this.snapshotAutoId) {
         clearInterval(this.snapshotAutoId)
@@ -866,7 +946,7 @@ export default {
           this.$parent.video.players.push('ref' + dev.id)
           this.$parent.$refs['ref' + dev.id][0].localId = localId
         })
-        let index = this.$store.state.deviceWindowMode.length + this.$store.state.videoInfo.length + (this.$store.state.cameraWeight > 0 ? 1 : 0)
+        let index = this.$store.state.deviceWindowMode.length + this.$store.state.videoInfo.length + this.$store.state.cameraInfo.length
         this.$parent.video.left = 288 * (index % Math.floor(document.documentElement.clientWidth / 288))
         this.$parent.video.top = 80 * Math.floor(index / Math.floor(document.documentElement.clientWidth / 288))
         document.getElementById('selectFile').click()
@@ -1014,9 +1094,18 @@ export default {
     },
     showQrCode(ip) {
       let that = this
+      this.qrCodeIp = ip
       that.$post(that.$uri.device.qrCode, {deviceIp: ip}).then(res => {
         that.qrCodeUrl = res.data
         that.qrCodeShow = true
+      })
+
+      that.$post(that.$uri.system.paramGet, {paramName: 'mediaServerWan'}).then(res => {
+        if (res.success) {
+          that.wanId = res.data.id
+          that.mediaServerWan = res.data.paramValue
+          console.log(that.mediaServerWan)
+        }
       })
     },
     getImgUrl(no) {
@@ -1098,6 +1187,13 @@ export default {
         })
       })
     },
+    getStatus(ip) {
+      let name = this.deviceStatusStr[ip]
+      if (this.scaleMode === 50 && name.length > 2) {
+        return ''
+      }
+      return name
+    },
     mouseEnter(index) {
       this.aaa = index
     },
@@ -1121,6 +1217,7 @@ export default {
           that.info = res
           that.test = []
           that.info.list.forEach(v => {
+            that.popover[v.deviceIp] = false
             if (that.adbPort[v.caseNo] == null) {
               that.adbPort[v.caseNo] = 0
               that.$post(that.$uri.device.caseInfoByCaseNo, {caseNo: v.caseNo}).then(res => {
@@ -1459,6 +1556,7 @@ export default {
     }
   },
   mounted () {
+    this.displayMode = this.$store.state.displayMode
     this.changeMode(this.$store.state.groupDevShowMode)
     this.getGroupList()
     this.getEngineVersion()

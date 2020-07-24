@@ -41,6 +41,8 @@ Vue.filter("formatDateTime", function(time) {
   return myUtil.formatDate(new Date(time))
 })
 
+Vue.prototype.$formatDate = myUtil.formatDate
+
 Vue.prototype.$enableKey = {
   ipProxy: 'i',
   devMaster: 'd',
