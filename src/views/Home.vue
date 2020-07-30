@@ -81,6 +81,10 @@
         <div>
           <div>有效期：{{licenseTime}}</div>
           <div>设备数量：{{licenseInfo.deviceNum}}</div>
+          <div class="show-item">配套服务：</div>
+          <template v-if="licenseInfo.service">
+            <div class="show-item-child" v-for="(item,index) in serviceList">{{item}}<i :class="[licenseInfo.service.indexOf(index) === -1 ? 'el-icon-error' : 'el-icon-success']" :style="{color: licenseInfo.service.indexOf(index) === -1 ? 'red' : 'green'}"></i></div>
+          </template>
         </div>
         <div style="width: 100%;text-align: center;padding: 15px 0">
           <el-button type="primary" @click="systemPop">设置系统参数</el-button>
@@ -148,6 +152,7 @@ export default {
   },
   data() {
     return {
+      serviceList: ['命令转发','IP代理池搭建','设备大师','虚拟定位','ADB调试','远程虚拟相机','多开远程控制窗口','电商多路直播','音视频导入云机','安全手机服务'],
       license: '',
       licenseResult: false,
       licenseInfo: {
@@ -440,5 +445,26 @@ export default {
     height: 100%;
     border: none;
   }
+  .show-item {
+    padding: 5px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 
+  .show-item-child {
+    width: 140px;
+    padding: 3px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    i {
+      font-size: 16px;
+    }
+  }
 </style>

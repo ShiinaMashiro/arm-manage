@@ -74,11 +74,8 @@
         sortInfo: {
           p: true, //true esc false desc
           order: 'id'
-        }
+        },
       }
-    },
-    watch: {
-
     },
     methods: {
       sortHandle(order) {

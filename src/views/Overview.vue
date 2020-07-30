@@ -57,6 +57,10 @@
           <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: left;padding: 20px 20px 10px 20px;font-size: 14px">
             <div style="text-align: left">有效时间：{{licenseTime}}</div>
             <div style="text-align: left;margin-top: 10px">设备数量：{{licenseInfo.deviceNum}}</div>
+            <div class="show-item" style="text-align: left;margin-top: 10px">配套服务：</div>
+            <div v-if="licenseInfo.service" style="display: flex;flex-direction: row;flex-wrap: wrap;width: 430px">
+              <div class="show-item-child" v-for="(item,index) in serviceList">{{item}}<i :class="[licenseInfo.service.indexOf(index) === -1 ? 'el-icon-error' : 'el-icon-success']" :style="{color: licenseInfo.service.indexOf(index) === -1 ? 'red' : 'green'}"></i></div>
+            </div>
           </div>
         </div>
       </div>
@@ -99,6 +103,7 @@
     name: "Overview",
     data() {
       return {
+        serviceList: ['命令转发','IP代理池搭建','设备大师','虚拟定位','ADB调试','远程虚拟相机','多开远程控制窗口','电商多路直播','音视频导入云机','安全手机服务'],
         deviceNum: 0,
         badNum: 0,
         streamNum: 0,
@@ -225,5 +230,21 @@
 }
   .shadow {
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.2);
+  }
+  .show-item-child {
+    font-size: 12px;
+    width: 140px;
+    padding: 3px 30px 3px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    i {
+      font-size: 16px;
+    }
   }
 </style>
