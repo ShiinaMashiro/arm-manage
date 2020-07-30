@@ -540,7 +540,7 @@ export default {
       displayMode: 0,
       scaleMode: 100,
       imgWidth: 144,
-      snapshotTime: 0,
+      snapshotTime: 10,
       snapshotAutoId: null,
       // remark
       changeRemarkPopShow: false,
@@ -632,7 +632,7 @@ export default {
         clearInterval(this.snapshotAutoId)
       }
       if (this.snapshotTime > 0) {
-        this.snapshotAutoId = setInterval(this.snapshotOne, this.snapshotTime * 1000)
+        this.snapshotAutoId = setInterval(this.snapshotAll, this.snapshotTime * 1000)
       }
     },
     copyAddress() {
@@ -1187,6 +1187,20 @@ export default {
         })
       })
     },
+    snapshotAll() {
+      let that = this
+      that.snapshotSuccess = false
+      that.info.list.forEach(d => {
+        let ip = d.deviceIp
+        that.$set(that.snapshotImgLoading, ip, true)
+        that.$post(that.$uri.device.snapshot, {deviceIp: ip, isSave: 0}).then(res => {
+          if (res.success) {
+            that.$set(that.snapshotImg, ip, res.data)
+          }
+          that.$set(that.snapshotImgLoading, ip, false)
+        })
+      })
+    },
     getStatus(ip) {
       let name = this.deviceStatusStr[ip]
       if (this.scaleMode === 50 && name.length > 2) {
@@ -1561,9 +1575,11 @@ export default {
     this.getGroupList()
     this.getEngineVersion()
     this.refreshDevList()
+    this.snapshotAuto()
   },
   beforeDestroy() {
     clearTimeout(this.timeoutId)
+    clearInterval(this.snapshotAutoId)
   }
 };
 </script>
