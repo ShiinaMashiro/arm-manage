@@ -132,7 +132,7 @@
           </div>
           <div class="info-view-item-btn">
             <el-button size="small" type="primary" v-if="!switchPopShow && $store.getters.checkChangeAuth()" @click="switchPop()">设置</el-button>
-            <el-button size="small" type="primary" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo)">保存</el-button>
+            <el-button size="small" type="primary" v-if="switchPopShow" @click="saveAppInfo(switchPopInfo, true)">保存</el-button>
             <el-button size="small" type="info" v-if="switchPopShow" @click="switchPopShow = false">取消</el-button>
           </div>
         </div>
@@ -275,7 +275,7 @@
         this.whiteList.splice(index, 1)
       },
       /* 修改设备池信息 */
-      saveAppInfo (info) {
+      saveAppInfo (info, s) {
         let that = this
         let sign = false
         if (!that.regexMap.encodeRateMax.test(info.encodeRateMax) || parseInt(info.encodeRateMax) < parseInt(info.encodeRateMin)) {
@@ -290,7 +290,7 @@
           that.checkInfo['framerate'] = true
           sign = true
         }
-        if (sign) {
+        if (sign && !s) {
           return
         }
         this.loading = this.$loading({
