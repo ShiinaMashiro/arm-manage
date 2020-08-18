@@ -356,6 +356,10 @@
         this.$emit('close')
       },
       getCameraList() {
+        if(!navigator.mediaDevices.getUserMedia) {
+          this.cameraErrorVisible = true
+          return
+        }
         navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
           stream.getTracks()[0].stop()
           navigator.mediaDevices.enumerateDevices().then(devs => {
