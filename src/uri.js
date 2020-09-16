@@ -27,7 +27,8 @@ export const uri = {
         license: '/system/activateLicense/', // license激活接口
         licenseGet: '/system/getLicense',
         updateRecord: '/engine/record/',
-        updateRecordDetail: '/engine/record/device/'
+        updateRecordDetail: '/engine/record/device',
+        diskSpace: '/system/diskSpace'
     },
     user: { // 用户管理模块
         list: '/user/list', // 用户信息列表
@@ -169,5 +170,14 @@ export const uri = {
         backup: '/database/backup',
         restore: '/database/restore',
         del: '/database/delete',
+    },
+    ops: {
+        list: '/operation/list',
+        request: '/operation/saveAdd',
+        detail: '/operation/edit',
+        del: '/operation/delete',
+        checkPort: '/operation/checkPort',
+        stop: '/operation/stop',
+        restart: '/operation/restart/'
     }
 }

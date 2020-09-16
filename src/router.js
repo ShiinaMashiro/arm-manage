@@ -57,6 +57,10 @@ export default new Router({
       path: "/test",
       name: "test",
       component: () => import('./views/VideoTest.vue')
+    },{
+      path: "/ops/:username/:password",
+      name: "ops",
+      component: () => import('./views/Ops.vue')
     }, {
       path: "/manage",
       name: "后台管理",
@@ -329,6 +333,13 @@ export default new Router({
           path: "system/ipproxy",
           name: "IP代理",
           component: IpPorxy,
+          meta: {
+            changeAuth: "_0000_"
+          }
+        }, {
+          path: "system/ops",
+          name: "远程运维",
+          component: () => import('./views/OpsCenter.vue'),
           meta: {
             changeAuth: "_0000_"
           }

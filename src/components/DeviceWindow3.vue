@@ -6,7 +6,12 @@
           <i class="close el-icon-close" @click="closeClick"></i>
         </div>
         <div class="body" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }">
-          <div v-if="deviceMessage" class="message"> {{ deviceMessage }} </div>
+          <div v-if="deviceMessage && !error" class="message"> {{ deviceMessage }} </div>
+          <div v-if="error" class="message" style="display: flex;flex-direction: column;align-items: center;width: 100%" @click="openPlayer">
+            <div style="padding-bottom: 40px">{{ deviceMessage }}</div>
+            <i class="el-icon-refresh" style="font-size: 40px"></i>
+            <div>点击刷新推流</div>
+          </div>
           <div :id="target" :style="{ width: deviceWidth + 'px', height: deviceHeight + 'px' }"></div>
         </div>
         <div class="footer" :style="{ width: deviceWidth + 'px' }">
@@ -62,7 +67,8 @@ export default {
       player: null,
       deviceWidth: 720,
       deviceHeight: 1280,
-      deviceMessage: ""
+      deviceMessage: "",
+      error: false
     }
   },
   /*watch: {
@@ -96,6 +102,7 @@ export default {
     });
     this.player.on('error', (error) => {
       if (error && error.message && error.code) {
+        this.error = true
         this.deviceMessage = error.message + '(' + error.code + ')';
       }
     })
@@ -129,6 +136,21 @@ export default {
     }
   },
   methods: {
+    openPlayer() {
+      this.deviceMessage = '连接中。。。'
+      this.error = false
+      let shinoIp = this.$store.getters.shinoIp();
+      this.player.open({
+        // appkey: this.appkey,
+        // appid: this.appid,
+        ip: this.port === 0 ? this.ip : shinoIp,
+        port: this.port === 0 ? 20000 : this.port,
+        ljyip: shinoIp,
+        deviceId: this.deviceId,
+        requestUrl: window.location.host + '/' + this.requestUrl,
+        reportUrl: window.location.host + '/' + this.reportUrl
+      });
+    },
     computeDeviceSize () {
       let clientWidth = document.documentElement.clientWidth;
 

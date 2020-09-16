@@ -3,7 +3,7 @@
     <vue-draggable-resizable :parent="true" :resizable="false" drag-handle=".header" :x="left" :y="top">
       <div class="window">
         <div class="header" :style="{ width: deviceWidth + 'px' }">
-          <span class="id">{{ id }}</span>
+          <span class="id" style="overflow: hidden;height: 36px;">{{ remark || id }}</span>
           <div v-show="camera || video" style="color: #409EFF;font-size: 12px;padding-right: 5px">{{camera ? '摄像头同步中' :
             '视频同步中'}}
           </div>
@@ -169,6 +169,7 @@
     props: {
       id: Number,
       index: Number,
+      remark: String,
       deviceId: Number,
       appid: {
         type: String,

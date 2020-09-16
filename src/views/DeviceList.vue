@@ -312,7 +312,7 @@
       },
       */
       deviceWindowOpen (id, deviceNo, ip) {
-        if (this.$store.state.deviceWindowMode.length > 0) {
+        if (!this.$isEnable(this.$enableKey.flowSync) && this.$store.state.deviceWindowMode.length > 0) {
           this.$message.error("同时只能控制一台设备！")
         } else {
           this.$store.commit(this.$mutation.DEVICE_WINDOW_SHOW_MODE, {
@@ -519,6 +519,7 @@
       this.getGroupList()
       this.getEngineVersion()
       this.refreshDevList()
+      this.$store.commit(this.$mutation.DISPLAY_MODE, 1)
     }
   };
 </script>

@@ -401,7 +401,7 @@
           <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
           <div style="font-size: 16px;margin-bottom: 5px;margin-top: 10px">升级记录</div>
           <template v-for="record in updateRecordList">
-            <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime || formatDateTime}}</el-form-item>
+            <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime | formatDateTime}}</el-form-item>
             <el-form-item label="升级版本：" style="margin-bottom: 8px!important;" label-width="90px">{{record.versionName}}</el-form-item>
             <el-form-item label="升级文件：" style="margin-bottom: 8px!important;" label-width="90px">{{record.fileName}}</el-form-item>
             <el-form-item label="升级详情：" style="margin-bottom: 8px!important;" label-width="90px">当前已升级{{record.upgradeNum}}路，
@@ -410,7 +410,6 @@
             </el-form-item>
             <div style="width: 100%;border-bottom: 1px solid #ddd;margin-top: 10px"></div>
           </template>
-
         </el-form>
       </div>
     </Drawer>
@@ -419,7 +418,7 @@
     <Drawer title="升级记录详情" :visible.sync="engineUpdateRecordDetailPopShow" :opt="false">
       <div v-if="engineUpdateRecordDetailPopShow">
         <el-form ref="form" size="mini" label-width="130px" label-position="left" style="display: flex;flex-direction: column;height: 100%">
-          <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime || formatDateTime}}</el-form-item>
+          <el-form-item label="升级时间：" style="margin-bottom: 8px!important;" label-width="90px">{{record.updateTime | formatDateTime}}</el-form-item>
           <el-form-item label="升级版本：" style="margin-bottom: 8px!important;" label-width="90px">{{record.versionName}}</el-form-item>
           <el-form-item label="升级文件：" style="margin-bottom: 8px!important;" label-width="90px">{{record.fileName}}</el-form-item>
           <el-form-item label="升级详情：" style="margin-bottom: 8px!important;" label-width="90px">当前已升级{{record.upgradeNum}}路，
@@ -785,7 +784,7 @@
       },
       engineUpdateRecordDetailPop(record) {
         let that = this
-        that.$post(that.$uri.system.updateRecordDetail).then(res => {
+        that.$post(that.$uri.system.updateRecordDetail, {engineUpgradeId: record.id}).then(res => {
           if (res.success) {
             that.updateRecordDetail = res.list
             that.record = record

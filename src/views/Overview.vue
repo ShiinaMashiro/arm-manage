@@ -52,17 +52,25 @@
             <div v-for="page in latelyPages" :key="page.path + '-lately'" @click="$router.push(page.path)" class="node">{{page.name}}</div>
           </div>
         </div>
-        <div style="margin-top: 15px;background-color: white;padding: 10px"  class="shadow">
-          <div class="title">License信息</div>
-          <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: left;padding: 20px 20px 10px 20px;font-size: 14px">
-            <div style="text-align: left">有效时间：{{licenseTime}}</div>
-            <div style="text-align: left;margin-top: 10px">设备数量：{{licenseInfo.deviceNum}}</div>
-            <div class="show-item" style="text-align: left;margin-top: 10px">配套服务：</div>
-            <div v-if="licenseInfo.service" style="display: flex;flex-direction: row;flex-wrap: wrap;width: 430px">
-              <div class="show-item-child" v-for="(item,index) in serviceList">{{item}}<i :class="[licenseInfo.service.indexOf(index) === -1 ? 'el-icon-error' : 'el-icon-success']" :style="{color: licenseInfo.service.indexOf(index) === -1 ? 'red' : 'green'}"></i></div>
+
+        <div style="display: flex;flex-direction: row;align-items: stretch;width: 100%;max-height: 220px;margin-top: 15px">
+          <div style="background-color: white;padding: 10px;height: 250px;flex-grow: 1" class="shadow">
+            <div class="title">License信息</div>
+            <div style="display: flex;flex-direction: column;justify-content: flex-start;align-items: left;padding: 20px 20px 10px 20px;font-size: 14px">
+              <div style="text-align: left">有效时间：{{licenseTime}}</div>
+              <div style="text-align: left;margin-top: 10px">设备数量：{{licenseInfo.deviceNum}}</div>
+              <div class="show-item" style="text-align: left;margin-top: 10px">配套服务：</div>
+              <div v-if="licenseInfo.service" style="display: flex;flex-direction: row;flex-wrap: wrap;width: 430px">
+                <div class="show-item-child" v-for="(item,index) in serviceList">{{item}}<i :class="[licenseInfo.service.indexOf(index) === -1 ? 'el-icon-error' : 'el-icon-success']" :style="{color: licenseInfo.service.indexOf(index) === -1 ? 'red' : 'green'}"></i></div>
+              </div>
             </div>
           </div>
+          <div style="background-color: white;padding: 10px;margin-left: 15px;width: 380px;height: 250px" class="shadow">
+            <div class="title">服务器存储空间</div>
+            <div id="diskSpace" style="width: 100%;height: 100%"></div>
+          </div>
         </div>
+
       </div>
       <div style="display: flex;flex-direction: column;margin-left: 15px;">
         <div style="background-color: white;padding: 10px;height: 200px" class="shadow">
@@ -138,6 +146,57 @@
     methods: {
       getFunList(title) {
         this.$store.dispatch(this.$action.GO_FUN, title)
+      },
+      getDiskSpace() {
+        this.$post(this.$uri.system.diskSpace).then(res => {
+          if (res.success) {
+            console.log('echarts')
+            const myChart = this.$echarts.init(document.querySelector('#diskSpace'))
+
+            let all = res.data.usedSpace/1024/1024/1024 + ''
+            all = all.substring(0, all.indexOf('.') + 2)
+            all = parseFloat(all)
+            let last = res.data.freeSpace/1024/1024/1024 + ''
+            last = last.substring(0, last.indexOf('.') + 2)
+            last = parseFloat(last)
+
+            myChart.setOption({
+              /*title: {
+                text: '某站点用户访问来源',
+                subtext: '纯属虚构',
+                left: 'center'
+              },*/
+              tooltip: {
+                trigger: 'item',
+                formatter: '{b} : {c}GB ({d}%)'
+              },
+              legend: {
+                orient: 'vertical',
+                left: 'right',
+                data: ['已占用空间', '未占用空间']
+              },
+              series: [
+                {
+                  name: '访问来源',
+                  type: 'pie',
+                  radius: '55%',
+                  center: ['50%', '55%'],
+                  data: [
+                    {value: all, name: '已占用空间'},
+                    {value: last, name: '未占用空间'},
+                  ],
+                  emphasis: {
+                    itemStyle: {
+                      shadowBlur: 10,
+                      shadowOffsetX: 0,
+                      shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                  }
+                }
+              ]
+            })
+          }
+        })
       }
     },
     beforeCreate() {
@@ -190,6 +249,8 @@
           that.devList = res.list
         }
       })
+
+      this.getDiskSpace()
     }
   };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="dev-list">
-    <div class="preview-bar" style="position: fixed; top: 130px; width: 100%; z-index: 2000;background-color: white;height: 60px;border-bottom: 1px solid #efefef">
+    <div class="preview-bar" style="position: fixed; top: 130px; z-index: 2000;background-color: white;height: 60px;border-bottom: 1px solid #efefef">
       <div class="preview-bar-operate">
         <div style="border-right: thin solid #ddd;padding: 0 10px 0 0; margin-right: 10px">
           <el-button type="primary" size="small" v-if="$store.getters.checkChangeAuth()" @click="$router.push('/home/group/dev/manage')">增减设备</el-button>
@@ -32,7 +32,7 @@
         </div>
         <el-button type="primary" size="small"  :disabled="multipleSelection.length === 0" @click="rebootDevBatch" v-if="$store.getters.checkChangeAuth()">重启</el-button>
       </div>
-      <div style="margin-right: 420px">
+      <div style="width: 200px">
         <span style="font-size: 14px">切换视图：</span>
         <el-button type="text" :disabled="!viewMode" @click="changeMode(false)">预览图</el-button>
         <el-button type="text" :disabled="viewMode"  @click="changeMode(true)">列表</el-button>
@@ -54,6 +54,11 @@
       <el-select size="mini" v-model="displayMode" placeholder="请选择" style="margin-left: 10px;width: 100px">
         <el-option label="平铺" :value="0"></el-option>
         <el-option label="堆叠" :value="1"></el-option>
+      </el-select>
+      <span style="font-size: 13px;margin-left: 10px">排序:</span>
+      <el-select size="mini" v-model="sortKey" placeholder="请选择" style="margin-left: 10px;width: 100px">
+        <el-option label="云机ID" :value="0"></el-option>
+        <el-option label="备注" :value="1"></el-option>
       </el-select>
       <span style="font-size: 13px;margin-left: 10px">截图刷新间隔:</span>
       <el-select size="mini" v-model="snapshotTime" placeholder="请选择" style="margin-left: 10px;width: 100px">
@@ -98,7 +103,7 @@
             <el-button type="text" size="small" slot="reference" @click="groupDevPop(scope.row.deviceIp)"
                        v-if="$store.state.isAdmin && scope.row.cardType !== 2">分组</el-button>
             <el-button type="text" size="small" :disabled="scope.row.deviceStatus !== 0" slot="reference"
-                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo)"
+                       @click="deviceWindowOpen(scope.row.id, scope.row.deviceNo, scope.row.deviceIp, scope.row.remark)"
                        v-if="($store.getters.checkChangeAuth() || !$store.state.isAdmin) && scope.row.cardType !== 2">控制</el-button>
             <el-button type="text" size="mini" @click="changeRemarkPop(scope.row.id, scope.row.remark)">修改备注</el-button>
           </template>
@@ -186,21 +191,17 @@
                     :disabled="scaleMode !== 50"
                     v-model="popover[item.deviceIp]">
               <el-image slot="reference"
-                        @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp)"
+                        @click="deviceWindowOpen(item.id, item.deviceNo, item.deviceIp, item.remark)"
                         @mouseover="popover[item.deviceIp] = true"
                         @mouseout="popover[item.deviceIp] = false"
                         v-loading="snapshotImgLoading[item.deviceIp]"
-                        element-loading-text="拼命加载中"
-                        element-loading-spinner="el-icon-loading"
-                        element-loading-background="rgba(0, 0, 0, 0.8)"
+                        element-loading-background="rgba(0, 0, 0, 0.1)"
                         :style="{width: imgWidth + 'px'}"
                         :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
                         fit="cover"></el-image>
               <el-image
                         v-loading="snapshotImgLoading[item.deviceIp]"
-                        element-loading-text="拼命加载中"
-                        element-loading-spinner="el-icon-loading"
-                        element-loading-background="rgba(0, 0, 0, 0.8)"
+                        element-loading-background="rgba(0, 0, 0, 0.1)"
                         style="width: 288px"
                         :src="statusImg(item.deviceStatus) || snapshotImg[item.deviceIp] || ''"
                         fit="cover"></el-image>
@@ -548,7 +549,8 @@ export default {
         id: 0,
         remark: ''
       },
-      queryParam: ''
+      queryParam: '',
+      sortKey: 0
     }
   },
   computed: {
@@ -607,6 +609,15 @@ export default {
     },
     scaleMode(n) {
       this.imgWidth = 144 * n / 100
+    },
+    sortKey() {
+      this.info.list.sort((d1, d2) => {
+        if (this.sortKey === 0) {
+          return d1.id >= d2.id ? 1 : -1
+        } else {
+          return d1.remark >= d2.remark ? -1 : 1
+        }
+      })
     }
   },
   methods: {
@@ -934,7 +945,7 @@ export default {
         }
       }
       ses.forEach(dev => {
-        this.deviceWindowOpen(dev.id, dev.deviceNo, dev.deviceIp)
+        this.deviceWindowOpen(dev.id, dev.deviceNo, dev.deviceIp, dev.remark)
       })
       this.$parent.selectShow = true
       this.$parent.$nextTick().then(() => {
@@ -1228,6 +1239,13 @@ export default {
         }
         let that = this
         that.$post(that.$uri.device.deviceList, {...p, groupId: that.$store.state.groupInfo.id, queryParam: that.queryParam}).then(res => {
+          res.list.sort((d1, d2) => {
+            if (this.sortKey === 0) {
+              return d1.id >= d2.id ? 1 : -1
+            } else {
+              return d1.remark >= d2.remark ? 1 : -1
+            }
+          })
           that.info = res
           that.test = []
           that.info.list.forEach(v => {
@@ -1329,7 +1347,7 @@ export default {
       tempwindow.location = this.$store.getters.h5TestUrl(deviceNo)
     },
     */
-    deviceWindowOpen (id, deviceNo, ip) {
+    deviceWindowOpen (id, deviceNo, ip, remark) {
       if (!this.$isEnable(this.$enableKey.flowSync) && this.$store.state.deviceWindowMode.length > 0) {
         return
       }
@@ -1349,6 +1367,7 @@ export default {
         mode: {
           show: true,
           id,
+          remark,
           deviceNo,
           ip: ip
         }
@@ -1686,5 +1705,8 @@ export default {
         }
       }
     }
+  }
+  .el-loading-mask {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 </style>

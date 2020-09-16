@@ -15,6 +15,9 @@
       <div class="home-main-top-bar">
         <span class="span_">{{appName || groupName || ($route.meta.fun ? $store.state.funList[$store.state.helpIndex].title : $route.name)}}</span>
         <span style="font-size: 12px;margin-left: 20px" v-if="$route.path === '/home/system/ipproxy'">自行通过OpenVPN搭建IP代理池，<span style="color: red">管理系统内的IP代理池仅提供板卡切换和管理功能</span></span>
+        <span style="font-size: 12px;margin-left: 20px;text-align: left;max-width: 800px" v-if="$route.path === '/home/system/ops'">线上运维系统用于一键开启运维权限账户，并且打通网络隧道，使运维人员可以通过运维账号登录您的管理系统并给出解决方案。
+运维权限可对您的系统进行ssh调试，通过ssh调试的代码日志可在运维记录中查看。
+运维权限账号密码均加密后生成和传输，不会产生任何的安全问题。</span>
         <span style="font-size: 12px;margin-left: 20px;text-align: left" v-if="$route.path === '/home/app/devMaster'">备份管理可指定设备和应用进行备份，同时将本地的备份上传至设定的FTP服务器（
           <span style="color: red">需用户自建</span>），并可将FTP服务器上的备份恢复至云机。</span>
         <span style="font-size: 12px;margin-left: 20px;text-align: left" v-if="$route.path === '/home/cmdForward'">命令转发功能需要用户上传自定的辅助程序（

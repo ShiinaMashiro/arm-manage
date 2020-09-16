@@ -14,11 +14,13 @@ import 'mavon-editor/dist/css/index.css'
 import axios from 'axios'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import VueClipboard from 'vue-clipboard2'
+import Echarts from 'echarts'
 
 Vue.use(VueClipboard)
 Vue.use(mavonEditor)
 Vue.use(ElementUI)
 Vue.config.productionTip = false
+Vue.prototype.$echarts = Echarts
 Vue.prototype.$post = postData
 Vue.prototype.$uri = uri
 Vue.prototype.$axios = axios
@@ -38,6 +40,9 @@ Vue.prototype.$action = acName
 Vue.prototype.$util = myUtil
 
 Vue.filter("formatDateTime", function(time) {
+  if (!time) {
+    return ""
+  }
   return myUtil.formatDate(new Date(time))
 })
 

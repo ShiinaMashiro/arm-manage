@@ -307,6 +307,13 @@ let sideItems = [
         author: '_0001_',
         queryAuthor: "14-1",
         updateAuthor: "14-0",
+      },
+      {
+        name: "远程运维",
+        path: '/home/system/ops',
+        author: '_0001_',
+        queryAuthor: "15-1",
+        updateAuthor: "15-0",
       }
     ]
   }
@@ -412,7 +419,8 @@ const state = {
   loginNow: true,
   displayMode: 0,
   fileRecordId: null,
-  fileIssueInfo: null
+  fileIssueInfo: null,
+  displaySide: true
 }
 
 let admin = {
@@ -840,6 +848,9 @@ export default new Vuex.Store({
       state.fileIssueInfo = info
       sessionStorage.setItem('fileIssueInfo', JSON.stringify(info))
     },
+    [mutation.DISPLAY_SIDE] (state, bool) {
+      state.displaySide = bool
+    }
   },
   actions: {
     /* 登陆 */
@@ -977,7 +988,8 @@ export default new Vuex.Store({
           viewList.push(view)
         }
       })
-
+      console.log(JSON.stringify(optList))
+      console.log(JSON.stringify(viewList))
       return {
         optData: optList,
         viewData: viewList
@@ -1017,6 +1029,8 @@ export default new Vuex.Store({
           }
         }
       })
+      console.log(list)
+
       return list
     },
     isChildren: (state) => (path) => {

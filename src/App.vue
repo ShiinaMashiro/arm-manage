@@ -201,4 +201,8 @@ textarea::-webkit-scrollbar {display:none}
       padding: 5px 7px;
     }
   }
+
+.el-loading-mask {
+  background-color: rgba(0, 0, 0, 0.1)!important;
+}
 </style>

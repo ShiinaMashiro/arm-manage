@@ -45,7 +45,7 @@ axios.interceptors.response.use(
         store.commit(vm.$mutation.IS_NEED_LICENSE, true)
       } else {
         let mes = obj.message || "请求失败"
-        vm.$message.error(mes)
+        // vm.$message.error(mes)
       }
       return Promise.reject(obj.message)
     }

@@ -126,7 +126,7 @@
                 <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传apk文件</div>
               </el-upload>
-              <div style="margin-top: 20px">
+              <div style="margin-top: 20px" ref="www">
                 <el-button type="primary" :disabled="addAppPopCloseTip" @click="submitUpload">确定</el-button>
                 <el-button @click="tipFileUpload">取消</el-button>
               </div>

@@ -1,19 +1,27 @@
 <template>
   <div class="home">
     <TopBar></TopBar>
-    <SideBar></SideBar>
-    <HomeMainTopBar class="home-main-top-bar-fixed" v-show="$store.state.sideInfo.item.src !== 'overview'"></HomeMainTopBar>
-    <MainScene></MainScene>
-    <div class="home-main" :style="{left: this.$store.state.sideInfo.scene ? '380px' : '230px', top: ($store.state.sideInfo.item.src !== 'overview') ? '140px' : '50px'}">
+    <SideBar v-show="$store.state.displaySide"></SideBar>
+    <HomeMainTopBar class="home-main-top-bar-fixed" :style="{left: $store.state.displaySide ? '230px' : '0px'}" v-show="$store.state.sideInfo.item.src !== 'overview'"></HomeMainTopBar>
+    <MainScene  v-show="$store.state.displaySide"></MainScene>
+    <div class="home-main" :style="mainStyle">
       <div class="home-list">
         <router-view></router-view>
       </div>
     </div>
+
+    <div v-show="!$store.state.displaySide" class="collect" @click="displaySide">
+      <el-tooltip effect="dark" content="展开菜单" placement="right">
+        <svg t="1600247697321" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3020" width="200" height="200"><path d="M682.666667 0a113.777778 113.777778 0 0 1 113.777777 113.777778L796.444444 910.222222a113.777778 113.777778 0 0 1-113.777777 113.777778l-455.111111 0 0-1024L682.666667 0z m-277.959111 265.443556a41.130667 41.130667 0 0 0-41.642667-5.688889 33.792 33.792 0 0 0-21.617778 32.426666 32.768 32.768 0 0 0 12.288 23.60888901L588.629333 526.620444l-234.894222 210.83022299a32.824889 32.824889 0 0 0-12.344889 23.55200001 32.085333 32.085333 0 0 0 9.841778 24.519111 39.537778 39.537778 0 0 0 26.168889 11.09333301 40.277333 40.277333 0 0 0 27.306667-8.81777801l265.671111-236.145777a32.654222 32.654222 0 0 0 12.174222-23.438223 31.914667 31.914667 0 0 0-9.841778-24.462222l-1.137778-1.137778-0.170666-0.170666-1.024-0.853334 0-0.113777-0.284445-0.113778-0.113778-0.170667z" fill="#ADB9C8" p-id="3021"></path></svg>
+      </el-tooltip>
+    </div>
+
     <div :style="{display: $store.state.guide > 0 ? 'block' : 'none'}" class="mask"></div>
     <template v-for="(mode, index) in $store.state.deviceWindowMode">
       <device-window :id="mode.id"
                      :ref="'ref' + mode.id"
                      :key="mode.id"
+                     :remark="mode.remark"
                      :index="index"
                      :device-id="mode.deviceNo"
                      :ip="mode.ip"
@@ -224,6 +232,13 @@ export default {
         }
       }
       return a === 6
+    },
+    mainStyle() {
+      let style = {left: this.$store.state.sideInfo.scene ? '380px' : '230px', top: (this.$store.state.sideInfo.item.src !== 'overview') ? '140px' : '50px'}
+      if (!this.$store.state.displaySide) {
+        style.left = '0px'
+      }
+      return style
     }
   },
   methods: {
@@ -359,6 +374,9 @@ export default {
       })
       that.$message.success("正在设置")
       that.systemParamSetPopShow = false
+    },
+    displaySide() {
+      this.$store.commit(this.$mutation.DISPLAY_SIDE, true)
     }
   },
   mounted () {
@@ -397,6 +415,18 @@ export default {
 </script>
 
 <style scoped lang="less">
+  .collect {
+    width: 20px;
+    height: 30px;
+    position: fixed;
+    left: 0;
+    z-index: 1000;
+    top: calc(50% - 15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
   .ssh {
     position: fixed;
     top: 50px;
@@ -413,7 +443,6 @@ export default {
     position: fixed;
     top: 50px;
     right: 0;
-    left: 230px;
   }
   .home-main {
     position: fixed;
